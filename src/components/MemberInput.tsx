@@ -38,7 +38,7 @@ export default function MemberInput({ members, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2 items-center">
+      <div className="flex flex-wrap gap-2 items-center w-full max-w-full overflow-hidden">
         <div className="relative">
           <button
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -78,7 +78,7 @@ export default function MemberInput({ members, onChange }: Props) {
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
           maxLength={10}
-          className="flex-1 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 outline-none focus:border-purple-400 h-12"
+          className="flex-1 min-w-0 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 outline-none focus:border-purple-400 h-12"
         />
 
         <select

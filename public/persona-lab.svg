@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="13 22 74 72">
+  <defs>
+    <style>
+      .flask-stroke {
+        fill: none;
+        stroke: #ffffff;
+        stroke-width: 5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .flask-fill {
+        fill: #C4B5FD;
+      }
+      .sparkle {
+        fill: #D1C4E9;
+      }
+    </style>
+  </defs>
+
+  <path class="flask-fill" d="M 31.5 55 L 68.5 55 L 82 81 C 84.5 85 81 90 75 90 L 25 90 C 19 90 15.5 85 18 81 Z" />
+
+  <path class="flask-stroke" d="M 42 25 L 42 35 L 18 81 C 15.5 85 19 90 25 90 L 75 90 C 81 90 84.5 85 82 81 L 58 35 L 58 25" />
+
+  <path class="flask-stroke" d="M 38 25 L 62 25" />
+
+  <circle class="sparkle" cx="50" cy="45" r="3.75" />
+  <circle class="sparkle" cx="58" cy="38" r="2.25" />
+</svg>

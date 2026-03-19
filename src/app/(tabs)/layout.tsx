@@ -6,7 +6,7 @@ import { MbtiProvider, useMbti } from "@/context/MbtiContext";
 
 const TABS = [
   { id: "mbti-love", label: "연인 궁합", emoji: "💕" },
-  { id: "mbti-map", label: "전체 궁합 맵", emoji: "🗺️" },
+  { id: "mbti-map", label: "궁합 맵", emoji: "🌐" },
   { id: "group-match", label: "그룹 궁합", emoji: "👥" },
 ];
 

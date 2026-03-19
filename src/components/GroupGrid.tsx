@@ -15,7 +15,6 @@ import {
   Member,
 } from "@/data/compatibility";
 import CompatCard from "@/components/CompatCard";
-import { getScoreInfo } from "@/data/labels";
 
 type Props = { members: Member[] };
 
@@ -44,16 +43,28 @@ type LineHit = {
   isCenter: boolean;
 };
 
-function mbtiHash(mbti: string): number {
-  let h = 0;
-  for (let i = 0; i < mbti.length; i++) h = (h * 31 + mbti.charCodeAt(i)) | 0;
-  return ((h % 30) - 15);
-}
+const SCORE_EMOJI = [
+  { min: 95, e: "🏆", l: "천생연분" },
+  { min: 88, e: "🔥", l: "환상의 궁합" },
+  { min: 80, e: "✨", l: "최고의 궁합" },
+  { min: 73, e: "💫", l: "아주 잘 맞아요" },
+  { min: 65, e: "🎯", l: "잘 맞아요" },
+  { min: 58, e: "🌿", l: "나쁘지 않아요" },
+  { min: 50, e: "🤝", l: "보통이에요" },
+  { min: 42, e: "🌧️", l: "노력이 필요해요" },
+  { min: 35, e: "⚠️", l: "많이 달라요" },
+  { min: 25, e: "🌊", l: "쉽지 않아요" },
+  { min: 0, e: "💀", l: "극과 극이에요" },
+];
 
-function getColor(s: number, mbti?: string) {
+function getInfo(s: number) {
+  return (
+    SCORE_EMOJI.find((e) => s >= e.min) ?? SCORE_EMOJI[SCORE_EMOJI.length - 1]
+  );
+}
+function getColor(s: number) {
   s = Math.max(0, Math.min(100, s));
-  const offset = mbti ? mbtiHash(mbti) : 0;
-  return `hsl(${s * 3.2 + offset},${77 + s * 0.11}%,${52 + s * 0.05}%)`;
+  return `hsl(${s * 3.2},${77 + s * 0.11}%,${52 + s * 0.05}%)`;
 }
 function hslToRgb(h: string): string {
   const m = h.match(/hsl\(([^,]+),([^,]+)%,([^)]+)%\)/);
@@ -146,10 +157,11 @@ function buildPositions(
     const angle = baseAngle + jitter;
     const d = orbit * DIST_MULTS[i % DIST_MULTS.length];
     const hoverScale = 1.28;
-    const mg = nodeR * hoverScale + 6;
+    const mgX = nodeR * hoverScale + 26;
+    const mgY = nodeR * hoverScale + 34;
     positions.push({
-      x: Math.max(mg, Math.min(W - mg, cx + d * Math.cos(angle))),
-      y: Math.max(mg, Math.min(H - mg, cy + d * Math.sin(angle))),
+      x: Math.max(mgX, Math.min(W - mgX, cx + d * Math.cos(angle))),
+      y: Math.max(mgY, Math.min(H - mgY, cy + d * Math.sin(angle))),
       r: nodeR,
       m,
       score,
@@ -163,12 +175,14 @@ function buildPositions(
       for (let j = i + 1; j < positions.length; j++) {
         const a = positions[i],
           b = positions[j];
-        const minDist = a.r + b.r + 5;
+        // 텍스트와 그림자 영역까지 고려한 충돌 반경 (매우 넓게)
+        const minDist = a.r + b.r + 48;
         const dx = b.x - a.x,
           dy = b.y - a.y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
         if (dist < minDist) {
-          const overlap = (minDist - dist) / 2,
+          // 매우 큰 밀어내기 힘 적용
+          const overlap = (minDist - dist) / 1.5,
             nx = dx / dist,
             ny = dy / dist;
           if (!a.isCenter) {
@@ -181,9 +195,10 @@ function buildPositions(
           }
           [a, b].forEach((p) => {
             if (!p.isCenter) {
-              const pad = p.r * 1.28 + 4;
-              p.x = Math.max(pad, Math.min(W - pad, p.x));
-              p.y = Math.max(pad, Math.min(H - pad, p.y));
+              const padX = p.r * 1.28 + 26;
+              const padY = p.r * 1.28 + 34;
+              p.x = Math.max(padX, Math.min(W - padX, p.x));
+              p.y = Math.max(padY, Math.min(H - padY, p.y));
             }
           });
           moved = true;
@@ -254,8 +269,7 @@ function drawCanvas(
         b = positions[j];
       const isCenter = a.isCenter || b.isCenter;
       const score = getScore(a.m.mbti, b.m.mbti);
-      const lineKey = `${a.m.mbti}${b.m.mbti}`;
-      const color = getColor(score, lineKey),
+      const color = getColor(score),
         rgb = hslToRgb(color);
       const dx = b.x - a.x,
         dy = b.y - a.y,
@@ -401,7 +415,6 @@ export default function GroupGrid({ members }: Props) {
   const nodeElsRef = useRef<HTMLDivElement[]>([]);
   const animRAFRef = useRef<number | null>(null);
   const prevPosRef = useRef<NodePos[]>([]);
-  const lastInterpRef = useRef<NodePos[]>([]);
   const cachePosRef = useRef<NodePos[]>([]);
   const hoverRef = useRef<HoverLine>(null);
   const [popup, setPopup] = useState<PopupData>(null);
@@ -417,7 +430,7 @@ export default function GroupGrid({ members }: Props) {
         const el = nodeElsRef.current[idx];
         if (!el) return;
         const { r, m, isCenter, score } = pos;
-        const color = isCenter ? "hsl(270,77%,58%)" : getColor(score, m.mbti);
+        const color = isCenter ? "hsl(270,77%,58%)" : getColor(score);
         const rgb = hslToRgb(color);
         const glowSz = isCenter ? 26 : Math.max(r * 0.58, 7);
         const glowOp = isCenter ? 0.48 : 0.18 + (score / 100) * 0.17;
@@ -484,12 +497,10 @@ export default function GroupGrid({ members }: Props) {
 
   const render = useCallback(
     (W: number, H: number) => {
-      if (!canvasRef.current || !nodesRef.current || !myInfo || !wrapRef.current) return;
+      if (!canvasRef.current || !nodesRef.current || !myInfo) return;
       const newPos = buildPositions(myInfo, others, W, H);
       const needed = newPos.length;
       const container = nodesRef.current;
-      wrapRef.current.style.height = H + "px";
-      container.style.height = H + "px";
 
       while (nodeElsRef.current.length < needed) {
         const node = document.createElement("div");
@@ -508,25 +519,21 @@ export default function GroupGrid({ members }: Props) {
       const canvas = canvasRef.current;
       const cx = W / 2,
         cy = H / 2;
-
-      if (animRAFRef.current) {
-        cancelAnimationFrame(animRAFRef.current);
-        animRAFRef.current = null;
-        if (lastInterpRef.current.length > 0) {
-          prevPosRef.current = [...lastInterpRef.current];
-        }
-      }
       const from =
         prevPosRef.current.length > 0
           ? [...prevPosRef.current]
           : newPos.map((p) => ({ ...p, x: cx, y: cy, r: 0 }));
+
+      if (animRAFRef.current) {
+        cancelAnimationFrame(animRAFRef.current);
+        animRAFRef.current = null;
+      }
       const start = performance.now(),
         dur = 1000;
       const frame = (now: number) => {
         const raw = Math.min((now - start) / dur, 1);
         const t = ease(raw);
         const interp = interpolatePos(from, newPos, t, cx, cy);
-        lastInterpRef.current = interp;
         drawCanvas(canvas, interp, W, H, hoverRef.current, lineHitsRef);
         interp.forEach((pos, idx) => {
           const el = nodeElsRef.current[idx];
@@ -702,28 +709,29 @@ export default function GroupGrid({ members }: Props) {
         >
           {/* 그룹 평균 궁합 미리보기 */}
           <div
-            className="rounded-2xl p-4 text-center"
+            className="rounded-2xl p-5 sm:p-6 text-center"
             style={{
-              background: "#0a0a14",
-              border: "0.5px solid rgba(100,100,100,0.2)",
+              background: "radial-gradient(ellipse at 50% -20%, rgba(168,85,247,0.1) 0%, rgba(15,15,26,0.95) 75%)",
+              border: "1px solid rgba(168,85,247,0.25)",
+              boxShadow: "0 0 30px rgba(168,85,247,0.06)",
             }}
           >
-            <p className="text-xs mb-1" style={{ color: "#ffffff30" }}>
+            <p className="text-xs mb-1 font-bold" style={{ color: "rgba(168,85,247,0.7)" }}>
               그룹 평균 궁합
             </p>
-            <p className="text-3xl font-black" style={{ color: "#888" }}>
+            <p className="text-3xl font-black mb-1" style={{ color: "#c084fc", textShadow: "0 0 12px rgba(168,85,247,0.6)" }}>
               73%
             </p>
-            <p className="text-xs mt-1" style={{ color: "#666" }}>
+            <p className="text-sm font-bold mt-1" style={{ color: "rgba(255,255,255,0.7)" }}>
               💫 아주 잘 맞아요
             </p>
             <div
-              className="h-1 rounded-full overflow-hidden mt-3"
-              style={{ background: "#ffffff0a" }}
+              className="h-1.5 rounded-full overflow-hidden mt-4"
+              style={{ background: "rgba(255,255,255,0.1)", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.5)" }}
             >
               <div
                 className="h-full rounded-full gauge-bar"
-                style={{ width: "73%", background: "#888" }}
+                style={{ width: "73%", background: "#c084fc", boxShadow: "0 0 8px rgba(168,85,247,0.8)" }}
               />
             </div>
           </div>
@@ -1031,67 +1039,67 @@ export default function GroupGrid({ members }: Props) {
     );
   }
 
-  const color = popup ? getColor(popup.score, `${popup.mA}${popup.mB}`) : "#a855f7";
+  const color = popup ? getColor(popup.score) : "#a855f7";
   const rgb = popup ? hslToRgb(color) : "168,85,247";
-  const info = popup ? getScoreInfo(popup.score) : null;
+  const info = popup ? getInfo(popup.score) : null;
 
   const needMore = members.length === 1;
 
   return (
     <div className="flex flex-col gap-6">
-      {needMore ? (
+      {needMore && !summary ? (
         <div
-          className="rounded-2xl p-4 text-center"
+          className="rounded-2xl p-5 sm:p-6 text-center"
           style={{
-            background: "#0a0a14",
-            border: "0.5px solid rgba(100,100,100,0.2)",
-            opacity: 0.35,
+            background: "radial-gradient(ellipse at 50% -20%, rgba(100,100,100,0.1) 0%, rgba(15,15,26,0.95) 75%)",
+            border: "1px solid rgba(100,100,100,0.2)",
           }}
         >
-          <p className="text-xs mb-1" style={{ color: "#ffffff30" }}>
+          <p className="text-xs mb-1 font-bold" style={{ color: "rgba(255,255,255,0.3)" }}>
             그룹 평균 궁합
           </p>
-          <p className="text-3xl font-black" style={{ color: "#888" }}>
-            —
+          <p className="text-3xl font-black mb-1" style={{ color: "rgba(255,255,255,0.2)", textShadow: "none" }}>
+            --%
           </p>
-          <p className="text-xs mt-1" style={{ color: "#666" }}>
+          <p className="text-sm font-bold mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
             🤝 데이터 부족
           </p>
           <div
-            className="h-1 rounded-full overflow-hidden mt-3"
-            style={{ background: "#ffffff0a" }}
+            className="h-1.5 rounded-full overflow-hidden mt-4"
+            style={{ background: "rgba(255,255,255,0.05)", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.5)" }}
           >
             <div
               className="h-full rounded-full"
-              style={{ width: "0%", background: "#888" }}
+              style={{ width: "0%", background: "#444" }}
             />
           </div>
         </div>
       ) : summary ? (
         <div
-          className="rounded-2xl p-4 text-center fade-in-up"
+          className="rounded-2xl p-5 sm:p-6 text-center fade-in-up"
           style={{
-            background: "#0a0a14",
-            border: `0.5px solid rgba(${hslToRgb(getColor(summary.avg))},0.28)`,
+            background: `radial-gradient(ellipse at 50% -20%, rgba(${hslToRgb(getColor(summary.avg))},0.15) 0%, rgba(15,15,26,0.95) 75%)`,
+            border: `1px solid rgba(${hslToRgb(getColor(summary.avg))},0.35)`,
+            boxShadow: `0 0 35px rgba(${hslToRgb(getColor(summary.avg))},0.1)`,
           }}
         >
-          <p className="text-xs mb-1" style={{ color: "#ffffff45" }}>
+          <p className="text-xs mb-1 font-bold" style={{ color: `rgba(${hslToRgb(getColor(summary.avg))},0.8)` }}>
             그룹 평균 궁합
           </p>
           <p
-            className="text-3xl font-black"
+            className="text-3xl font-black mb-1"
             style={{
               color: getColor(summary.avg),
-              textShadow: `0 0 12px rgba(${hslToRgb(getColor(summary.avg))},0.8)`,
+              textShadow: `0 0 14px rgba(${hslToRgb(getColor(summary.avg))},0.7)`,
             }}
           >
             {summary.avg}%
           </p>
           <p
-            className="text-xs mt-1"
-            style={{ color: getColor(summary.avg), opacity: 0.75 }}
+            className="text-sm font-bold mt-1"
+            style={{ color: "rgba(255,255,255,0.8)" }}
           >
-            {getScoreInfo(summary.avg).emoji} {getScoreInfo(summary.avg).label}
+            {getInfo(summary.avg).e} {getInfo(summary.avg).l}
           </p>
           <div
             className="h-1 rounded-full overflow-hidden mt-3"
@@ -1112,9 +1120,11 @@ export default function GroupGrid({ members }: Props) {
       <div className="relative">
         <div
           ref={wrapRef}
-          className="relative w-full rounded-2xl overflow-hidden"
+          className="relative w-full rounded-2xl overflow-hidden transition-all duration-300"
           style={{
-            background: "#07070f",
+            background: "radial-gradient(circle at center, rgba(168,85,247,0.06) 0%, rgba(7,7,15,0.95) 80%)",
+            border: "1px solid rgba(168,85,247,0.15)",
+            boxShadow: "0 0 40px rgba(168,85,247,0.08)",
             height: dims.H || "auto",
             minHeight: 200,
           }}
@@ -1191,7 +1201,7 @@ export default function GroupGrid({ members }: Props) {
                 className="text-xs font-bold mb-2"
                 style={{ color: "rgba(220,38,38,0.5)" }}
               >
-                최악의 궁합
+                💀 최악의 궁합
               </p>
               <div className="text-3xl mb-1">🌧️</div>
               <div
@@ -1289,7 +1299,7 @@ export default function GroupGrid({ members }: Props) {
             >
               ✕
             </button>
-            <div className="text-4xl mb-2">{info?.emoji}</div>
+            <div className="text-4xl mb-2">{info?.e}</div>
             <div
               className="text-2xl font-black mb-1"
               style={{ color, textShadow: `0 0 14px rgba(${rgb},0.9)` }}
@@ -1311,7 +1321,7 @@ export default function GroupGrid({ members }: Props) {
                 border: `0.5px solid rgba(${rgb},0.35)`,
               }}
             >
-              {info?.label}
+              {info?.l}
             </div>
             <div
               className="h-1.5 rounded-full overflow-hidden mb-4"

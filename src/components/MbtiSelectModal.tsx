@@ -10,14 +10,14 @@ type Props = {
 export default function MbtiSelectModal({ onSelect }: Props) {
   return (
     <>
-      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm pointer-events-none" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div
-          className="w-full max-w-md rounded-3xl p-8 flex flex-col gap-6"
+          className="w-full max-w-md rounded-3xl p-8 flex flex-col gap-6 relative pointer-events-auto"
           style={{
-            background: "#0f0f1a",
-            border: "1px solid rgba(168,85,247,0.2)",
-            boxShadow: "0 0 60px rgba(168,85,247,0.12)",
+            background: "#1a1a2e",
+            border: "1px solid rgba(168,85,247,0.3)",
+            boxShadow: "0 0 60px rgba(168,85,247,0.18)",
           }}
         >
           <div className="text-center flex flex-col gap-2">
@@ -31,7 +31,7 @@ export default function MbtiSelectModal({ onSelect }: Props) {
             >
               내 MBTI는?
             </h2>
-            <p className="text-white/40 text-sm">
+            <p className="text-white/50 text-sm">
               선택하면 바로 궁합을 볼 수 있어요
             </p>
           </div>
@@ -39,7 +39,7 @@ export default function MbtiSelectModal({ onSelect }: Props) {
           <div className="flex flex-col gap-4">
             {MBTI_GROUPS.map((group) => (
               <div key={group.label} className="flex flex-col gap-1.5">
-                <p className="text-[11px] text-white/30 font-medium pl-1">
+                <p className="text-[11px] text-white/40 font-medium pl-1">
                   {group.label}
                 </p>
                 <div className="grid grid-cols-4 gap-2">
@@ -49,9 +49,9 @@ export default function MbtiSelectModal({ onSelect }: Props) {
                       onClick={() => onSelect(type)}
                       className="py-2.5 rounded-xl text-sm font-bold transition-all duration-200 hover:-translate-y-0.5 hover:scale-105"
                       style={{
-                        background: "rgba(168,85,247,0.08)",
-                        border: "0.5px solid rgba(168,85,247,0.2)",
-                        color: "rgba(255,255,255,0.75)",
+                        background: "rgba(168,85,247,0.12)",
+                        border: "0.5px solid rgba(168,85,247,0.25)",
+                        color: "rgba(255,255,255,0.82)",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.background =

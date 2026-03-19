@@ -1,13 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import {
-  COMPATIBILITY,
-  COMPATIBILITY_DESC,
-  MbtiType,
-} from "@/data/compatibility";
+import { COMPATIBILITY, MbtiType } from "@/data/compatibility";
 import { getCoupleTier } from "@/data/labels";
 import { MBTI_GROUPS } from "@/data/groups";
+import { LOVE_DESC } from "@/data/love-descriptions";
 
 type Props = {
   myMbti: MbtiType;
@@ -154,13 +151,18 @@ export default function CoupleResult({
   onPartnerSelect,
 }: Props) {
   const resultRef = useRef<HTMLDivElement>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const handlePartnerSelect = useCallback(
     (mbti: MbtiType) => {
       onPartnerSelect(mbti);
+      setDetailOpen(false);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          resultRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
         });
       });
     },
@@ -169,10 +171,8 @@ export default function CoupleResult({
 
   const score = partnerMbti ? COMPATIBILITY[myMbti][partnerMbti] : null;
   const tier = score !== null ? getCoupleTier(score) : null;
-  const desc = partnerMbti
-    ? COMPATIBILITY_DESC[myMbti]?.[partnerMbti] ??
-      COMPATIBILITY_DESC[partnerMbti]?.[myMbti] ??
-      null
+  const loveDesc = partnerMbti
+    ? (LOVE_DESC[myMbti]?.[partnerMbti] ?? null)
     : null;
   const categories =
     partnerMbti && score !== null
@@ -185,8 +185,8 @@ export default function CoupleResult({
       <div
         className="rounded-2xl p-6 flex flex-col gap-5"
         style={{
-          background: "rgba(236,72,153,0.04)",
-          border: "1px solid rgba(236,72,153,0.15)",
+          background: "rgba(236,72,153,0.08)",
+          border: "1px solid rgba(236,72,153,0.22)",
         }}
       >
         <div className="flex items-center gap-2">
@@ -201,7 +201,7 @@ export default function CoupleResult({
         <div className="flex flex-col gap-3">
           {MBTI_GROUPS.map((group) => (
             <div key={group.label} className="flex flex-col gap-1.5">
-              <p className="text-[11px] text-white/30 font-medium pl-1">
+              <p className="text-[11px] text-white/40 font-medium pl-1">
                 {group.label}
               </p>
               <div className="grid grid-cols-4 gap-2">
@@ -214,12 +214,12 @@ export default function CoupleResult({
                       className="py-2.5 rounded-xl text-sm font-bold transition-all duration-200 hover:-translate-y-0.5 hover:scale-105"
                       style={{
                         background: selected
-                          ? "rgba(236,72,153,0.25)"
-                          : "rgba(236,72,153,0.06)",
+                          ? "rgba(236,72,153,0.28)"
+                          : "rgba(236,72,153,0.10)",
                         border: selected
                           ? "1.5px solid rgba(236,72,153,0.6)"
-                          : "0.5px solid rgba(236,72,153,0.15)",
-                        color: selected ? "#fff" : "rgba(255,255,255,0.7)",
+                          : "0.5px solid rgba(236,72,153,0.22)",
+                        color: selected ? "#fff" : "rgba(255,255,255,0.8)",
                         boxShadow: selected
                           ? "0 0 16px rgba(236,72,153,0.35)"
                           : "none",
@@ -238,74 +238,195 @@ export default function CoupleResult({
       {/* 결과 */}
       {partnerMbti && score !== null && tier && (
         <div ref={resultRef} className="fade-in-up flex flex-col gap-6">
-          {/* 히어로 카드 */}
-          <div
-            className="relative rounded-2xl p-8 flex flex-col items-center gap-4 overflow-hidden"
-            style={{
-              background:
-                "radial-gradient(ellipse at 50% 0%, rgba(236,72,153,0.12) 0%, rgba(15,15,26,0.95) 70%)",
-              border: "1px solid rgba(236,72,153,0.2)",
-              boxShadow: "0 0 40px rgba(236,72,153,0.08)",
-            }}
-          >
-            <FloatingHearts />
-
-            <div className="flex items-center gap-4 z-10">
-              <div
-                className="px-4 py-2 rounded-xl text-lg font-black"
-                style={{
-                  background: "rgba(168,85,247,0.15)",
-                  border: "1px solid rgba(168,85,247,0.3)",
-                  color: "#c084fc",
-                }}
-              >
-                {myMbti}
-              </div>
-              <span className="text-3xl">💕</span>
-              <div
-                className="px-4 py-2 rounded-xl text-lg font-black"
-                style={{
-                  background: "rgba(236,72,153,0.15)",
-                  border: "1px solid rgba(236,72,153,0.3)",
-                  color: "#f472b6",
-                }}
-              >
-                {partnerMbti}
-              </div>
-            </div>
-
-            <CircularGauge score={score} />
-
-            <div className="flex flex-col items-center gap-1 z-10">
-              <span className="text-3xl">{tier.emoji}</span>
-              <span
-                className="text-base font-bold"
-                style={{ color: "rgba(236,72,153,0.9)" }}
-              >
-                {tier.label}
-              </span>
-            </div>
-          </div>
-
-          {/* 설명 카드 */}
-          {desc && (
+          {/* 공유용 메인 카드 */}
+          {loveDesc && (
             <div
-              className="rounded-2xl p-6"
+              className="rounded-2xl flex flex-col gap-0"
               style={{
-                background: "rgba(236,72,153,0.04)",
-                border: "1px solid rgba(236,72,153,0.12)",
-                borderLeft: "3px solid rgba(236,72,153,0.5)",
+                background: "rgba(236,72,153,0.06)",
+                border: "1px solid rgba(236,72,153,0.18)",
               }}
             >
-              <p className="text-sm font-bold mb-2" style={{ color: "#f472b6" }}>
-                💌 궁합 이야기
-              </p>
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: "rgba(255,255,255,0.55)" }}
+              {/* 메인 영역 — 강조 */}
+              <div
+                className="p-7 sm:p-8 flex flex-col items-center gap-4"
+                style={{
+                  background:
+                    "radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.10) 0%, transparent 70%)",
+                }}
               >
-                {desc}
-              </p>
+                {/* 💥 한 줄 요약 */}
+                <span className="text-3xl">💥</span>
+                <p
+                  className="text-xl sm:text-2xl font-black leading-snug text-center px-2"
+                  style={{
+                    color: "#fff",
+                    textShadow:
+                      "0 0 14px rgba(236,72,153,0.55), 0 0 40px rgba(236,72,153,0.2)",
+                  }}
+                >
+                  &ldquo;{loveDesc.preview}&rdquo;
+                </p>
+                {/* 히어로 카드 */}
+                <div
+                  className="relative w-full py-6 flex flex-col items-center gap-4 overflow-hidden"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse at 50% 30%, rgba(236,72,153,0.08) 0%, transparent 70%)",
+                  }}
+                >
+                  <FloatingHearts />
+
+                  <div className="flex items-center gap-4 z-10">
+                    <div
+                      className="px-4 py-2 rounded-xl text-lg font-black"
+                      style={{
+                        background: "rgba(168,85,247,0.15)",
+                        border: "1px solid rgba(168,85,247,0.3)",
+                        color: "#c084fc",
+                      }}
+                    >
+                      {myMbti}
+                    </div>
+                    <span className="text-3xl">💕</span>
+                    <div
+                      className="px-4 py-2 rounded-xl text-lg font-black"
+                      style={{
+                        background: "rgba(236,72,153,0.15)",
+                        border: "1px solid rgba(236,72,153,0.3)",
+                        color: "#f472b6",
+                      }}
+                    >
+                      {partnerMbti}
+                    </div>
+                  </div>
+
+                  <CircularGauge score={score} />
+
+                  <div className="flex flex-col items-center gap-2 z-10">
+                    <p
+                      className="text-lg sm:text-xl font-black text-center leading-snug px-2"
+                      style={{
+                        color: "#fff",
+                        textShadow:
+                          "0 0 12px rgba(236,72,153,0.5), 0 0 30px rgba(236,72,153,0.2)",
+                      }}
+                    >
+                      {tier.label}
+                    </p>
+                  </div>
+                </div>
+                {/* 🔥 싸움 패턴 + 🔧 해결 핵심 */}
+                <div className="w-full flex flex-col gap-4 mt-3">
+                  <div
+                    className="rounded-xl p-5 flex flex-col gap-2.5"
+                    style={{
+                      background: "rgba(239,68,68,0.08)",
+                      border: "1px solid rgba(239,68,68,0.2)",
+                      boxShadow: "0 0 20px rgba(239,68,68,0.06)",
+                    }}
+                  >
+                    <p
+                      className="text-base font-black"
+                      style={{
+                        color: "#fb7185",
+                        textShadow:
+                          "0 0 10px rgba(251,113,133,0.4), 0 0 25px rgba(251,113,133,0.15)",
+                      }}
+                    >
+                      🔥 싸움 패턴
+                    </p>
+                    <p
+                      className="text-base sm:text-lg leading-relaxed font-medium"
+                      style={{ color: "rgba(255,255,255,0.82)" }}
+                    >
+                      {loveDesc.fightStyle}
+                    </p>
+                  </div>
+
+                  <div
+                    className="rounded-xl p-5 flex flex-col gap-2.5"
+                    style={{
+                      background: "rgba(168,85,247,0.08)",
+                      border: "1px solid rgba(168,85,247,0.2)",
+                      boxShadow: "0 0 20px rgba(168,85,247,0.06)",
+                    }}
+                  >
+                    <p
+                      className="text-base font-black"
+                      style={{
+                        color: "#c084fc",
+                        textShadow:
+                          "0 0 10px rgba(192,132,252,0.4), 0 0 25px rgba(192,132,252,0.15)",
+                      }}
+                    >
+                      🔧 해결 핵심
+                    </p>
+                    <p
+                      className="text-base sm:text-lg leading-relaxed font-medium"
+                      style={{ color: "rgba(255,255,255,0.82)" }}
+                    >
+                      {loveDesc.solution}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 아코디언 더보기 */}
+              <button
+                onClick={() => setDetailOpen((prev) => !prev)}
+                className="flex items-center justify-center gap-2 py-4 text-sm font-bold transition-colors"
+                style={{
+                  color: "rgba(236,72,153,0.75)",
+                  borderTop: "1px solid rgba(236,72,153,0.12)",
+                }}
+              >
+                <span>{detailOpen ? "접기" : "📖 더 자세히 보기"}</span>
+                <span
+                  className="transition-transform duration-200 text-xs"
+                  style={{
+                    transform: detailOpen ? "rotate(180deg)" : "rotate(0)",
+                  }}
+                >
+                  ▼
+                </span>
+              </button>
+
+              {detailOpen && (
+                <div
+                  className="px-7 pb-7 flex flex-col gap-5 fade-in-up"
+                  style={{
+                    borderTop: "1px solid rgba(236,72,153,0.10)",
+                  }}
+                >
+                  {loveDesc.detail
+                    .split(/\n(?=[\u{1F300}-\u{1FAFF}])/u)
+                    .filter((s) => s.trim())
+                    .map((section, i) => {
+                      const lines = section.split("\n");
+                      const heading = lines[0];
+                      const body = lines.slice(1).join("\n").trim();
+                      return (
+                        <div key={i} className="flex flex-col gap-2">
+                          <p
+                            className="text-base font-bold pt-1"
+                            style={{ color: "#f472b6" }}
+                          >
+                            {heading}
+                          </p>
+                          {body && (
+                            <p
+                              className="text-sm sm:text-base leading-relaxed whitespace-pre-line"
+                              style={{ color: "rgba(255,255,255,0.6)" }}
+                            >
+                              {body}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
             </div>
           )}
 

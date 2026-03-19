@@ -157,7 +157,7 @@ function buildPositions(
       ANGLE_OFFSETS[i % ANGLE_OFFSETS.length] * (0.5 / Math.max(n, 3));
     const angle = baseAngle + jitter;
     const d = orbit * DIST_MULTS[i % DIST_MULTS.length];
-    const mgX = r + 6;
+    const mgX = r + 26;
     const mgY = r + 36;
     positions.push({
       x: Math.max(mgX, Math.min(W - mgX, cx + d * Math.cos(angle))),
@@ -182,12 +182,14 @@ function buildPositions(
       for (let j = i + 1; j < positions.length; j++) {
         const a = positions[i],
           b = positions[j];
-        const minDist = a.r + b.r + 8;
+        // 텍스트와 그림자 영역까지 고려한 여유 충돌 반경
+        const minDist = a.r + b.r + 45;
         const dx = b.x - a.x,
           dy = b.y - a.y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
         if (dist < minDist) {
-          const overlap = (minDist - dist) / 2;
+          // 겹침을 확실히 해소하기 위해 강하게 밀어내기
+          const overlap = (minDist - dist) / 1.5;
           const nx = dx / dist,
             ny = dy / dist;
           if (!a.isCenter) {
@@ -200,8 +202,10 @@ function buildPositions(
           }
           [a, b].forEach((p) => {
             if (!p.isCenter) {
-              p.x = Math.max(p.r + 4, Math.min(W - p.r - 4, p.x));
-              p.y = Math.max(p.r + 34, Math.min(H - p.r - 34, p.y));
+              const padX = p.r + 26;
+              const padY = p.r + 36;
+              p.x = Math.max(padX, Math.min(W - padX, p.x));
+              p.y = Math.max(padY, Math.min(H - padY, p.y));
             }
           });
           moved = true;
@@ -624,9 +628,11 @@ export default function MbtiGraph({ selectedMbti }: Props) {
     <>
       <div
         ref={wrapRef}
-        className="relative w-full rounded-2xl overflow-hidden"
+        className="relative w-full rounded-2xl overflow-hidden transition-all duration-300"
         style={{
-          background: "#07070f",
+          background: "radial-gradient(circle at center, rgba(168,85,247,0.06) 0%, rgba(7,7,15,0.95) 80%)",
+          border: "1px solid rgba(168,85,247,0.15)",
+          boxShadow: "0 0 40px rgba(168,85,247,0.08)",
           height: dims.H || "auto",
           minHeight: 350,
         }}

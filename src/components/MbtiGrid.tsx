@@ -1,31 +1,49 @@
+/**
+ * @file MbtiGrid.tsx
+ * @description 궁합 맵 탭의 순위 리스트 + 상세 패널 컴포넌트
+ *
+ * 선택된 MBTI를 기준으로 나머지 16개 MBTI와의 궁합 점수를 내림차순 정렬하여
+ * 순위 리스트로 렌더링한다. 동일 점수는 같은 순위 그룹으로 묶인다.
+ *
+ * 주요 기능:
+ * - 최고/최악 궁합 카드(CompatCard)를 상단에 2열 그리드로 표시
+ * - 순위 항목을 DetailScoreCard(categories 모드)로 ScoreBar 렌더링
+ * - MBTI 배지 클릭 시 상세 팝업(DetailPanel)으로 점수·게이지·연애vs친구 문구 확인
+ * - children prop으로 MbtiGraph 등 외부 컴포넌트를 삽입받을 수 있음
+ */
 "use client";
 
 import { useState } from "react";
 import { MBTI_TYPES, COMPATIBILITY, MbtiType } from "@/data/compatibility";
-import { SCORE_EMOJI, getScoreInfo } from "@/data/labels";
+import { getScoreInfo } from "@/data/labels";
 import CompatCard from "@/components/CompatCard";
+import DetailScoreCard, { type CategoryItem } from "@/components/DetailScoreCard";
+import CompatDetailModal, { type CompatDetailData } from "@/components/CompatDetailModal";
 
-type ScoreInfo = (typeof SCORE_EMOJI)[number];
-
-type PanelData = {
-  my: MbtiType;
-  other: MbtiType;
-  score: number;
-} | null;
-
+/** 동일 점수를 가진 MBTI들을 하나의 그룹으로 묶기 위한 타입 */
 type GroupedPair = {
   score: number;
   types: MbtiType[];
 };
 
+/**
+ * 점수 구간별 대표 색상을 반환한다.
+ * @param score - 궁합 점수 (0~100)
+ * @returns HEX 색상 문자열
+ */
 function getColor(score: number): string {
-  if (score >= 85) return "#a855f7";
-  if (score >= 70) return "#3b82f6";
-  if (score >= 50) return "#22c55e";
-  if (score >= 35) return "#f97316";
-  return "#ef4444";
+  if (score >= 85) return "#a855f7"; // 보라 — 환상적
+  if (score >= 70) return "#3b82f6"; // 파랑 — 좋음
+  if (score >= 50) return "#22c55e"; // 초록 — 보통
+  if (score >= 35) return "#f97316"; // 주황 — 주의
+  return "#ef4444"; // 빨강 — 나쁨
 }
 
+/**
+ * 점수 구간별 배경 색상(15% 불투명도)을 반환한다.
+ * @param score - 궁합 점수 (0~100)
+ * @returns HEX + alpha 색상 문자열
+ */
 function getBg(score: number): string {
   if (score >= 85) return "#a855f715";
   if (score >= 70) return "#3b82f615";
@@ -34,185 +52,116 @@ function getBg(score: number): string {
   return "#ef444415";
 }
 
+/**
+ * 개별 MBTI 유형을 나타내는 알약형 배지 버튼.
+ * 클릭하면 상위에서 전달받은 onClick 핸들러가 호출되어 DetailPanel이 열린다.
+ * 호버 시 위로 살짝 떠오르는 애니메이션과 글로우 그림자가 적용된다.
+ *
+ * @param type  - 표시할 MBTI 유형 (예: "INFP")
+ * @param score - 해당 유형과의 궁합 점수 (색상 결정에 사용)
+ * @param onClick - 배지 클릭 시 실행할 콜백
+ */
 function Badge({
   type,
   score,
   onClick,
+  themeColor,
 }: {
   type: MbtiType;
   score: number;
   onClick: () => void;
+  /** 카드 테마 색상 — 지정 시 점수 기반 색상 대신 이 색상 사용 */
+  themeColor?: string;
 }) {
-  const color = getColor(score);
-  const bg = getBg(score);
+  const color = themeColor ?? getColor(score);
+  const bg = themeColor ? `${themeColor}15` : getBg(score);
 
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition-all duration-200 hover:-translate-y-1 hover:scale-105"
+      className="badge-btn inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold transition-all duration-200 hover:-translate-y-1 hover:scale-105"
       style={{
         color,
         backgroundColor: bg,
         border: `0.5px solid ${color}50`,
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.boxShadow =
-          `0 6px 16px ${color}40`;
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.boxShadow = "none";
-      }}
+        "--badge-glow": `${color}40`,
+      } as React.CSSProperties}
     >
       {type} <span className="opacity-70">→</span>
     </button>
   );
 }
 
-function RankRow({
-  rank,
-  group,
-  score,
-  onClickType,
-}: {
-  rank: number;
-  group: MbtiType[];
-  score: number;
-  onClickType: (type: MbtiType) => void;
-}) {
-  const color = getColor(score);
-  const bg = getBg(score);
-  const info = getScoreInfo(score);
-  const rankLabel =
-    group.length > 1 ? `${rank}~${rank + group.length - 1}위` : `${rank}위`;
 
-  return (
-    <div
-      className="flex items-center gap-3 px-4 py-3 rounded-xl mb-2"
-      style={{ backgroundColor: bg, border: `0.5px solid ${color}30` }}
-    >
-      <div className="min-w-[36px] text-center">
-        <div className="text-[10px] text-white/40">{rankLabel}</div>
-        <div className="text-xl">{info.emoji}</div>
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex flex-wrap gap-1 mb-2">
-          {group.map((type) => (
-            <Badge
-              key={type}
-              type={type}
-              score={score}
-              onClick={() => onClickType(type)}
-            />
-          ))}
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex-1 h-1 rounded-full overflow-hidden bg-white/10">
-            <div
-              className="h-full rounded-full gauge-bar"
-              style={{ width: `${score}%`, backgroundColor: color }}
-            />
-          </div>
-          <span
-            className="text-xs font-bold min-w-[32px] text-right"
-            style={{ color }}
-          >
-            {score}%
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
-function DetailPanel({
-  data,
-  onClose,
-}: {
-  data: PanelData;
-  onClose: () => void;
-}) {
-  if (!data) return null;
-  const { my, other, score } = data;
-  const color = getColor(score);
-  const bg = getBg(score);
-  const info = getScoreInfo(score);
-
-  return (
-    <>
-      <div className="fixed inset-0 bg-black/40 z-50" onClick={onClose} />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] z-50 rounded-2xl p-6 bg-[#0f0f1a] border border-white/10">
-        <div className="text-center">
-          <div className="text-4xl mb-2">{info.emoji}</div>
-          <div className="text-2xl font-black mb-1" style={{ color }}>
-            {score}%
-          </div>
-          <div className="text-sm font-bold text-white mb-1">
-            {my} × {other}
-          </div>
-          <div
-            className="inline-block text-xs px-3 py-1 rounded-full mb-4"
-            style={{ color, backgroundColor: bg }}
-          >
-            {info.label}
-          </div>
-          <div className="h-1.5 rounded-full overflow-hidden bg-white/10 mb-4">
-            <div
-              className="h-full rounded-full gauge-bar"
-              style={{ width: `${score}%`, backgroundColor: color }}
-            />
-          </div>
-          <div className="h-px bg-white/10 mb-4" />
-          <p className="text-sm text-white/60 leading-relaxed text-left">
-            {my}와 {other}의 궁합이에요. 서로를 이해하고 배려하면 좋은 관계가 될
-            수 있어요.
-          </p>
-          <button
-            onClick={onClose}
-            className="mt-4 w-full py-2 rounded-xl border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-all text-sm"
-          >
-            닫기
-          </button>
-        </div>
-      </div>
-    </>
-  );
-}
-
+/** MbtiGrid 컴포넌트의 Props 타입 */
 type Props = {
+  /** 현재 선택된 내 MBTI 유형 */
   selectedMbti: MbtiType;
+  /** MBTI 선택 변경 콜백 (상위에서 상태 관리) */
   onSelect?: (mbti: MbtiType) => void;
+  /** 최고/최악 카드와 순위 리스트 사이에 삽입되는 자식 요소 (예: MbtiGraph) */
   children?: React.ReactNode;
 };
 
+/**
+ * 궁합 맵 탭의 메인 컴포넌트.
+ *
+ * 전체 흐름:
+ * 1. 16개 MBTI 선택 버튼 → 선택된 MBTI 기준으로 궁합 데이터 계산
+ * 2. 내림차순 정렬 후 최고/최악 궁합을 CompatCard로 표시
+ * 3. children 슬롯 (MbtiGraph 등 외부 컴포넌트 삽입 영역)
+ * 4. 동일 점수를 그룹으로 묶어 DetailScoreCard(categories)로 순위 렌더링
+ * 5. 배지 클릭 시 DetailPanel 팝업으로 상세 정보 표시
+ *
+ * @param selectedMbti - 현재 선택된 MBTI 유형
+ * @param onSelect     - MBTI 변경 시 호출되는 콜백
+ * @param children     - 카드와 순위 사이에 삽입할 React 노드
+ */
 export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
+  // onSelect가 없으면 빈 함수로 대체 (읽기 전용 모드 대응)
   const setSelectedMbti = onSelect ?? (() => {});
-  const [panel, setPanel] = useState<PanelData>(null);
 
+  // 상세 팝업 모달의 표시 상태
+  const [panel, setPanel] = useState<CompatDetailData>(null);
+
+  // 선택된 MBTI를 제외한 15개 유형의 궁합 점수를 내림차순 정렬
   const scores = MBTI_TYPES.map((type) => ({
     type,
     score: COMPATIBILITY[selectedMbti][type],
   }))
-    .filter((p) => p.type !== selectedMbti)
-    .sort((a, b) => b.score - a.score);
+    .filter((p) => p.type !== selectedMbti) // 자기 자신 제외
+    .sort((a, b) => b.score - a.score); // 높은 점수 우선
 
+  // 최고 궁합 (1등)과 최악 궁합 (꼴등) 추출
   const best = scores[0];
   const worst = scores[scores.length - 1];
+
+  // 최고 점수와 동일한 점수를 가진 유형들 (공동 1등 처리)
   const bestGroup = scores
     .filter((p) => p.score === best.score)
     .map((p) => p.type);
+
+  // 최악 점수와 동일한 점수를 가진 유형들 (공동 꼴등 처리)
   const worstGroup = scores
     .filter((p) => p.score === worst.score)
     .map((p) => p.type);
 
+  // 동일 점수끼리 그룹화 — 순위 리스트 렌더링에 사용
   const grouped: GroupedPair[] = [];
   let i = 0;
   while (i < scores.length) {
     const s = scores[i].score;
     const group = scores.filter((p) => p.score === s).map((p) => p.type);
     grouped.push({ score: s, types: group });
-    i += group.length;
+    i += group.length; // 같은 점수 그룹은 건너뛰기
   }
 
+  /**
+   * MBTI 배지 클릭 핸들러.
+   * 클릭된 유형과의 궁합 데이터를 패널 상태에 저장하여 DetailPanel을 연다.
+   * @param other - 클릭된 상대 MBTI 유형
+   */
   function handleClickType(other: MbtiType) {
     setPanel({
       my: selectedMbti,
@@ -223,32 +172,47 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <p className="text-xs text-white/50">내 MBTI 선택</p>
-        <div className="flex flex-wrap gap-2">
-          {MBTI_TYPES.map((type) => (
-            <button
-              key={type}
-              onClick={() => setSelectedMbti(type)}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200"
-              style={{
-                backgroundColor:
-                  selectedMbti === type ? "#a855f7" : "#ffffff10",
-                color: selectedMbti === type ? "white" : "#ffffff60",
-                border:
-                  selectedMbti === type
-                    ? "0.5px solid #a855f7"
-                    : "0.5px solid transparent",
-              }}
-            >
-              {type}
-            </button>
-          ))}
+      {/* ── 섹션 1: 내 MBTI 선택 ── */}
+      <div
+        className="rounded-2xl p-4 sm:p-5 transition-all duration-300 mb-2"
+        style={{
+          background: "rgba(168,85,247,0.08)",
+          border: "1px solid rgba(168,85,247,0.22)",
+        }}
+      >
+        <div className="flex flex-col gap-3 fade-in-up">
+          <div className="flex items-center gap-2 pl-1">
+            <span className="text-sm font-bold text-white/80">
+              다른 MBTI로 보기
+            </span>
+            <span className="text-lg">👇</span>
+          </div>
+          <div
+            className="w-full flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 scrollbar-hide snap-x"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
+            {MBTI_TYPES.map((type) => {
+              const selected = selectedMbti === type;
+              return (
+                <button
+                  key={type}
+                  onClick={() => setSelectedMbti(type)}
+                  className={`shrink-0 whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold snap-center ${
+                    selected ? "neon-btn-active" : "neon-btn"
+                  }`}
+                  style={{ "--neon": "168,85,247" } as React.CSSProperties}
+                >
+                  {type}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
+      {/* ── 섹션 2: 최고/최악 궁합 카드 (2열 그리드) ── */}
       <div className="grid grid-cols-2 gap-3">
-        <CompatCard title="🏆 최고의 궁합" score={best.score} variant="best">
+        <CompatCard score={best.score} variant="best">
           <div className="flex flex-wrap gap-1 justify-center">
             {bestGroup.map((type) => (
               <Badge
@@ -256,11 +220,12 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
                 type={type}
                 score={best.score}
                 onClick={() => handleClickType(type)}
+                themeColor="#f0a030"
               />
             ))}
           </div>
         </CompatCard>
-        <CompatCard title="💀 최악의 궁합" score={worst.score} variant="worst">
+        <CompatCard score={worst.score} variant="worst">
           <div className="flex flex-wrap gap-1 justify-center">
             {worstGroup.map((type) => (
               <Badge
@@ -268,35 +233,43 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
                 type={type}
                 score={worst.score}
                 onClick={() => handleClickType(type)}
+                themeColor="#e04070"
               />
             ))}
           </div>
         </CompatCard>
       </div>
 
+      {/* ── 섹션 3: 외부 삽입 영역 (예: MbtiGraph 차트) ── */}
       {children}
 
-      <div className="flex flex-col gap-1">
-        <p className="text-xs text-white/50 mb-2">궁합 순위</p>
-        {(() => {
+      {/* ── 섹션 4: 전체 궁합 순위 리스트 (DetailScoreCard categories 모드) ── */}
+      <DetailScoreCard
+        title="📊 궁합 순위"
+        themeRgb="168,85,247"
+        categories={(() => {
+          const items: CategoryItem[] = [];
           let rank = 1;
-          return grouped.map((g) => {
-            const currentRank = rank;
+          for (const g of grouped) {
+            const info = getScoreInfo(g.score);
+            const rankLabel =
+              g.types.length > 1
+                ? `${rank}~${rank + g.types.length - 1}위`
+                : `${rank}위`;
+            items.push({
+              emoji: info.emoji,
+              label: `${rankLabel}  ${g.types.join(" · ")}`,
+              score: g.score,
+              comment: info.label,
+            });
             rank += g.types.length;
-            return (
-              <RankRow
-                key={g.score}
-                rank={currentRank}
-                group={g.types}
-                score={g.score}
-                onClickType={handleClickType}
-              />
-            );
-          });
+          }
+          return items;
         })()}
-      </div>
+      />
 
-      <DetailPanel data={panel} onClose={() => setPanel(null)} />
+      {/* ── 상세 팝업 패널 (배지 클릭 시 활성화) ── */}
+      <CompatDetailModal data={panel} onClose={() => setPanel(null)} />
     </div>
   );
 }

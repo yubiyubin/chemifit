@@ -1,3 +1,9 @@
+/**
+ * 그룹 궁합 멤버용 이모지 아바타 & 랜덤 이름
+ *
+ * - EMOJI_AVATARS: 선택 가능한 동물 이모지 목록 (8종)
+ * - EMOJI_NAMES: 이모지별 랜덤 이름 풀 (MemberInput에서 이모지 선택 시 이름 자동 생성)
+ */
 export const EMOJI_AVATARS = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼"];
 
 export const EMOJI_NAMES: Record<string, string[]> = {

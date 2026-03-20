@@ -1,26 +1,52 @@
+/**
+ * 호환성 카드 — 최고/최악 궁합 표시용
+ *
+ * 궁합 맵(MbtiGrid)과 그룹 궁합(GroupGrid) 양쪽에서 공유한다.
+ *
+ * variant에 따라 타이틀·색상이 자동 결정됨:
+ * - "best":  / 골드 톤
+ * - "worst": 💀 최악의 궁합 / 로즈 톤
+ *
+ * 구성: 타이틀 → 이모지 → 점수 → 라벨 → children(MBTI 이름 등) → 게이지 바
+ */
 "use client";
 
 import { ReactNode } from "react";
 import { getScoreInfo } from "@/data/labels";
+import ScoreBar from "./ScoreBar";
+
+/** variant별 고정 속성 (타이틀, 메인 색상, RGB 문자열) */
+const VARIANT_CONFIG = {
+  best: { title: "최고의 궁합", color: "#f0a030", rgb: "240,160,48", hue: 36 },
+  worst: { title: "최악의 궁합", color: "#e04070", rgb: "224,64,112", hue: 340 },
+} as const;
 
 type Props = {
-  title: string;
   score: number;
   variant: "best" | "worst";
   children?: ReactNode;
   onClick?: () => void;
+  className?: string;
+  /** 좁은 공간용 컴팩트 모드 — 내부 요소 크기 축소 */
+  compact?: boolean;
 };
 
-export default function CompatCard({ title, score, variant, children, onClick }: Props) {
-  const color = variant === "best" ? "#eab308" : "#f43f5e"; // bright yellow vs rose
-  const rgb = variant === "best" ? "234,179,8" : "244,63,94";
+export default function CompatCard({
+  score,
+  variant,
+  children,
+  onClick,
+  className,
+  compact,
+}: Props) {
+  const { title, color, rgb, hue } = VARIANT_CONFIG[variant];
   const info = getScoreInfo(score);
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl p-5 sm:p-6 text-center flex flex-col items-center gap-1 transition-transform hover:scale-[1.02] ${
-        onClick ? "cursor-pointer" : ""
-      }`}
+      className={`relative overflow-hidden rounded-2xl text-center flex flex-col items-center transition-transform hover:scale-[1.02] ${
+        compact ? "p-3 gap-0.5" : "p-5 sm:p-6 gap-1"
+      } ${onClick ? "cursor-pointer" : ""} ${className ?? ""}`}
       style={{
         background: `radial-gradient(ellipse at 50% 0%, rgba(${rgb},0.15) 0%, rgba(15,15,26,0.95) 75%)`,
         border: `1px solid rgba(${rgb},0.3)`,
@@ -29,7 +55,7 @@ export default function CompatCard({ title, score, variant, children, onClick }:
       onClick={onClick}
     >
       <p
-        className="text-sm font-black mb-1 z-10"
+        className={`${compact ? "text-[10px]" : "text-sm"} font-black mb-0.5 z-10`}
         style={{
           color,
           textShadow: `0 0 10px rgba(${rgb},0.5)`,
@@ -37,9 +63,13 @@ export default function CompatCard({ title, score, variant, children, onClick }:
       >
         {title}
       </p>
-      <div className="text-4xl mb-1 z-10 filter drop-shadow-md">{info.emoji}</div>
       <div
-        className="text-2xl font-black mb-1 z-10"
+        className={`${compact ? "text-xl" : "text-4xl"} mb-0.5 z-10 filter drop-shadow-md`}
+      >
+        {info.emoji}
+      </div>
+      <div
+        className={`${compact ? "text-base" : "text-2xl"} font-black mb-0.5 z-10`}
         style={{
           color,
           textShadow: `0 0 14px rgba(${rgb},0.8)`,
@@ -47,20 +77,20 @@ export default function CompatCard({ title, score, variant, children, onClick }:
       >
         {score}%
       </div>
-      <div className="text-xs font-bold text-white/70 mb-3 z-10">{info.label}</div>
-      
+      <div
+        className={`${compact ? "text-[10px] mb-1" : "text-xs mb-3"} font-bold text-white/70 z-10`}
+      >
+        {info.label}
+      </div>
+
       <div className="z-10 w-full">{children}</div>
 
-      <div className="mt-4 h-1.5 w-full rounded-full overflow-hidden bg-white/10 z-10 shadow-inner">
-        <div
-          className="h-full rounded-full gauge-bar"
-          style={{
-            width: `${score}%`,
-            backgroundColor: color,
-            boxShadow: `0 0 8px rgba(${rgb},0.8)`,
-          }}
-        />
-      </div>
+      <ScoreBar
+        score={score}
+        overrideHue={hue}
+        height={compact ? "h-1" : "h-1.5"}
+        className={`${compact ? "mt-1" : "mt-4"} w-full z-10`}
+      />
     </div>
   );
 }

@@ -1,3 +1,11 @@
+/**
+ * 연인 궁합 상세 설명 — 타입 정의 + 4개 파일 합산
+ *
+ * 256개 조합 (16×16)의 연인 궁합 설명을 제공.
+ * 데이터는 크기가 크므로 4개 파일(nt/nf/sj/sp)로 분할 저장.
+ *
+ * 사용처: CoupleResult.tsx에서 LOVE_DESC[myMbti][partnerMbti]로 접근.
+ */
 import type { MbtiType } from "./compatibility";
 
 /** 연인 궁합 상세 설명 */

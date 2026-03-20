@@ -1,50 +1,144 @@
+/**
+ * 글로벌 스타일시트
+ *
+ * Tailwind CSS v4 + 커스텀 애니메이션 정의.
+ * 모든 페이지에 app/layout.tsx에서 import됨.
+ */
 @import "tailwindcss";
 
+/* 모든 클릭 가능 요소에 커서 포인터 */
 button, select, [role="button"] {
   cursor: pointer;
 }
 
+/* ===== 막대 게이지 애니메이션 ===== */
+
+/* 게이지 바가 왼쪽에서 오른쪽으로 채워지는 애니메이션 */
 @keyframes gauge-fill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
+/* 게이지 바의 네온 맥동 — 밝기가 살짝 올라갔다 내려감 */
+@keyframes neon-pulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.25); }
+}
+
+/* 게이지 바 공통 클래스
+ * - gauge-fill: 3초간 채워짐
+ * - neon-pulse: 채우기 완료 2초 후부터 3초 주기로 맥동 */
 .gauge-bar {
   transform-origin: left;
-  animation: gauge-fill 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: gauge-fill 3s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+             neon-pulse 3s ease-in-out 2s infinite;
 }
 
+/* ===== 페이드인 애니메이션 ===== */
+
+/* 아래에서 위로 올라오며 나타나는 효과 (결과 카드 등장 시 사용) */
 @keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .fade-in-up {
   animation: fade-in-up 0.5s ease-out forwards;
 }
 
+/* ===== 연인 궁합 전용 애니메이션 ===== */
+
+/* 히어로 카드의 떠다니는 하트 (FloatingHearts 컴포넌트) */
 @keyframes heart-float {
   0% { opacity: 0.7; transform: translateY(0) scale(1); }
   50% { opacity: 0.5; }
   100% { opacity: 0; transform: translateY(-80px) scale(0.4); }
 }
 
+/* 원형 게이지 안의 점수 텍스트가 핑크빛으로 빛나는 효과 */
 @keyframes score-pulse {
   0%, 100% { text-shadow: 0 0 8px rgba(236,72,153,0.4); }
   50% { text-shadow: 0 0 24px rgba(236,72,153,0.9); }
 }
 
+/* SVG 원형 게이지 채우기 (현재 미사용 — CircularGauge는 JS로 직접 제어) */
 @keyframes gauge-circle-fill {
   from { stroke-dashoffset: var(--gauge-circumference); }
   to { stroke-dashoffset: var(--gauge-target); }
+}
+
+/* ===== 네온 버튼 시스템 =====
+ *
+ * CSS custom property `--neon`(R,G,B)으로 색상 테마를 지정한다.
+ * 사용법: style={{ '--neon': '168,85,247' }}  (보라)
+ *         style={{ '--neon': '236,72,153' }}  (핑크)
+ *
+ * 클래스 계층:
+ *  .neon-btn            → 기본 상태 (낮은 투명도 배경, 얇은 테두리)
+ *  .neon-btn:hover      → 호버 (밝은 배경, 글로우, 살짝 위로)
+ *  .neon-btn-active     → 선택됨 (진한 배경, 두꺼운 테두리, 글로우)
+ *  .neon-action         → 풀폭 액션 버튼 (연인궁합 바로가기 등)
+ *  .neon-action:hover   → 액션 호버 (배경 강화, 글로우 확대)
+ *  .neon-ghost          → 보조 버튼 (닫기 등 — 테두리만, 네온색 없음)
+ */
+
+.neon-btn {
+  background: rgba(var(--neon), 0.08);
+  border: 0.5px solid rgba(var(--neon), 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s;
+}
+
+.neon-btn:hover {
+  background: rgba(var(--neon), 0.2);
+  border-color: rgba(var(--neon), 0.45);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(var(--neon), 0.25);
+  transform: translateY(-2px);
+}
+
+.neon-btn-active {
+  background: rgba(var(--neon), 0.3);
+  border: 1.5px solid rgba(var(--neon), 0.6);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(var(--neon), 0.25);
+}
+
+.neon-action {
+  background: rgba(var(--neon), 0.15);
+  border: 1px solid rgba(var(--neon), 0.35);
+  color: rgb(var(--neon));
+  box-shadow: 0 0 12px rgba(var(--neon), 0.1);
+  transition: all 0.2s;
+}
+
+.neon-action:hover {
+  background: rgba(var(--neon), 0.25);
+  box-shadow: 0 0 20px rgba(var(--neon), 0.25);
+  transform: scale(1.02);
+}
+
+.neon-ghost {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.6);
+  transition: all 0.2s;
+}
+
+.neon-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Badge 버튼 호버 글로우 (score 기반 동적 hex 색상 사용) */
+.badge-btn:hover {
+  box-shadow: 0 6px 16px var(--badge-glow);
+}
+
+/* ===== 유틸리티 ===== */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

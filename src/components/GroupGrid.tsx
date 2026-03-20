@@ -1221,7 +1221,7 @@ export default function GroupGrid({ members }: Props) {
                   className="text-xs font-bold mb-2"
                   style={{ color: "rgba(229,165,10,0.5)" }}
                 >
-                  최고의 궁합
+                  🏆 최고의 궁합
                 </p>
                 <div className="text-3xl mb-1">✨</div>
                 <div
@@ -1257,7 +1257,7 @@ export default function GroupGrid({ members }: Props) {
                   className="text-xs font-bold mb-2"
                   style={{ color: "rgba(220,38,38,0.5)" }}
                 >
-                  최악의 궁합
+                  💀 최악의 궁합
                 </p>
                 <div className="text-3xl mb-1">🌧️</div>
                 <div

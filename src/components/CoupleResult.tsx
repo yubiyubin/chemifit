@@ -35,6 +35,41 @@ type Props = {
   onPartnerSelect: (mbti: MbtiType) => void;
 };
 
+import { TITLE1, TITLE2, TITLE3, titleProps } from "@/styles/titles";
+import { FIGHT_THEME, SOLUTION_THEME, type CardTheme } from "@/styles/card-themes";
+
+/** 싸움 패턴 / 해결 핵심용 테마 카드 */
+function InfoCard({
+  theme,
+  title,
+  body,
+}: {
+  theme: CardTheme;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div
+      className="rounded-xl p-5 flex flex-col gap-2.5"
+      style={{
+        background: `rgba(${theme.rgb},${theme.bgAlpha})`,
+        border: `1px solid rgba(${theme.rgb},${theme.borderAlpha})`,
+        boxShadow: `0 0 20px rgba(${theme.rgb},${theme.shadowAlpha})`,
+      }}
+    >
+      <p {...titleProps(TITLE3, theme.title, theme.titleGlowRgb)}>
+        {title}
+      </p>
+      <p
+        className="text-base sm:text-lg leading-relaxed font-medium whitespace-pre-line"
+        style={{ color: "rgba(255,255,255,0.82)" }}
+      >
+        {body}
+      </p>
+    </div>
+  );
+}
+
 /**
  * 세부 궁합 카테고리별 점수대 한 줄 코멘트 맵
  *
@@ -241,10 +276,19 @@ export function CircularGauge({
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative" style={{ width: size, height: size }}>
-        <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full -rotate-90">
+        <svg
+          viewBox={`0 0 ${size} ${size}`}
+          className="w-full h-full -rotate-90"
+        >
           {useGradient && (
             <defs>
-              <linearGradient id="gauge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient
+                id="gauge-grad"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
                 <stop offset="0%" stopColor={gradient[0]} />
                 <stop offset="100%" stopColor={gradient[1]} />
               </linearGradient>
@@ -299,8 +343,24 @@ export default function CoupleResult({
 }: Props) {
   const router = useRouter();
   const resultRef = useRef<HTMLDivElement>(null); // 결과 영역 스크롤 타겟
+  const partnerScrollRef = useRef<HTMLDivElement>(null); // 상대 MBTI 가로 스크롤
   const [detailOpen, setDetailOpen] = useState(false); // 아코디언 펼침 상태
-  const [isModalOpen, setIsModalOpen] = useState(!partnerMbti); // 파트너 MBTI 미선택 시 모달 초기 표시
+  const [isModalOpen, setIsModalOpen] = useState(!partnerMbti);
+
+  // 선택된 상대 MBTI 버튼이 보이도록 자동 스크롤
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      const container = partnerScrollRef.current;
+      if (!container) return;
+      const btn = container.querySelector<HTMLElement>(
+        "[data-selected='true']",
+      );
+      if (!btn) return;
+      const left =
+        btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
+      container.scrollTo({ left, behavior: "smooth" });
+    });
+  }, [partnerMbti]);
 
   /**
    * 상대방 MBTI 선택 핸들러
@@ -368,7 +428,8 @@ export default function CoupleResult({
                   다른 MBTI와 궁합 보기
                 </span>
               </div>
-              <div 
+              <div
+                ref={partnerScrollRef}
                 className="w-full flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 scrollbar-hide snap-x"
                 style={{ WebkitOverflowScrolling: "touch" }}
               >
@@ -377,6 +438,7 @@ export default function CoupleResult({
                   return (
                     <button
                       key={type}
+                      data-selected={selected}
                       onClick={() => handlePartnerSelect(type)}
                       className={`shrink-0 whitespace-nowrap px-5 py-2.5 rounded-xl text-sm font-bold snap-center ${
                         selected ? "neon-btn-active" : "neon-btn"
@@ -426,16 +488,26 @@ export default function CoupleResult({
 
                   {/* 한줄요약 (히어로 카드 최상단) */}
                   <span className="text-3xl z-10">💥</span>
-                  <p
-                    className="text-xl sm:text-2xl font-black leading-snug text-center px-2 z-10"
-                    style={{
-                      color: "#fff",
-                      textShadow:
-                        "0 0 14px rgba(236,72,153,0.55), 0 0 40px rgba(236,72,153,0.2)",
-                    }}
-                  >
-                    &ldquo;{loveDesc.preview}&rdquo;
-                  </p>
+                  {(() => {
+                    const parts = loveDesc.preview.split(" — ");
+                    if (parts.length >= 2) {
+                      return (
+                        <div className="flex flex-col items-center gap-1 z-10 px-2">
+                          <p {...titleProps(TITLE2, "rgba(255,255,255,0.7)", "236,72,153", "text-center leading-snug")}>
+                            {parts[0]}
+                          </p>
+                          <p {...titleProps(TITLE1, "#fff", "236,72,153", "text-center leading-snug")}>
+                            &ldquo;{parts.slice(1).join(" — ")}&rdquo;
+                          </p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <p {...titleProps(TITLE1, "#fff", "236,72,153", "leading-snug text-center px-2 z-10")}>
+                        &ldquo;{loveDesc.preview}&rdquo;
+                      </p>
+                    );
+                  })()}
 
                   {/* 내 MBTI + 상대 MBTI 뱃지 */}
                   <div className="flex items-center gap-4 z-10">
@@ -481,59 +553,16 @@ export default function CoupleResult({
                 </div>
                 {/* ── 섹션 4: 싸움 패턴 + 해결 핵심 ── */}
                 <div className="w-full flex flex-col gap-4 mt-3">
-                  {/* 싸움 패턴 카드 */}
-                  <div
-                    className="rounded-xl p-5 flex flex-col gap-2.5"
-                    style={{
-                      background: "rgba(239,68,68,0.08)",
-                      border: "1px solid rgba(239,68,68,0.2)",
-                      boxShadow: "0 0 20px rgba(239,68,68,0.06)",
-                    }}
-                  >
-                    <p
-                      className="text-base font-black"
-                      style={{
-                        color: "#fb7185",
-                        textShadow:
-                          "0 0 10px rgba(251,113,133,0.4), 0 0 25px rgba(251,113,133,0.15)",
-                      }}
-                    >
-                      🔥 싸움 패턴
-                    </p>
-                    <p
-                      className="text-base sm:text-lg leading-relaxed font-medium whitespace-pre-line"
-                      style={{ color: "rgba(255,255,255,0.82)" }}
-                    >
-                      {loveDesc.fightStyle}
-                    </p>
-                  </div>
-
-                  {/* 해결 핵심 카드 */}
-                  <div
-                    className="rounded-xl p-5 flex flex-col gap-2.5"
-                    style={{
-                      background: "rgba(168,85,247,0.08)",
-                      border: "1px solid rgba(168,85,247,0.2)",
-                      boxShadow: "0 0 20px rgba(168,85,247,0.06)",
-                    }}
-                  >
-                    <p
-                      className="text-base font-black"
-                      style={{
-                        color: "#c084fc",
-                        textShadow:
-                          "0 0 10px rgba(192,132,252,0.4), 0 0 25px rgba(192,132,252,0.15)",
-                      }}
-                    >
-                      🔧 해결 핵심
-                    </p>
-                    <p
-                      className="text-base sm:text-lg leading-relaxed font-medium whitespace-pre-line"
-                      style={{ color: "rgba(255,255,255,0.82)" }}
-                    >
-                      {loveDesc.solution}
-                    </p>
-                  </div>
+                  <InfoCard
+                    theme={FIGHT_THEME}
+                    title="🔥 싸움 패턴"
+                    body={loveDesc.fightStyle}
+                  />
+                  <InfoCard
+                    theme={SOLUTION_THEME}
+                    title="🔧 해결 핵심"
+                    body={loveDesc.solution}
+                  />
                 </div>
               </div>
 
@@ -566,7 +595,7 @@ export default function CoupleResult({
                   }}
                 >
                   {loveDesc.detail
-                    .split(/\n(?=[\u{1F300}-\u{1FAFF}])/u) // 이모지로 시작하는 줄 앞에서 분리
+                    .split(/\n(?=[\u{2300}-\u{23FF}\u{1F300}-\u{1FAFF}])/u) // 이모지로 시작하는 줄 앞에서 분리
                     .filter((s) => s.trim())
                     .map((section, i) => {
                       const lines = section.split("\n");
@@ -574,10 +603,7 @@ export default function CoupleResult({
                       const body = lines.slice(1).join("\n").trim(); // 본문
                       return (
                         <div key={i} className="flex flex-col gap-2">
-                          <p
-                            className="text-base font-bold pt-1"
-                            style={{ color: "#f472b6" }}
-                          >
+                          <p {...titleProps(TITLE3, "#f472b6", "244,114,182", "pt-1")}>
                             {heading}
                           </p>
                           {body && (
@@ -600,10 +626,16 @@ export default function CoupleResult({
                 className="neon-action mx-6 mb-6 py-4 rounded-xl text-center"
                 style={{ "--neon": "168,85,247" } as React.CSSProperties}
               >
-                <p className="text-sm font-bold" style={{ color: "rgba(168,85,247,0.85)" }}>
+                <p
+                  className="text-sm font-bold"
+                  style={{ color: "rgba(168,85,247,0.85)" }}
+                >
                   이 궁합, 전체 중에서 몇 위일까? 👀
                 </p>
-                <p className="text-xs mt-1" style={{ color: "rgba(168,85,247,0.55)" }}>
+                <p
+                  className="text-xs mt-1"
+                  style={{ color: "rgba(168,85,247,0.55)" }}
+                >
                   👉 상위 몇 %인지 확인해보기
                 </p>
               </button>

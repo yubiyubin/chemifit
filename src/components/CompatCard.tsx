@@ -15,11 +15,7 @@ import { ReactNode } from "react";
 import { getScoreInfo } from "@/data/labels";
 import ScoreBar from "./ScoreBar";
 
-/** variant별 고정 속성 (타이틀, 메인 색상, RGB 문자열) */
-const VARIANT_CONFIG = {
-  best: { title: "최고의 궁합", color: "#f0a030", rgb: "240,160,48", hue: 36 },
-  worst: { title: "최악의 궁합", color: "#e04070", rgb: "224,64,112", hue: 340 },
-} as const;
+import { VARIANT_CONFIG } from "@/styles/card-themes";
 
 type Props = {
   score: number;

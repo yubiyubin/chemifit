@@ -36,37 +36,19 @@ type Props = {
  *  65% → 310° (로즈)
  * 100% → 280° (보라)
  */
-function scoreHue(score: number): number {
+export function scoreHue(score: number): number {
   if (score <= 35) return 350 + (score / 35) * 25;          // 350→375(=15°) (레드→오렌지)
   if (score <= 65) return 15 + ((score - 35) / 30) * 295;   // 15→310 (오렌지→로즈)
   return 310 - ((score - 65) / 35) * 30;                    // 310→280 (로즈→보라)
 }
 
-// ── 스타일 변수 (조정 시 여기만 수정) ──
-
-/** 텍스트 */
-const TEXT_SAT = 70;        // 채도
-const TEXT_LIT = 58;        // 밝기
-const TEXT_GLOW_SAT = 75;
-const TEXT_GLOW_LIT = 45;
-const TEXT_GLOW_OP = 0.7;   // 글로우 불투명도
-const TEXT_GLOW_R = 12;     // 글로우 반경(px)
-
-/** 바 그라데이션 */
-const BAR_SAT_L = 68;       // 왼쪽(어두운 끝) 채도
-const BAR_LIT_L = 32;       // 왼쪽 밝기
-const BAR_SAT_R = 75;       // 오른쪽(밝은 끝) 채도
-const BAR_LIT_R = 43;       // 오른쪽 밝기
-
-/** 바 글로우 (3단계: 근거리 / 중거리 / 원거리) */
-const GLOW_1 = { r: 10, sat: 75, lit: 40, op: 0.85 };
-const GLOW_2 = { r: 24, sat: 70, lit: 36, op: 0.45 };
-const GLOW_3 = { r: 44, sat: 65, lit: 32, op: 0.18 };
-
-/** 트랙 inset 글로우 */
-const TRACK_SAT = 50;
-const TRACK_LIT = 40;
-const TRACK_OP = 0.4;
+import {
+  TEXT_SAT, TEXT_LIT, TEXT_GLOW_SAT, TEXT_GLOW_LIT, TEXT_GLOW_OP, TEXT_GLOW_R,
+  BAR_SAT_L, BAR_LIT_L, BAR_SAT_R, BAR_LIT_R,
+  GLOW_1, GLOW_2, GLOW_3,
+  TRACK_SAT, TRACK_LIT, TRACK_OP,
+} from "@/styles/score-bar";
+import { TITLE4, titleProps } from "@/styles/titles";
 
 export default function ScoreBar({
   score,
@@ -86,7 +68,16 @@ export default function ScoreBar({
       {/* 카테고리명 + 점수 (풀 모드에서만 표시) */}
       {showLabel && (
         <div className="flex justify-between items-center">
-          <span className="text-sm text-white/60">
+          <span
+            className={`${TITLE4.size} ${TITLE4.weight}`}
+            style={{
+              color: "rgba(255,255,255,0.6)",
+              textShadow: [
+                TITLE4.glowNear > 0 && `0 0 ${TITLE4.glowNear}px hsla(${hue},70%,50%,${TITLE4.glowNearOp})`,
+                TITLE4.glowFar > 0 && `0 0 ${TITLE4.glowFar}px hsla(${hue},70%,50%,${TITLE4.glowFarOp})`,
+              ].filter(Boolean).join(", ") || undefined,
+            }}
+          >
             {emoji} {label}
           </span>
           <span

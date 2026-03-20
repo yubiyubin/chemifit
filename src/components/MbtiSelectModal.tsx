@@ -41,12 +41,20 @@ export default function MbtiSelectModal({
   
   const content = (
     <div
-      className={`w-full max-w-md rounded-3xl p-8 flex flex-col gap-6 relative ${inline ? "mx-auto fade-in-up" : "pointer-events-auto"}`}
-      style={{
-        background: "#1a1a2e",
-        border: `1px solid rgba(${mainColor},0.3)`,
-        boxShadow: `0 0 60px rgba(${mainColor},0.18)`,
-      }}
+      className={`w-full flex flex-col gap-6 relative ${
+        inline
+          ? "fade-in-up"
+          : "max-w-md rounded-3xl p-8 pointer-events-auto"
+      }`}
+      style={
+        inline
+          ? undefined
+          : {
+              background: "#1a1a2e",
+              border: `1px solid rgba(${mainColor},0.3)`,
+              boxShadow: `0 0 60px rgba(${mainColor},0.18)`,
+            }
+      }
     >
       {onClose && (
         <button

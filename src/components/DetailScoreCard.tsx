@@ -11,6 +11,7 @@
 
 import { ReactNode } from "react";
 import ScoreBar from "./ScoreBar";
+import { TITLE3, titleProps } from "@/styles/titles";
 
 export type CategoryItem = {
   label: string;
@@ -44,7 +45,7 @@ export default function DetailScoreCard({
         border: `1px solid rgba(${themeRgb},0.12)`,
       }}
     >
-      <p className="text-sm font-bold" style={{ color: `rgba(${themeRgb},0.85)` }}>
+      <p {...titleProps(TITLE3, `rgba(${themeRgb},0.85)`, themeRgb)}>
         {title}
       </p>
       {categories

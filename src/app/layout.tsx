@@ -11,18 +11,30 @@
  * 탭별 공통 UI(헤더, 탭바, 푸터)는 (tabs)/layout.tsx에서 처리.
  */
 import type { Metadata } from "next";
+import Script from "next/script";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
   title: "Personality Lab - MBTI & 성격 테스트 허브",
-  description: "MBTI 궁합, 동물 매칭, 연애 유형 등 다양한 성격 콘텐츠를 즐겨보세요. 나와 맞는 성향을 찾고 친구들과 결과를 공유해보세요!",
-  keywords: ["MBTI", "성격 테스트", "MBTI 궁합", "동물 매칭", "연애 테스트", "성격 유형", "페르소나 랩", "심리 테스트"],
+  description:
+    "MBTI 궁합, 동물 매칭, 연애 유형 등 다양한 성격 콘텐츠를 즐겨보세요. 나와 맞는 성향을 찾고 친구들과 결과를 공유해보세요!",
+  keywords: [
+    "MBTI",
+    "성격 테스트",
+    "MBTI 궁합",
+    "동물 매칭",
+    "연애 테스트",
+    "성격 유형",
+    "페르소나 랩",
+    "심리 테스트",
+  ],
   icons: {
     icon: "/persona-lab.svg",
   },
   openGraph: {
     title: "Personality Lab - MBTI & 성격 테스트",
-    description: "MBTI 궁합, 동물 매칭, 연애 유형 등 다양한 성격 콘텐츠를 즐겨보세요.",
+    description:
+      "MBTI 궁합, 동물 매칭, 연애 유형 등 다양한 성격 콘텐츠를 즐겨보세요.",
     type: "website",
     locale: "ko_KR",
     siteName: "Personality Lab",
@@ -38,7 +50,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Personality Lab - MBTI & 성격 테스트",
-    description: "MBTI 궁합, 동물 매칭, 연애 유형 등 다양한 성격 콘텐츠를 즐겨보세요.",
+    description:
+      "MBTI 궁합, 동물 매칭, 연애 유형 등 다양한 성격 콘텐츠를 즐겨보세요.",
     images: ["/og-image.png"],
   },
 };
@@ -50,6 +63,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-X9H4T8V3PW"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-X9H4T8V3PW');
+          `}
+        </Script>
+      </head>
       <body className="overflow-x-hidden overscroll-y-contain">{children}</body>
     </html>
   );

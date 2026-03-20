@@ -172,11 +172,11 @@ function buildPositions(
 
   // 캔버스 중심 좌표 및 노드 크기 계산
   const cx = W / 2,
-    cy = H / 2;
-  const centerR = W * 0.1215;   // 중앙 노드 반지름 (가장 큼)
-  const normalR = W * 0.09;     // 하이라이트 노드 반지름
-  const halfR = W * 0.048;      // 일반 노드 반지름 (작음)
-  const orbit = Math.min(W, H) * 0.38; // 궤도 기본 반경
+    cy = H * 0.45;              // 중심을 약간 위로 올려 하단 여백 축소
+  const centerR = W * 0.1215;
+  const normalR = W * 0.09;
+  const halfR = W * 0.048;
+  const orbit = Math.min(W, H) * 0.4; // 궤도 반경 (약간 확대)
 
   // 중앙 노드를 첫 번째로 추가
   const positions: NodePos[] = [
@@ -499,18 +499,18 @@ export default function MbtiGraph({ selectedMbti }: Props) {
           ? 26
           : isHighlight
             ? Math.max(r * 0.7, 7)
-            : Math.max(r * 0.4, 4);
+            : Math.max(r * 0.5, 5);
         const glowOp = isCenter
           ? 0.48
           : isHighlight
             ? 0.3 + (score / 100) * 0.2
-            : 0.12 + (score / 100) * 0.08;
+            : 0.22 + (score / 100) * 0.1;
 
         // 위치/크기는 애니메이션 루프가 제어
-        el.style.border = `${isCenter ? "2.5px" : isHighlight ? "2px" : "1px"} solid rgba(${rgb},${isCenter ? 0.85 : isHighlight ? 0.8 : 0.35})`;
-        el.style.boxShadow = `0 0 ${glowSz}px rgba(${rgb},${glowOp}),inset 0 0 ${glowSz * 0.4}px rgba(${rgb},${isCenter ? 0.14 : isHighlight ? 0.1 : 0.05})`;
-        el.style.background = `radial-gradient(circle at 35% 35%,rgba(${rgb},${isCenter ? 0.26 : isHighlight ? 0.2 : 0.1}) 0%,rgba(${rgb},0.05) 65%,transparent 100%),#07070f`;
-        el.style.opacity = isHighlight || isCenter ? "1" : "0.75";
+        el.style.border = `${isCenter ? "2.5px" : isHighlight ? "2px" : "1px"} solid rgba(${rgb},${isCenter ? 0.85 : isHighlight ? 0.8 : 0.45})`;
+        el.style.boxShadow = `0 0 ${glowSz}px rgba(${rgb},${glowOp}),inset 0 0 ${glowSz * 0.4}px rgba(${rgb},${isCenter ? 0.14 : isHighlight ? 0.1 : 0.08})`;
+        el.style.background = `radial-gradient(circle at 35% 35%,rgba(${rgb},${isCenter ? 0.26 : isHighlight ? 0.2 : 0.15}) 0%,rgba(${rgb},0.06) 65%,transparent 100%),#07070f`;
+        el.style.opacity = isHighlight || isCenter ? "1" : "0.85";
         el.style.zIndex = isCenter ? "4" : isHighlight ? "3" : "2";
 
         // 노드 내부 텍스트 크기 계산
@@ -520,8 +520,8 @@ export default function MbtiGraph({ selectedMbti }: Props) {
         const badge = isBest ? "🏆" : isWorst ? "💀" : "";
         el.innerHTML = `
         ${badge ? `<span class="mbti-badge" style="font-size:${es}px;line-height:1;opacity:0;transition:opacity 2s ease;">${badge}</span>` : ""}
-        <span style="font-size:${ns}px;font-weight:700;color:rgba(${rgb},${isHighlight || isCenter ? 0.85 : 0.6});text-shadow:0 0 6px rgba(${rgb},0.6);line-height:1.2;">${mbti}</span>
-        <span style="font-size:${ms}px;font-weight:800;color:rgba(${rgb},1);text-shadow:0 0 8px rgba(${rgb},${isHighlight ? 0.9 : 0.5});line-height:1.2;">${isCenter ? "" : score + "%"}</span>
+        <span style="font-size:${ns}px;font-weight:700;color:rgba(${rgb},${isHighlight || isCenter ? 0.85 : 0.7});text-shadow:0 0 6px rgba(${rgb},0.6);line-height:1.2;">${mbti}</span>
+        <span style="font-size:${ms}px;font-weight:800;color:rgba(${rgb},1);text-shadow:0 0 8px rgba(${rgb},${isHighlight ? 0.9 : 0.6});line-height:1.2;">${isCenter ? "" : score + "%"}</span>
       `;
 
         // 중앙 노드가 아닌 경우에만 호버/클릭 이벤트 등록
@@ -752,7 +752,7 @@ export default function MbtiGraph({ selectedMbti }: Props) {
     cachePosRef.current = [];
     if (!wrapRef.current) return;
     const W = wrapRef.current.getBoundingClientRect().width || 560;
-    const H = Math.min(W * 0.88, 500);
+    const H = Math.min(W * 1.0, 580);
     queueMicrotask(() => updateDims(W, H));
     render(W, H);
   }, [selectedMbti, render, updateDims]);
@@ -762,7 +762,7 @@ export default function MbtiGraph({ selectedMbti }: Props) {
     const ob = new ResizeObserver(() => {
       if (!wrapRef.current) return;
       const W = wrapRef.current.getBoundingClientRect().width || 560;
-      const H = Math.min(W * 0.88, 500);
+      const H = Math.min(W * 1.0, 580);
       updateDims(W, H);
       render(W, H);
     });
@@ -780,8 +780,6 @@ export default function MbtiGraph({ selectedMbti }: Props) {
           background: "radial-gradient(circle at center, rgba(168,85,247,0.06) 0%, rgba(7,7,15,0.95) 80%)",
           border: "1px solid rgba(168,85,247,0.15)",
           boxShadow: "0 0 40px rgba(168,85,247,0.08)",
-          height: dims.H || "auto",
-          minHeight: 350,
         }}
       >
         {/* 연결선 Canvas 레이어 (절대 위치, 노드 아래) */}

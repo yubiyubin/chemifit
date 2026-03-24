@@ -15,6 +15,8 @@
 
 import type { MbtiType } from "@/data/compatibility";
 import { MBTI_GROUPS } from "@/data/groups";
+import CloseButton from "./CloseButton";
+import ModalOverlay from "./ModalOverlay";
 
 type Props = {
   onSelect: (mbti: MbtiType) => void;
@@ -113,14 +115,8 @@ export default function MbtiSelectModal({
   }
 
   return (
-    <>
-      <div
-        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm ${onClose ? "cursor-pointer" : ""}`}
-        onClick={onClose}
-      />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto pointer-events-none">
-        {content}
-      </div>
-    </>
+    <ModalOverlay onClose={onClose} blur>
+      {content}
+    </ModalOverlay>
   );
 }

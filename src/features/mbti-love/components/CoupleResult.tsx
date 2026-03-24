@@ -25,7 +25,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { COMPATIBILITY, MbtiType, MBTI_TYPES } from "@/data/compatibility";
 import { getCoupleTier } from "@/data/labels";
-import { LOVE_DESC } from "@/data/love-descriptions";
+import { LOVE_DESC } from "@/features/mbti-love/consts/love-descriptions";
 import MbtiSelectModal from "@/components/MbtiSelectModal";
 import DetailScoreCard from "@/components/DetailScoreCard";
 
@@ -37,6 +37,11 @@ type Props = {
 
 import { TITLE1, TITLE2, TITLE3, titleProps } from "@/styles/titles";
 import { FIGHT_THEME, SOLUTION_THEME, type CardTheme } from "@/styles/card-themes";
+import { getCategoryComment } from "@/features/mbti-love/consts/category-comments";
+import { getCategoryScores } from "@/features/mbti-love/consts/categories";
+import { SECTION_EMOJIS, LINE_EMOJIS, DEFAULT_BULLET_EMOJI } from "@/features/mbti-love/consts/detail-emojis";
+import { COUPLE, MBTI_SELECT, EMOJIS } from "@/data/ui-text";
+import { SYMBOLS } from "@/data/symbols";
 
 /** 싸움 패턴 / 해결 핵심용 테마 카드 */
 function InfoCard({
@@ -70,148 +75,20 @@ function InfoCard({
   );
 }
 
-/**
- * 세부 궁합 카테고리별 점수대 한 줄 코멘트 맵
- *
- * 각 카테고리(감정 교류, 대화 궁합, 가치관, 일상 호환)마다 4단계 코멘트를 정의한다.
- * 인덱스 0이 최고 점수대(75+), 인덱스 3이 최저 점수대(35 미만).
- */
-const CATEGORY_COMMENTS: Record<string, string[]> = {
-  "감정 교류": [
-    "눈빛만 봐도 통하는 사이 ✨",
-    "감정 교류 꽤 원활한 편 👍",
-    "가끔 통역이 필요함 🤔",
-    "감정은 각자 알아서 처리 중 🧊",
-  ],
-  "대화 궁합": [
-    "대화하다 밤새는 조합 🌙",
-    "말이 잘 통하는 편 💬",
-    "가끔 다른 나라 사람 같음 🌐",
-    "대화보다 침묵이 편한 사이 🤐",
-  ],
-  가치관: [
-    "인생관이 거의 쌍둥이 🧬",
-    "큰 틀에선 방향이 비슷함 🧭",
-    "중요한 건 좀 다르게 봄 🔀",
-    "평행우주에서 온 것 같은 가치관 🪐",
-  ],
-  "일상 호환": [
-    "같이 살아도 스트레스 제로 🏠",
-    "생활 리듬 꽤 맞는 편 ☕",
-    "습관 차이로 가끔 충돌 ⚡",
-    "동거하면 서바이벌 시작 🏕️",
-  ],
-};
 
-/**
- * 점수 구간에 따라 해당 카테고리의 코멘트를 반환한다.
- * - 75 이상: 최상위 코멘트 (인덱스 0)
- * - 55~74: 양호 코멘트 (인덱스 1)
- * - 35~54: 보통 코멘트 (인덱스 2)
- * - 34 이하: 최하위 코멘트 (인덱스 3)
- */
 /**
  * detail 본문의 `•` 불릿을 섹션·키워드에 맞는 이모티콘으로 치환한다.
- * 헤딩(heading)으로 섹션 맥락을 판별하고, 줄 내용 키워드로 세부 이모지를 결정.
  */
 function decorateBullets(body: string, heading: string): string {
-  // 헤딩 키워드 → 섹션 기본 이모지
-  const sectionEmoji = heading.includes("실제 상황") ? "🎬"
-    : heading.includes("싸움") ? "⚡"
-    : heading.includes("잘 맞는") ? "💡"
-    : heading.includes("속마음") ? "💭"
-    : heading.includes("관계 흐름") ? "📅"
-    : heading.includes("궁합 요약") ? "✨"
-    : "▸";
+  const sectionEntry = SECTION_EMOJIS.find((s) => heading.includes(s.keyword));
+  const sectionEmoji = sectionEntry?.emoji ?? DEFAULT_BULLET_EMOJI;
 
   return body.replace(/^• (.+)/gm, (_match, content: string) => {
-    // 키워드 기반 세부 이모지 매칭
     const line = content.trim();
-    let emoji = sectionEmoji;
-
-    if (/^데이트[:：]/.test(line)) emoji = "💑";
-    else if (/^연락\s*스타일[:：]/.test(line)) emoji = "📱";
-    else if (/^초반[:：]/.test(line)) emoji = "🌱";
-    else if (/^중반[:：]/.test(line)) emoji = "🌿";
-    else if (/^장기[:：]/.test(line)) emoji = "🌳";
-    else if (/^공통[:：]|\[공통\][:：]/.test(line)) emoji = "🤝";
-    else if (/속마음\]?[:：]/.test(line)) emoji = "💭";
-    else if (/에게\][:：]/.test(line)) emoji = "💜";
-
+    const lineEntry = LINE_EMOJIS.find((e) => e.pattern.test(line));
+    const emoji = lineEntry?.emoji ?? sectionEmoji;
     return `${emoji} ${content}`;
   });
-}
-
-function getCategoryComment(label: string, score: number): string {
-  const comments = CATEGORY_COMMENTS[label];
-  if (!comments) return "";
-  if (score >= 75) return comments[0];
-  if (score >= 55) return comments[1];
-  if (score >= 35) return comments[2];
-  return comments[3];
-}
-
-/**
- * 두 MBTI의 4글자(E/I, S/N, T/F, J/P) 일치 여부를 기반으로 카테고리별 점수를 산출한다.
- *
- * ### 계산 공식
- * 각 카테고리는 `baseScore * 0.6`을 기본값으로 하고, MBTI 지표 일치 여부에 따라 보너스를 가산:
- * - **감정 교류**: T/F 일치 +25, E/I 일치 +10 (불일치 시 +5)
- * - **대화 궁합**: E/I 일치 +20 (불일치 +5), S/N 일치 +15
- * - **가치관**: S/N 일치 +20 (불일치 +5), T/F 일치 +15
- * - **일상 호환**: J/P 일치 +25 (불일치 +5), E/I 일치 +10
- *
- * 최종 점수는 0~100 범위로 clamp 처리된다.
- *
- * @param myMbti - 내 MBTI
- * @param partnerMbti - 상대 MBTI
- * @param baseScore - COMPATIBILITY 테이블에서 가져온 기본 궁합 점수
- * @returns 각 카테고리의 label, emoji, score, comment 배열
- */
-function getCategoryScores(
-  myMbti: MbtiType,
-  partnerMbti: MbtiType,
-  baseScore: number,
-) {
-  // MBTI 4글자 각 위치 일치 여부 판별
-  const match = [
-    myMbti[0] === partnerMbti[0], // E/I 일치 여부
-    myMbti[1] === partnerMbti[1], // S/N 일치 여부
-    myMbti[2] === partnerMbti[2], // T/F 일치 여부
-    myMbti[3] === partnerMbti[3], // J/P 일치 여부
-  ];
-
-  // 0~100 범위로 제한하는 유틸
-  const clamp = (v: number) => Math.max(0, Math.min(100, Math.round(v)));
-
-  const items = [
-    {
-      label: "감정 교류",
-      emoji: "💓",
-      score: clamp(baseScore * 0.6 + (match[2] ? 25 : 0) + (match[0] ? 10 : 5)), // T/F + E/I 보너스
-    },
-    {
-      label: "대화 궁합",
-      emoji: "💬",
-      score: clamp(baseScore * 0.6 + (match[0] ? 20 : 5) + (match[1] ? 15 : 0)), // E/I + S/N 보너스
-    },
-    {
-      label: "가치관",
-      emoji: "🌙",
-      score: clamp(baseScore * 0.6 + (match[1] ? 20 : 5) + (match[2] ? 15 : 0)), // S/N + T/F 보너스
-    },
-    {
-      label: "일상 호환",
-      emoji: "☀️",
-      score: clamp(baseScore * 0.6 + (match[3] ? 25 : 5) + (match[0] ? 10 : 0)), // J/P + E/I 보너스
-    },
-  ];
-
-  // 각 항목에 점수대별 코멘트를 부착하여 반환
-  return items.map((item) => ({
-    ...item,
-    comment: getCategoryComment(item.label, item.score),
-  }));
 }
 
 /**
@@ -221,7 +98,7 @@ function getCategoryScores(
  * 아래에서 위로 부유하는 효과를 준다. 각 하트는 서로 다른 지속시간과 딜레이를 가진다.
  */
 export function FloatingHearts() {
-  const hearts = ["💕", "💗", "💘", "♥", "💖"];
+  const hearts = [...EMOJIS.hearts];
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
       {hearts.map((h, i) => (
@@ -441,9 +318,9 @@ export default function CoupleResult({
             <div className="fade-in-up w-full">
               <MbtiSelectModal
                 inline
-                title="상대방의 MBTI는?"
-                subtitle="궁금한 그 사람의 유형을 선택해주세요 💕"
-                emoji="💘"
+                title={MBTI_SELECT.partnerTitle}
+                subtitle={MBTI_SELECT.partnerSubtitle}
+                emoji={MBTI_SELECT.partnerEmoji}
                 theme="pink"
                 onSelect={(mbti) => {
                   handlePartnerSelect(mbti);
@@ -455,9 +332,9 @@ export default function CoupleResult({
           ) : (
             <div className="flex flex-col gap-3 fade-in-up">
               <div className="flex items-center gap-2 pl-1">
-                <span className="text-lg">💘</span>
+                <span className="text-lg">{MBTI_SELECT.partnerEmoji}</span>
                 <span className="text-sm font-bold text-white/80">
-                  다른 MBTI와 궁합 보기
+                  {MBTI_SELECT.otherMbtiLabel}
                 </span>
               </div>
               <div
@@ -519,7 +396,7 @@ export default function CoupleResult({
                   <FloatingHearts />
 
                   {/* 한줄요약 (히어로 카드 최상단) */}
-                  <span className="text-3xl z-10">💥</span>
+                  <span className="text-3xl z-10">{COUPLE.heroEmoji}</span>
                   {(() => {
                     const parts = loveDesc.preview.split(" — ");
                     if (parts.length >= 2) {
@@ -553,7 +430,7 @@ export default function CoupleResult({
                     >
                       {myMbti}
                     </div>
-                    <span className="text-3xl">💕</span>
+                    <span className="text-3xl">{COUPLE.mbtiSeparator}</span>
                     <div
                       className="px-4 py-2 rounded-xl text-lg font-black"
                       style={{
@@ -587,12 +464,12 @@ export default function CoupleResult({
                 <div className="w-full flex flex-col gap-4 mt-3">
                   <InfoCard
                     theme={FIGHT_THEME}
-                    title="🔥 싸움 패턴"
+                    title={COUPLE.fightTitle}
                     body={loveDesc.fightStyle}
                   />
                   <InfoCard
                     theme={SOLUTION_THEME}
-                    title="🔧 해결 핵심"
+                    title={COUPLE.solutionTitle}
                     body={loveDesc.solution}
                   />
                 </div>
@@ -607,14 +484,14 @@ export default function CoupleResult({
                   borderTop: "1px solid rgba(236,72,153,0.12)",
                 }}
               >
-                <span>{detailOpen ? "접기" : "📖 더 자세히 보기"}</span>
+                <span>{detailOpen ? COUPLE.detailCloseLabel : COUPLE.detailOpenLabel}</span>
                 <span
                   className="transition-transform duration-200 text-xs"
                   style={{
                     transform: detailOpen ? "rotate(180deg)" : "rotate(0)",
                   }}
                 >
-                  ▼
+                  {SYMBOLS.dropdown}
                 </span>
               </button>
 
@@ -662,13 +539,13 @@ export default function CoupleResult({
                   className="text-sm font-bold"
                   style={{ color: "rgba(168,85,247,0.85)" }}
                 >
-                  이 궁합, 전체 중에서 몇 위일까? 👀
+                  {COUPLE.rankCta}
                 </p>
                 <p
                   className="text-xs mt-1"
                   style={{ color: "rgba(168,85,247,0.55)" }}
                 >
-                  👉 상위 몇 %인지 확인해보기
+                  {COUPLE.rankCtaSub}
                 </p>
               </button>
             </div>

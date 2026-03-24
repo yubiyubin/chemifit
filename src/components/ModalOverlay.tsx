@@ -49,9 +49,7 @@ export default function ModalOverlay({
         onClick={onClose}
       />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto pointer-events-none">
-        <div className="pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-          {children}
-        </div>
+        {children}
       </div>
     </>
   );

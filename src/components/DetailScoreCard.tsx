@@ -12,6 +12,7 @@
 import { ReactNode } from "react";
 import ScoreBar from "./ScoreBar";
 import { TITLE3, titleProps } from "@/styles/titles";
+import { COUPLE } from "@/data/ui-text";
 
 export type CategoryItem = {
   label: string;
@@ -35,7 +36,7 @@ export default function DetailScoreCard({
   categories,
   children,
   themeRgb = "236,72,153",
-  title = "💞 세부 궁합",
+  title = COUPLE.detailScoreTitle,
 }: Props) {
   return (
     <div

@@ -12,7 +12,7 @@
 import { Suspense, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useMbti } from "@/context/MbtiContext";
-import CoupleResult from "@/components/CoupleResult";
+import CoupleResult from "@/features/mbti-love/components/CoupleResult";
 import { MBTI_TYPES, type MbtiType } from "@/data/compatibility";
 
 /** useSearchParams는 Suspense boundary 필수 — 외부 래퍼에서 감싸준다 */

@@ -9,7 +9,7 @@
  *
  * love-descriptions.ts에서 NT_LOVE_DESC를 import하여 LOVE_DESC에 합산.
  */
-import type { MbtiType } from "../compatibility";
+import type { MbtiType } from "@/data/compatibility";
 import type { LoveDescription } from "../love-descriptions";
 
 export const NT_LOVE_DESC: Partial<

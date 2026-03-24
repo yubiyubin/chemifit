@@ -17,6 +17,8 @@ import type { MbtiType } from "@/data/compatibility";
 import { MBTI_GROUPS } from "@/data/groups";
 import CloseButton from "./CloseButton";
 import ModalOverlay from "./ModalOverlay";
+import { MBTI_SELECT } from "@/data/ui-text";
+import { SYMBOLS } from "@/data/symbols";
 
 type Props = {
   onSelect: (mbti: MbtiType) => void;
@@ -31,9 +33,9 @@ type Props = {
 export default function MbtiSelectModal({
   onSelect,
   onClose,
-  title = "내 MBTI는?",
-  subtitle = "선택하면 바로 궁합을 볼 수 있어요",
-  emoji = "🧬",
+  title = MBTI_SELECT.defaultTitle,
+  subtitle = MBTI_SELECT.defaultSubtitle,
+  emoji = MBTI_SELECT.defaultEmoji,
   theme = "purple",
   inline = false,
 }: Props) {
@@ -63,7 +65,7 @@ export default function MbtiSelectModal({
           onClick={onClose}
           className="neon-ghost absolute top-4 right-5 text-xl border-0"
         >
-          ✕
+          {SYMBOLS.close}
         </button>
       )}
       

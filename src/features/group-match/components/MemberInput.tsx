@@ -14,8 +14,10 @@
 
 import { useState } from "react";
 import { MBTI_TYPES, MbtiType, Member } from "@/data/compatibility";
-import { EMOJI_AVATARS, EMOJI_NAMES } from "@/data/avatars";
+import { EMOJI_AVATARS, EMOJI_NAMES } from "@/features/group-match/consts/avatars";
 import DropdownPicker from "./DropdownPicker";
+import { MEMBER_INPUT } from "@/data/ui-text";
+import { SYMBOLS } from "@/data/symbols";
 
 /** 같은 이모지의 멤버가 여러 명일 때 이름 풀에서 다음 이름 선택 */
 function getNextName(emoji: string, members: Member[]): string {
@@ -29,8 +31,8 @@ type Props = {
   onChange: (members: Member[]) => void;
 };
 
-const MAX_MEMBERS = 8;
-const MIN_MEMBERS = 2;
+const MAX_MEMBERS = MEMBER_INPUT.maxMembers;
+const MIN_MEMBERS = MEMBER_INPUT.minMembers;
 
 export default function MemberInput({ members, onChange }: Props) {
   const [name, setName] = useState("");
@@ -64,7 +66,7 @@ export default function MemberInput({ members, onChange }: Props) {
         {/* 이름 입력 */}
         <input
           type="text"
-          placeholder="이름 (비우면 랜덤)"
+          placeholder={MEMBER_INPUT.namePlaceholder}
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
@@ -91,7 +93,7 @@ export default function MemberInput({ members, onChange }: Props) {
             ))}
           </select>
           <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] text-white/40 pointer-events-none">
-            ▼
+            {SYMBOLS.dropdown}
           </span>
         </div>
 
@@ -102,7 +104,7 @@ export default function MemberInput({ members, onChange }: Props) {
           className="neon-btn-active px-4 h-12 rounded-lg text-white font-bold disabled:opacity-30 disabled:cursor-not-allowed"
           style={{ "--neon": "168,85,247" } as React.CSSProperties}
         >
-          추가
+          {MEMBER_INPUT.addButton}
         </button>
       </div>
 
@@ -127,15 +129,15 @@ export default function MemberInput({ members, onChange }: Props) {
               onClick={() => handleRemove(i)}
               className="neon-ghost text-white/40 hover:text-red-400 ml-1 border-0"
             >
-              ✕
+              {SYMBOLS.close}
             </button>
           </div>
         ))}
       </div>
 
       <p className="text-white/40 text-sm">
-        {members.length}/{MAX_MEMBERS}명 입력됨
-        {members.length < MIN_MEMBERS && " — 최소 2명이 필요해요"}
+        {members.length}/{MAX_MEMBERS}{MEMBER_INPUT.countSuffix}
+        {members.length < MIN_MEMBERS && ` — ${MEMBER_INPUT.minWarning}`}
       </p>
     </div>
   );

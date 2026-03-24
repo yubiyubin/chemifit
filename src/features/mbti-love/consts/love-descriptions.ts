@@ -6,7 +6,7 @@
  *
  * 사용처: CoupleResult.tsx에서 LOVE_DESC[myMbti][partnerMbti]로 접근.
  */
-import type { MbtiType } from "./compatibility";
+import type { MbtiType } from "@/data/compatibility";
 
 /** 연인 궁합 상세 설명 */
 export type LoveDescription = {

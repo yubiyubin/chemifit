@@ -5,6 +5,8 @@
  */
 "use client";
 
+import { SYMBOLS } from "@/data/symbols";
+
 type Props = {
   onClick: () => void;
   className?: string;
@@ -16,7 +18,7 @@ export default function CloseButton({ onClick, className }: Props) {
       onClick={onClick}
       className={`neon-ghost absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-xs ${className ?? ""}`}
     >
-      ✕
+      {SYMBOLS.close}
     </button>
   );
 }

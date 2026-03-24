@@ -4,7 +4,7 @@
  * 형식: preview / fightStyle(대화체) / solution(👉 팁) / detail(이모지 마크다운)
  * love-descriptions.ts에서 NF_LOVE_DESC를 import하여 LOVE_DESC에 합산.
  */
-import type { MbtiType } from "../compatibility";
+import type { MbtiType } from "@/data/compatibility";
 import type { LoveDescription } from "../love-descriptions";
 
 export const NF_LOVE_DESC: Partial<

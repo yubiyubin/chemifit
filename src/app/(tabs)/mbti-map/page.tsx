@@ -12,8 +12,8 @@
 import { useRef } from "react";
 import { useMbti } from "@/context/MbtiContext";
 import { useAutoScroll } from "@/hooks/useAutoScroll";
-import MbtiGrid from "@/components/MbtiGrid";
-import MbtiGraph from "@/components/MbtiGraph";
+import MbtiGrid from "@/features/mbti-map/components/MbtiGrid";
+import MbtiGraph from "@/features/mbti-map/components/MbtiGraph";
 
 export default function MbtiMapPage() {
   const { selectedMbti, selectMbti } = useMbti();

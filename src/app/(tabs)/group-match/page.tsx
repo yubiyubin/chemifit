@@ -13,8 +13,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useMbti } from "@/context/MbtiContext";
 import { useAutoScroll } from "@/hooks/useAutoScroll";
-import MemberInput from "@/components/MemberInput";
-import GroupGrid from "@/components/GroupGrid";
+import MemberInput from "@/features/group-match/components/MemberInput";
+import GroupGrid from "@/features/group-match/components/GroupGrid";
 import type { Member } from "@/data/compatibility";
 
 export default function GroupMatchPage() {

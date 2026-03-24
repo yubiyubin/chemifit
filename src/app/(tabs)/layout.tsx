@@ -20,18 +20,12 @@
  */
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
 import TabSwitcher from "@/components/TabSwitcher";
 import MbtiSelectModal from "@/components/MbtiSelectModal";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import { MbtiProvider, useMbti } from "@/context/MbtiContext";
-
-/** 탭 정의 — id는 URL 경로와 동일해야 함 */
-const TABS = [
-  { id: "mbti-love", label: "연인 궁합", emoji: "💕" },
-  { id: "mbti-map", label: "궁합 맵", emoji: "🌐" },
-  { id: "group-match", label: "그룹 궁합", emoji: "👥" },
-];
+import { TABS } from "@/data/tabs";
 
 /** Context를 소비하는 내부 레이아웃 (Provider 안에서만 사용 가능) */
 function TabsLayoutInner({ children }: { children: React.ReactNode }) {
@@ -47,75 +41,13 @@ function TabsLayoutInner({ children }: { children: React.ReactNode }) {
         />
       )}
       <div className="max-w-3xl mx-auto px-4 py-12 flex flex-col gap">
-        <header className="flex justify-between items-start gap-4">
-          <div className="flex flex-col gap-2">
-            <Link
-              href="/"
-              className="flex flex-col md:flex-row items-start md:items-center gap-3 hover:opacity-80 transition-opacity"
-            >
-              <Image
-                src="/chemifit.svg"
-                alt="Chemifit 로고"
-                width={150}
-                height={50}
-                priority
-              />
-              <h1
-                className="text-xl md:text-2xl pl-2 pt-0 md:pt-3 md:pl-0 font-bold tracking-tight"
-                style={{
-                  color: "#ffffffce",
-                  textShadow:
-                    "0 0 8px rgba(168,85,247,0.4), 0 0 20px rgba(168,85,247,0.15)",
-                }}
-              >
-                MBTI 궁합 맵
-              </h1>
-            </Link>
-          </div>
-          {selectedMbti && (
-            <button
-              onClick={openModal}
-              className="group flex items-center gap-3 px-4 py-2 sm:py-2.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 mt-1 shrink-0"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(139,92,246,0.15) 100%)",
-                border: "1px solid rgba(168,85,247,0.4)",
-                boxShadow: "0 4px 20px rgba(168,85,247,0.2)",
-              }}
-            >
-              <div className="flex flex-col items-start">
-                <span className="text-[10px] sm:text-xs font-bold text-purple-300/80 mb-0.5">
-                  내 MBTI
-                </span>
-                <span className="text-base sm:text-lg font-black text-white drop-shadow-[0_0_8px_rgba(168,85,247,0.6)] leading-none">
-                  {selectedMbti}
-                </span>
-              </div>
-              <div
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-colors group-hover:bg-purple-500/30"
-                style={{ background: "rgba(168,85,247,0.2)" }}
-              >
-                <span className="text-xs font-bold text-purple-200">
-                  재선택
-                </span>
-                <span className="text-[10px] text-purple-200 group-hover:translate-x-0.5 transition-transform">
-                  ❯
-                </span>
-              </div>
-            </button>
-          )}
-        </header>
-        <p className="text-white/50 text-sm md:text-base pl-2  pb-8">
-          재미로 보는 궁합이에요 😊 과학적 근거는 없어요
-        </p>
+        <SiteHeader selectedMbti={selectedMbti} onOpenModal={openModal} />
         <nav aria-label="메인 탭" className="mb-3">
           <TabSwitcher tabs={TABS} />
         </nav>
         <section>{children}</section>
       </div>
-      <footer className="text-center py-8 text-white/25 text-xs">
-        © 2026 CYB Labs. All rights reserved.
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

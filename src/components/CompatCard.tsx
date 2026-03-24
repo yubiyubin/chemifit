@@ -14,8 +14,8 @@
 import { ReactNode } from "react";
 import { getScoreInfo } from "@/data/labels";
 import ScoreBar from "./ScoreBar";
-
 import { VARIANT_CONFIG } from "@/styles/card-themes";
+import { EMOJIS } from "@/data/ui-text";
 
 type Props = {
   score: number;
@@ -62,7 +62,7 @@ export default function CompatCard({
       <div
         className={`${compact ? "text-xl" : "text-4xl"} mb-0.5 z-10 filter drop-shadow-md`}
       >
-        {variant === "best" ? "🏆" : "💀"}
+        {variant === "best" ? EMOJIS.best : EMOJIS.worst}
       </div>
       <div
         className={`${compact ? "text-base" : "text-2xl"} font-black mb-0.5 z-10`}

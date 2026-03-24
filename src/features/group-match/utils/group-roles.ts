@@ -12,7 +12,7 @@
  * - 🌙 마이페이스: Fi 내향 (INFP, INFJ, ISFP)
  */
 
-import type { MbtiType } from "./compatibility";
+import type { MbtiType } from "@/data/compatibility";
 
 // ─────────────────────────────────────────────
 // 타입 정의

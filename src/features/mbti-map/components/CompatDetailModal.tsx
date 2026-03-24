@@ -10,10 +10,11 @@
 
 import { useRouter } from "next/navigation";
 import { getScoreInfo, getLoveFriendLine } from "@/data/labels";
+import { COMPAT_DETAIL } from "@/data/ui-text";
 import { scoreTierHue } from "@/data/colors";
-import ScoreBar from "./ScoreBar";
-import CloseButton from "./CloseButton";
-import ModalOverlay from "./ModalOverlay";
+import ScoreBar from "@/components/ScoreBar";
+import CloseButton from "@/components/CloseButton";
+import ModalOverlay from "@/components/ModalOverlay";
 
 export type CompatDetailData = {
   my: string;
@@ -101,7 +102,7 @@ export default function CompatDetailModal({ data, onClose }: Props) {
           className="neon-action mt-4 w-full py-2.5 rounded-xl text-sm font-bold"
           style={{ "--neon": "168,85,247" } as React.CSSProperties}
         >
-          💜 이 MBTI랑 연애하면?
+          {COMPAT_DETAIL.loveCtaLabel}
         </button>
 
         {/* 닫기 버튼 */}
@@ -109,7 +110,7 @@ export default function CompatDetailModal({ data, onClose }: Props) {
           onClick={onClose}
           className="neon-ghost mt-2 w-full py-2 rounded-xl text-sm"
         >
-          닫기
+          {COMPAT_DETAIL.closeLabel}
         </button>
       </div>
     </ModalOverlay>

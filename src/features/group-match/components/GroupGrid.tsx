@@ -17,14 +17,19 @@
 import { useState, useCallback, useMemo } from "react";
 import { COMPATIBILITY, MbtiType, Member, getScore } from "@/data/compatibility";
 import CompatCard from "@/components/CompatCard";
-import { CircularGauge } from "@/components/CoupleResult";
 import { getScoreInfo, getLoveFriendLine } from "@/data/labels";
-import { analyzeGroup } from "@/data/group-roles";
+import { TITLE1, TITLE2, titleProps } from "@/styles/titles";
+import { analyzeGroup } from "@/features/group-match/utils/group-roles";
 import { getGraphColor as getColor, hslToRgb } from "@/data/colors";
 import { computeGroupLayout } from "@/lib/layout";
-import NetworkGraph, { type GraphNode } from "./NetworkGraph";
+import BatteryGauge from "./BatteryGauge";
+import NetworkGraph, { type GraphNode } from "@/components/NetworkGraph";
 import { applyNodeHover } from "@/lib/node-styles";
-import CloseButton from "./CloseButton";
+import CloseButton from "@/components/CloseButton";
+import ModalOverlay from "@/components/ModalOverlay";
+import { DUMMY_CENTER, DUMMY_NODES, DUMMY_BEST, DUMMY_WORST, DUMMY_AVG } from "@/features/group-match/consts/dummy-preview";
+import { GROUP } from "@/data/ui-text";
+import { SYMBOLS } from "@/data/symbols";
 
 /** 컴포넌트 Props: 그룹에 포함된 멤버 배열 (첫 번째 멤버가 '나') */
 type Props = { members: Member[] };
@@ -46,6 +51,7 @@ type PopupData = { mA: Member; mB: Member; score: number } | null;
 
 export default function GroupGrid({ members }: Props) {
   const [popup, setPopup] = useState<PopupData>(null);
+  const [roleOpen, setRoleOpen] = useState(false);
   const [summary, setSummary] = useState<{
     avg: number;
     best: { mA: Member; mB: Member; score: number };
@@ -173,64 +179,8 @@ export default function GroupGrid({ members }: Props) {
   // ─────────────────────────────────────────────
 
   if (!myInfo) {
-    const guideText = "멤버를 추가하면 궁합 맵이 나타나요";
-    const center = {
-      x: 50,
-      y: 48,
-      label: "나",
-      emoji: "⭐",
-      color: "#a855f7",
-      r: 10,
-      score: 100,
-    };
-    const dummyNodes = [
-      {
-        x: 48,
-        y: 14,
-        label: "ENFP",
-        emoji: "🦊",
-        color: "#818cf8",
-        r: 8,
-        score: 92,
-      },
-      {
-        x: 13,
-        y: 38,
-        label: "INTJ",
-        emoji: "🦉",
-        color: "#34d399",
-        r: 5.5,
-        score: 65,
-      },
-      {
-        x: 88,
-        y: 42,
-        label: "ISFJ",
-        emoji: "🐻",
-        color: "#fb923c",
-        r: 7,
-        score: 78,
-      },
-      {
-        x: 22,
-        y: 80,
-        label: "ENTP",
-        emoji: "🐬",
-        color: "#f87171",
-        r: 4.5,
-        score: 45,
-      },
-      {
-        x: 78,
-        y: 78,
-        label: "INFP",
-        emoji: "🦋",
-        color: "#f472b6",
-        r: 7.5,
-        score: 85,
-      },
-    ];
-    const allNodes = [center, ...dummyNodes];
+    const guideText = GROUP.previewGuide;
+    const allNodes = [DUMMY_CENTER, ...DUMMY_NODES];
     return (
       <div className="relative">
         <div
@@ -260,13 +210,13 @@ export default function GroupGrid({ members }: Props) {
                 textShadow: "0 0 12px rgba(168,85,247,0.6)",
               }}
             >
-              73%
+              {DUMMY_AVG.score}%
             </p>
             <p
               className="text-sm font-bold mt-1"
               style={{ color: "rgba(255,255,255,0.7)" }}
             >
-              💫 아주 잘 맞아요
+              {DUMMY_AVG.label}
             </p>
             <div
               className="h-1.5 rounded-full overflow-hidden mt-4"
@@ -278,7 +228,7 @@ export default function GroupGrid({ members }: Props) {
               <div
                 className="h-full rounded-full gauge-bar"
                 style={{
-                  width: "73%",
+                  width: `${DUMMY_AVG.score}%`,
                   background: "#c084fc",
                   boxShadow: "0 0 8px rgba(168,85,247,0.8)",
                 }}
@@ -307,12 +257,12 @@ export default function GroupGrid({ members }: Props) {
                     height="260%"
                   >
                     <feGaussianBlur
-                      stdDeviation={n === center ? "2.5" : "1.8"}
+                      stdDeviation={n === DUMMY_CENTER ? "2.5" : "1.8"}
                       result="blur1"
                     />
                     <feFlood
                       floodColor={n.color}
-                      floodOpacity={n === center ? "0.8" : "0.6"}
+                      floodOpacity={n === DUMMY_CENTER ? "0.8" : "0.6"}
                     />
                     <feComposite in2="blur1" operator="in" result="glow1" />
                     <feGaussianBlur
@@ -361,7 +311,7 @@ export default function GroupGrid({ members }: Props) {
               </defs>
               {allNodes.map((a, i) =>
                 allNodes.slice(i + 1).map((b, j) => {
-                  if (a === center || b === center) return null;
+                  if (a === DUMMY_CENTER || b === DUMMY_CENTER) return null;
                   const score = Math.round((a.score + b.score) / 3);
                   return (
                     <g key={`line-${i}-${j}`} filter="url(#line-glow)">
@@ -389,19 +339,19 @@ export default function GroupGrid({ members }: Props) {
                   );
                 }),
               )}
-              {dummyNodes.map((n, i) => {
-                const midX = (center.x + n.x) / 2;
-                const midY = (center.y + n.y) / 2;
-                const dx = n.y - center.y;
-                const dy = -(n.x - center.x);
+              {DUMMY_NODES.map((n, i) => {
+                const midX = (DUMMY_CENTER.x + n.x) / 2;
+                const midY = (DUMMY_CENTER.y + n.y) / 2;
+                const dx = n.y - DUMMY_CENTER.y;
+                const dy = -(n.x - DUMMY_CENTER.x);
                 const len = Math.sqrt(dx * dx + dy * dy) || 1;
                 const offX = (dx / len) * 5;
                 const offY = (dy / len) * 5;
                 return (
                   <g key={`cline-${i}`}>
                     <line
-                      x1={center.x}
-                      y1={center.y}
+                      x1={DUMMY_CENTER.x}
+                      y1={DUMMY_CENTER.y}
                       x2={n.x}
                       y2={n.y}
                       stroke={n.color}
@@ -410,8 +360,8 @@ export default function GroupGrid({ members }: Props) {
                       filter={`url(#glow-${i + 1})`}
                     />
                     <line
-                      x1={center.x}
-                      y1={center.y}
+                      x1={DUMMY_CENTER.x}
+                      y1={DUMMY_CENTER.y}
                       x2={n.x}
                       y2={n.y}
                       stroke={n.color}
@@ -435,7 +385,7 @@ export default function GroupGrid({ members }: Props) {
                 );
               })}
               {allNodes.map((n, i) => {
-                const isCenter = n === center;
+                const isCenter = n === DUMMY_CENTER;
                 return (
                   <g key={`node-${i}`} filter={`url(#glow-${i})`}>
                     <circle
@@ -514,17 +464,17 @@ export default function GroupGrid({ members }: Props) {
                   className="text-xl font-bold mb-1"
                   style={{ color: "rgba(229,165,10,0.5)" }}
                 >
-                  92%
+                  {DUMMY_BEST.score}%
                 </div>
-                <div className="text-xs text-white/30 mb-3">최고의 궁합</div>
+                <div className="text-xs text-white/30 mb-3">{DUMMY_BEST.label}</div>
                 <p className="text-xs" style={{ color: "#ffffff50" }}>
-                  🦊 × 🦋
+                  {DUMMY_BEST.emoji1} × {DUMMY_BEST.emoji2}
                 </p>
                 <div className="mt-2 h-1 rounded-full overflow-hidden bg-white/10">
                   <div
                     className="h-full rounded-full gauge-bar"
                     style={{
-                      width: "92%",
+                      width: `${DUMMY_BEST.score}%`,
                       backgroundColor: "rgba(229,165,10,0.4)",
                       boxShadow: "0 0 6px rgba(229,165,10,0.5)",
                     }}
@@ -549,19 +499,19 @@ export default function GroupGrid({ members }: Props) {
                   className="text-xl font-bold mb-1"
                   style={{ color: "rgba(220,38,38,0.5)" }}
                 >
-                  45%
+                  {DUMMY_WORST.score}%
                 </div>
                 <div className="text-xs text-white/30 mb-3">
-                  노력이 필요해요
+                  {DUMMY_WORST.label}
                 </div>
                 <p className="text-xs" style={{ color: "#ffffff50" }}>
-                  🦉 × 🐬
+                  {DUMMY_WORST.emoji1} × {DUMMY_WORST.emoji2}
                 </p>
                 <div className="mt-2 h-1 rounded-full overflow-hidden bg-white/10">
                   <div
                     className="h-full rounded-full gauge-bar"
                     style={{
-                      width: "45%",
+                      width: `${DUMMY_WORST.score}%`,
                       backgroundColor: "rgba(220,38,38,0.4)",
                       boxShadow: "0 0 6px rgba(220,38,38,0.5)",
                     }}
@@ -598,249 +548,233 @@ export default function GroupGrid({ members }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* ── 결과 요약 섹션 ── */}
-      {needMore && !summary ? (
+      {/* ── 결과 카드 — 세로 풀 레이아웃 ── */}
+      {summary ? (
         <div
-          className="grid grid-cols-[2fr_1.5fr_1.5fr] gap-3"
-          style={{ opacity: 0.35, pointerEvents: "none" }}
-        >
-          <div
-            className="rounded-2xl p-3 text-center flex flex-col justify-center"
-            style={{
-              background:
-                "radial-gradient(ellipse at 50% -20%, rgba(100,100,100,0.1) 0%, rgba(15,15,26,0.95) 75%)",
-              border: "1px solid rgba(100,100,100,0.2)",
-            }}
-          >
-            <p
-              className="text-xs mb-1 font-bold"
-              style={{ color: "rgba(255,255,255,0.3)" }}
-            >
-              그룹 평균 궁합
-            </p>
-            <p
-              className="text-xl font-black mb-1"
-              style={{ color: "rgba(255,255,255,0.2)", textShadow: "none" }}
-            >
-              --%
-            </p>
-            <p
-              className="text-xs font-bold mt-1"
-              style={{ color: "rgba(255,255,255,0.4)" }}
-            >
-              🤝 데이터 부족
-            </p>
-          </div>
-          <div
-            className="rounded-2xl p-3 text-center flex flex-col justify-center"
-            style={{
-              backgroundColor: "rgba(229,165,10,0.05)",
-              border: "0.5px solid rgba(229,165,10,0.15)",
-            }}
-          >
-            <p
-              className="text-[10px] font-bold mb-1"
-              style={{ color: "rgba(229,165,10,0.5)" }}
-            >
-              🏆 최고의 궁합
-            </p>
-            <div className="text-lg mb-0.5">✨</div>
-            <div
-              className="text-sm font-bold"
-              style={{ color: "rgba(229,165,10,0.5)" }}
-            >
-              —
-            </div>
-          </div>
-          <div
-            className="rounded-2xl p-3 text-center flex flex-col justify-center"
-            style={{
-              backgroundColor: "rgba(220,38,38,0.05)",
-              border: "0.5px solid rgba(220,38,38,0.15)",
-            }}
-          >
-            <p
-              className="text-[10px] font-bold mb-1"
-              style={{ color: "rgba(220,38,38,0.5)" }}
-            >
-              💀 최악의 궁합
-            </p>
-            <div className="text-lg mb-0.5">🌧️</div>
-            <div
-              className="text-sm font-bold"
-              style={{ color: "rgba(220,38,38,0.5)" }}
-            >
-              —
-            </div>
-          </div>
-        </div>
-      ) : summary ? (
-        <div className="grid grid-cols-[2fr_1.5fr_1.5fr] gap-3 fade-in-up">
-          <div
-            className="relative overflow-hidden rounded-2xl text-center flex flex-col justify-center"
-            style={{
-              background:
-                "radial-gradient(ellipse at 50% -10%, rgba(119,92,246,0.45) 0%, rgba(79,90,235,0.16) 40%, rgba(13,13,24,0.96) 80%)",
-              border: "1px solid rgba(109,90,238,0.55)",
-              boxShadow: "0 0 50px rgba(119,92,246,0.25), 0 0 100px rgba(79,90,235,0.1), inset 0 0 40px rgba(79,90,235,0.06)",
-            }}
-          >
-            <div className="relative z-10 flex flex-col items-center gap-2 py-6 px-4">
-              <p
-                className="text-sm font-black tracking-wide"
-                style={{ color: "#d8b4fe", textShadow: "0 0 12px rgba(168,85,247,0.8), 0 0 24px rgba(168,85,247,0.4)" }}
-              >
-                그룹 평균 궁합
-              </p>
-              <CircularGauge
-                score={summary.avg}
-                size={150}
-                overrideColor="#a855f7"
-              />
-              <p
-                className="text-sm font-black"
-                style={{
-                  color: "#e9d5ff",
-                  textShadow: "0 0 14px rgba(168,85,247,0.7), 0 0 28px rgba(168,85,247,0.3)",
-                }}
-              >
-                {summaryInfo?.emoji} {summaryInfo?.label}
-              </p>
-            </div>
-          </div>
-
-          <CompatCard
-            score={summary.best.score}
-            variant="best"
-            onClick={() =>
-              setPopup({
-                mA: summary.best.mA,
-                mB: summary.best.mB,
-                score: summary.best.score,
-              })
-            }
-          >
-            <p className="text-xs leading-tight" style={{ color: "#ffffffbb" }}>
-              {summary.best.mA.emoji}
-              {summary.best.mA.name} × {summary.best.mB.emoji}
-              {summary.best.mB.name}
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: "#ffffff38" }}>
-              {summary.best.mA.mbti} + {summary.best.mB.mbti}
-            </p>
-          </CompatCard>
-
-          <CompatCard
-            score={summary.worst.score}
-            variant="worst"
-            onClick={() =>
-              setPopup({
-                mA: summary.worst.mA,
-                mB: summary.worst.mB,
-                score: summary.worst.score,
-              })
-            }
-          >
-            <p className="text-xs leading-tight" style={{ color: "#ffffffbb" }}>
-              {summary.worst.mA.emoji}
-              {summary.worst.mA.name} × {summary.worst.mB.emoji}
-              {summary.worst.mB.name}
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: "#ffffff38" }}>
-              {summary.worst.mA.mbti} + {summary.worst.mB.mbti}
-            </p>
-          </CompatCard>
-        </div>
-      ) : null}
-
-      {/* ── 그룹 역할 분석 ── */}
-      {groupAnalysis && (
-        <div
-          className="rounded-2xl p-5 flex flex-col gap-3 fade-in-up"
+          className="rounded-2xl flex flex-col gap-0 fade-in-up"
           style={{
-            background:
-              "radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.12) 0%, rgba(15,15,26,0.95) 70%)",
-            border: "1px solid rgba(139,92,246,0.25)",
-            boxShadow: "0 0 30px rgba(139,92,246,0.08)",
+            background: "rgba(139,92,246,0.06)",
+            border: "1px solid rgba(139,92,246,0.18)",
           }}
         >
-          <p
-            className="text-base font-black text-center"
+          {/* 상단: 타이틀 + 멤버 뱃지 */}
+          <div
+            className="p-7 sm:p-8 flex flex-col items-center gap-5"
             style={{
-              color: "#e9d5ff",
-              textShadow:
-                "0 0 12px rgba(168,85,247,0.6), 0 0 24px rgba(168,85,247,0.3)",
+              background:
+                "radial-gradient(ellipse at 50% 80%, rgba(139,92,246,0.10) 0%, transparent 70%)",
             }}
           >
-            {groupAnalysis.meme}
-          </p>
-          <div className="flex flex-col gap-2 mt-1">
-            {groupAnalysis.roles.map((role) => (
-              <div
-                key={role.id}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl"
+            {/* 밈 한 줄 — CoupleResult 한줄요약과 동일 형식 */}
+            {groupAnalysis && (
+              <div className="flex flex-col items-center gap-1 z-10 px-2">
+                <span className="text-3xl z-10">👥</span>
+                <p {...titleProps(TITLE1, "#fff", "168,85,247", "text-center leading-snug")}>
+                  &ldquo;{groupAnalysis.meme}&rdquo;
+                </p>
+              </div>
+            )}
+
+            {/* 배터리 게이지 (그룹 평균) */}
+            <BatteryGauge
+              score={summary.avg}
+              label={`${summaryInfo?.emoji} ${summaryInfo?.label}`}
+            />
+
+            {/* 멤버 뱃지 가로 나열 */}
+            <div className="flex flex-wrap justify-center gap-2">
+              {members.map((m, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold"
+                  style={{
+                    background: "rgba(168,85,247,0.12)",
+                    border: "1px solid rgba(168,85,247,0.25)",
+                    color: "#c084fc",
+                  }}
+                >
+                  <span>{m.emoji}</span>
+                  <span>{m.name}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* 네트워크 그래프 (카드 안 히어로) */}
+            <div className="w-full relative">
+              <NetworkGraph
+                buildPositions={buildPositions}
+                applyNodeStyles={applyNodeStyles}
+                onLineClick={onLineClick}
+                onAnimComplete={onAnimComplete}
+                getLineColorKey={getLineColorKey}
+                drawNonCenterLines={true}
+                animDuration={1000}
+                resetOnDataChange={false}
+              />
+              {/* 그래프 인터랙션 힌트 */}
+              <p
+                className="text-center text-[11px] font-medium mt-1"
+                style={{ color: "rgba(255,255,255,0.25)" }}
+              >
+                {GROUP.graphHint}
+              </p>
+            </div>
+
+            {/* 구분선 + 소제목 */}
+            <div
+              className="w-full flex items-center gap-3 mt-2"
+              style={{ color: "rgba(168,85,247,0.5)" }}
+            >
+              <div className="flex-1 h-px" style={{ background: "rgba(168,85,247,0.15)" }} />
+              <span className="text-xs font-bold shrink-0">{GROUP.pairSectionTitle}</span>
+              <div className="flex-1 h-px" style={{ background: "rgba(168,85,247,0.15)" }} />
+            </div>
+
+            {/* 최고/최저 궁합 2열 */}
+            <div className="grid grid-cols-2 gap-3 w-full">
+              <CompatCard
+                score={summary.best.score}
+                variant="best"
+                onClick={() =>
+                  setPopup({
+                    mA: summary.best.mA,
+                    mB: summary.best.mB,
+                    score: summary.best.score,
+                  })
+                }
+              >
+                <p className="text-xs leading-tight" style={{ color: "#ffffffbb" }}>
+                  {summary.best.mA.emoji}
+                  {summary.best.mA.name} × {summary.best.mB.emoji}
+                  {summary.best.mB.name}
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: "#ffffff38" }}>
+                  {summary.best.mA.mbti} + {summary.best.mB.mbti}
+                </p>
+              </CompatCard>
+
+              <CompatCard
+                score={summary.worst.score}
+                variant="worst"
+                onClick={() =>
+                  setPopup({
+                    mA: summary.worst.mA,
+                    mB: summary.worst.mB,
+                    score: summary.worst.score,
+                  })
+                }
+              >
+                <p className="text-xs leading-tight" style={{ color: "#ffffffbb" }}>
+                  {summary.worst.mA.emoji}
+                  {summary.worst.mA.name} × {summary.worst.mB.emoji}
+                  {summary.worst.mB.name}
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: "#ffffff38" }}>
+                  {summary.worst.mA.mbti} + {summary.worst.mB.mbti}
+                </p>
+              </CompatCard>
+            </div>
+          </div>
+
+          {/* 그룹 역할 분석 아코디언 */}
+          {groupAnalysis && (
+            <>
+              <button
+                onClick={() => setRoleOpen((prev) => !prev)}
+                className="flex items-center justify-center gap-2 py-4 text-sm font-bold transition-colors"
                 style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "rgba(168,85,247,0.75)",
+                  borderTop: "1px solid rgba(139,92,246,0.12)",
                 }}
               >
-                <span className="text-lg shrink-0">{role.emoji}</span>
-                <span className="text-sm font-bold text-white/70 shrink-0">
-                  {role.name} {role.count}명
+                <span>{roleOpen ? GROUP.roleAccordionClose : GROUP.roleAccordionOpen}</span>
+                <span
+                  className="transition-transform duration-200 text-xs"
+                  style={{
+                    transform: roleOpen ? "rotate(180deg)" : "rotate(0)",
+                  }}
+                >
+                  {SYMBOLS.dropdown}
                 </span>
-                <span className="text-white/30 shrink-0">→</span>
-                <span className="text-sm text-white/50">{role.effect}</span>
-              </div>
-            ))}
+              </button>
+              {roleOpen && (
+                <div
+                  className="px-7 pb-7 flex flex-col gap-3 fade-in-up"
+                  style={{ borderTop: "1px solid rgba(139,92,246,0.10)" }}
+                >
+                  <div className="flex flex-col gap-2 mt-3">
+                    {groupAnalysis.roles.map((role) => (
+                      <div
+                        key={role.id}
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                        style={{
+                          background: "rgba(255,255,255,0.04)",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                        }}
+                      >
+                        <span className="text-lg shrink-0">{role.emoji}</span>
+                        <span className="text-sm font-bold text-white/70 shrink-0">
+                          {role.name} {role.count}명
+                        </span>
+                        <span className="text-white/30 shrink-0">→</span>
+                        <span className="text-sm text-white/50">{role.effect}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      ) : (
+        /* 멤버 부족 시: 카드 형태 빈 상태 */
+        <div
+          className="rounded-2xl flex flex-col items-center gap-5 p-7 sm:p-8"
+          style={{
+            background: "rgba(139,92,246,0.06)",
+            border: "1px solid rgba(139,92,246,0.18)",
+          }}
+        >
+          <div className="relative w-full" style={{ opacity: 0.4 }}>
+            <NetworkGraph
+              buildPositions={buildPositions}
+              applyNodeStyles={applyNodeStyles}
+              onLineClick={onLineClick}
+              onAnimComplete={onAnimComplete}
+              getLineColorKey={getLineColorKey}
+              drawNonCenterLines={true}
+              animDuration={1000}
+              resetOnDataChange={false}
+            />
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-3xl">{GROUP.emptyEmoji}</span>
+            <p
+              className="text-base font-bold text-center"
+              style={{
+                color: "rgba(255,255,255,0.6)",
+                textShadow: "0 0 8px rgba(168,85,247,0.2)",
+              }}
+            >
+              {GROUP.emptyTitle}
+            </p>
+            <p className="text-sm text-white/30">
+              {GROUP.emptySubtitle}
+            </p>
           </div>
         </div>
       )}
 
-      {/* ── 네트워크 그래프 영역 ── */}
-      <div className="relative">
-        <NetworkGraph
-          buildPositions={buildPositions}
-          applyNodeStyles={applyNodeStyles}
-          onLineClick={onLineClick}
-          onAnimComplete={onAnimComplete}
-          getLineColorKey={getLineColorKey}
-          drawNonCenterLines={true}
-          animDuration={1000}
-          resetOnDataChange={false}
-        />
-        {needMore && (
-          <div className="absolute inset-0 flex items-start justify-center pt-6 pointer-events-none">
-            <p
-              className="text-white text-md md:text-base font-bold px-7 py-3.5 rounded-2xl"
-              style={{
-                background: "rgba(15,15,26,0.9)",
-                border: "0.5px solid rgba(168,85,247,0.2)",
-                boxShadow: "0 0 15px rgba(168,85,247,0.08)",
-                textShadow: "0 0 6px rgba(168,85,247,0.15)",
-              }}
-            >
-              최소 2명이 필요해요 — 1명 더 추가해주세요
-            </p>
-          </div>
-        )}
-      </div>
-
       {/* ── 궁합 상세 팝업 (모달) ── */}
       {popup && (
-        <>
+        <ModalOverlay onClose={() => setPopup(null)} align="transform">
           <div
-            className="fixed inset-0 z-50"
-            style={{ background: "#00000075" }}
-            onClick={() => setPopup(null)}
-          />
-          <div
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[300px] rounded-2xl p-7 text-center"
+            className="rounded-2xl p-7 text-center"
             style={{
               background: "#0d0d1a",
               border: `0.5px solid rgba(${rgb},0.32)`,
               boxShadow: `0 0 36px rgba(${rgb},0.18)`,
             }}
-            onClick={(e) => e.stopPropagation()}
           >
             <CloseButton onClick={() => setPopup(null)} />
             <div className="text-4xl mb-2">{popupInfo?.emoji}</div>
@@ -887,7 +821,7 @@ export default function GroupGrid({ members }: Props) {
               {getLoveFriendLine(popup.score)}
             </p>
           </div>
-        </>
+        </ModalOverlay>
       )}
     </div>
   );

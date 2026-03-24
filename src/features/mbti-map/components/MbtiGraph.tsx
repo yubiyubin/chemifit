@@ -10,23 +10,13 @@ import { useCallback, useState } from "react";
 import { MBTI_TYPES, COMPATIBILITY, MbtiType } from "@/data/compatibility";
 import { getGraphColor as getColor, hslToRgb } from "@/data/colors";
 import CompatDetailModal, { type CompatDetailData } from "./CompatDetailModal";
-import NetworkGraph, { type GraphNode } from "./NetworkGraph";
+import NetworkGraph, { type GraphNode } from "@/components/NetworkGraph";
 import { resolveCollisions } from "@/lib/layout";
 import { applyNodeHover } from "@/lib/node-styles";
+import { ANGLE_OFFSETS_16 as ANGLE_OFFSETS, DIST_MULTS_16 as DIST_MULTS } from "@/data/graph-constants";
+import { EMOJIS } from "@/data/ui-text";
 
 type Props = { selectedMbti: MbtiType };
-
-/** 궤도 각도 지터링 오프셋 — 균일한 원형 배치를 깨뜨려 자연스러운 분포를 만든다 */
-const ANGLE_OFFSETS = [
-  0, 0.35, -0.28, 0.55, -0.42, 0.2, -0.5, 0.65, 0.1, -0.35, 0.45, -0.2, 0.6,
-  -0.15, 0.25, -0.6,
-];
-
-/** 궤도 거리 배율 — 동일 반경 겹침 방지 */
-const DIST_MULTS = [
-  1.0, 1.2, 0.88, 1.35, 0.82, 1.15, 0.92, 1.28, 1.05, 0.85, 1.22, 0.9, 1.1,
-  0.78, 1.3, 0.95,
-];
 
 export default function MbtiGraph({ selectedMbti }: Props) {
   const [popup, setPopup] = useState<CompatDetailData>(null);
@@ -154,7 +144,7 @@ export default function MbtiGraph({ selectedMbti }: Props) {
         const ns = Math.max(r * 0.26, 5);
         const es = Math.max(r * 0.38, 7);
         const ms = Math.max(r * 0.28, 6);
-        const badge = isBest ? "🏆" : isWorst ? "💀" : "";
+        const badge = isBest ? EMOJIS.best : isWorst ? EMOJIS.worst : "";
         el.innerHTML = `
           ${badge ? `<span class="mbti-badge" style="font-size:${es}px;line-height:1;opacity:0;transition:opacity 2s ease;">${badge}</span>` : ""}
           <span style="font-size:${ns}px;font-weight:700;color:rgba(${rgb},${isHighlight || isCenter ? 0.85 : 0.7});text-shadow:0 0 6px rgba(${rgb},0.6);line-height:1.2;">${mbti}</span>

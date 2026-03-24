@@ -15,12 +15,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import { MBTI_TYPES, COMPATIBILITY, MbtiType } from "@/data/compatibility";
+import { MBTI_MAP } from "@/data/ui-text";
 import { getScoreInfo } from "@/data/labels";
-import MbtiBadge from "@/components/MbtiBadge";
+import MbtiBadge from "@/features/mbti-map/components/MbtiBadge";
 import CompatCard from "@/components/CompatCard";
 import DetailScoreCard from "@/components/DetailScoreCard";
 import ScoreBar from "@/components/ScoreBar";
-import CompatDetailModal, { type CompatDetailData } from "@/components/CompatDetailModal";
+import CompatDetailModal, { type CompatDetailData } from "@/features/mbti-map/components/CompatDetailModal";
 
 /** 동일 점수를 가진 MBTI들을 하나의 그룹으로 묶기 위한 타입 */
 type GroupedPair = {
@@ -130,9 +131,9 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
         <div className="flex flex-col gap-3 fade-in-up">
           <div className="flex items-center gap-2 pl-1">
             <span className="text-sm font-bold text-white/80">
-              다른 MBTI로 보기
+              {MBTI_MAP.otherMbtiLabel}
             </span>
-            <span className="text-lg">👇</span>
+            <span className="text-lg">{MBTI_MAP.otherMbtiEmoji}</span>
           </div>
           <div
             ref={scrollRef}
@@ -193,7 +194,7 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
       {children}
 
       {/* ── 섹션 4: 전체 궁합 순위 리스트 (DetailScoreCard categories 모드) ── */}
-      <DetailScoreCard title="📊 궁합 순위" themeRgb="168,85,247">
+      <DetailScoreCard title={MBTI_MAP.rankTitle} themeRgb="168,85,247">
         {(() => {
           let rank = 1;
           return grouped.map((g, i) => {

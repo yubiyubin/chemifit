@@ -3,6 +3,7 @@ import {
   MBTI_TYPES,
   COMPATIBILITY,
   getScore,
+  getScorePercentile,
 } from "./compatibility";
 
 describe("MBTI_TYPES", () => {
@@ -165,3 +166,39 @@ describe("getScore()", () => {
     expect(getScore("ENTJ", "INTJ")).toBe(getScore("INTJ", "ENTJ"));
   });
 });
+
+describe("getScorePercentile()", () => {
+  it("반환값이 0 이상 100 이하여야 한다", () => {
+    [0, 50, 98, 100].forEach((score) => {
+      const p = getScorePercentile(score);
+      expect(p).toBeGreaterThanOrEqual(0);
+      expect(p).toBeLessThanOrEqual(100);
+    });
+  });
+
+  it("score=0 → 100% (모든 조합이 0 이상)", () => {
+    expect(getScorePercentile(0)).toBe(100);
+  });
+
+  it("score=101 → 0% (101을 초과하는 조합 없음)", () => {
+    expect(getScorePercentile(101)).toBe(0);
+  });
+
+  it("낮은 점수일수록 높은 퍼센타일 반환", () => {
+    const p50 = getScorePercentile(50);
+    const p80 = getScorePercentile(80);
+    expect(p50).toBeGreaterThanOrEqual(p80);
+  });
+
+  it("소수점 1자리로 반환됨", () => {
+    const p = getScorePercentile(70);
+    const decimals = (p.toString().split(".")[1] ?? "").length;
+    expect(decimals).toBeLessThanOrEqual(1);
+  });
+
+  it("전체 256개 점수 기반으로 계산됨 — INTJ-INTP(98점)은 상위 소수여야 함", () => {
+    // 98점 이상인 조합은 극소수여야 함 (상위 10% 미만)
+    expect(getScorePercentile(98)).toBeLessThan(10);
+  });
+});
+

@@ -337,3 +337,16 @@ export type Member = {
 export function getScore(a: MbtiType, b: MbtiType): number {
   return COMPATIBILITY[a]?.[b] ?? COMPATIBILITY[b]?.[a] ?? 50;
 }
+
+/**
+ * 주어진 점수가 전체 256개 조합(16×16) 중 상위 몇 %인지 반환한다.
+ * score 이상인 조합의 수 / 256 × 100 을 소수점 1자리로 반올림.
+ * @example getScorePercentile(98) // → 1.2 (상위 1.2%)
+ */
+export function getScorePercentile(score: number): number {
+  const allScores = MBTI_TYPES.flatMap((a) =>
+    MBTI_TYPES.map((b) => getScore(a as MbtiType, b as MbtiType)),
+  );
+  const aboveOrEqual = allScores.filter((s) => s >= score).length;
+  return Math.round((aboveOrEqual / allScores.length) * 1000) / 10;
+}

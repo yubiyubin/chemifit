@@ -73,15 +73,18 @@ function InfoLine({
   if (mbtiMatch) {
     const [, mbti, text] = mbtiMatch;
     // myMbti → titleColor(밝음), partnerMbti → rgba 흐린 버전으로 시각적 구분
-    const mbtiColor =
-      mbti === myMbti
-        ? (titleColor ?? `rgba(${themeRgb},0.95)`)
-        : mbti === partnerMbti
-          ? `color-mix(in srgb, rgb(${themeRgb}) 50%, white)`
-          : (titleColor ?? `rgba(${themeRgb},0.95)`);
+    const isMyMbti = mbti === myMbti;
+    const mbtiColor = isMyMbti
+      ? (titleColor ?? `rgba(${themeRgb},0.95)`)
+      : mbti === partnerMbti
+        ? `color-mix(in srgb, rgb(${themeRgb}) 50%, white)`
+        : (titleColor ?? `rgba(${themeRgb},0.95)`);
+    const mbtiGlow = isMyMbti
+      ? `0 0 8px rgba(${themeRgb},0.7)`
+      : `0 0 8px rgba(${themeRgb},0.35)`;
     return (
       <p className="text-sm sm:text-base leading-relaxed">
-        <span className="font-black mr-2" style={{ color: mbtiColor }}>{mbti}{mbtiSuffix}</span>
+        <span className="font-black mr-2" style={{ color: mbtiColor, textShadow: mbtiGlow }}>{mbti}{mbtiSuffix}</span>
         <span className="font-medium" style={{ color: "rgba(255,255,255,0.82)" }}>{text}</span>
       </p>
     );

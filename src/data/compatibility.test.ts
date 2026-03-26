@@ -3,7 +3,6 @@ import {
   MBTI_TYPES,
   COMPATIBILITY,
   getScore,
-  getScoreLevel,
 } from "./compatibility";
 
 describe("MBTI_TYPES", () => {
@@ -164,73 +163,5 @@ describe("getScore()", () => {
 
   it("ENTJ-INTJ 대칭 확인", () => {
     expect(getScore("ENTJ", "INTJ")).toBe(getScore("INTJ", "ENTJ"));
-  });
-});
-
-describe("getScoreLevel()", () => {
-  it("85 이상 → perfect", () => {
-    expect(getScoreLevel(85)).toBe("perfect");
-    expect(getScoreLevel(100)).toBe("perfect");
-    expect(getScoreLevel(98)).toBe("perfect");
-  });
-
-  it("70~84 → great", () => {
-    expect(getScoreLevel(70)).toBe("great");
-    expect(getScoreLevel(84)).toBe("great");
-    expect(getScoreLevel(75)).toBe("great");
-  });
-
-  it("50~69 → good", () => {
-    expect(getScoreLevel(50)).toBe("good");
-    expect(getScoreLevel(69)).toBe("good");
-    expect(getScoreLevel(60)).toBe("good");
-  });
-
-  it("35~49 → soso", () => {
-    expect(getScoreLevel(35)).toBe("soso");
-    expect(getScoreLevel(49)).toBe("soso");
-    expect(getScoreLevel(42)).toBe("soso");
-  });
-
-  it("34 이하 → hard", () => {
-    expect(getScoreLevel(34)).toBe("hard");
-    expect(getScoreLevel(0)).toBe("hard");
-    expect(getScoreLevel(15)).toBe("hard");
-  });
-
-  it("경계값 85 → perfect (경계 포함)", () => {
-    expect(getScoreLevel(85)).toBe("perfect");
-  });
-
-  it("경계값 84 → great (경계 미포함)", () => {
-    expect(getScoreLevel(84)).toBe("great");
-  });
-
-  it("경계값 70 → great (경계 포함)", () => {
-    expect(getScoreLevel(70)).toBe("great");
-  });
-
-  it("경계값 69 → good (경계 미포함)", () => {
-    expect(getScoreLevel(69)).toBe("good");
-  });
-
-  it("경계값 50 → good (경계 포함)", () => {
-    expect(getScoreLevel(50)).toBe("good");
-  });
-
-  it("경계값 49 → soso (경계 미포함)", () => {
-    expect(getScoreLevel(49)).toBe("soso");
-  });
-
-  it("경계값 35 → soso (경계 포함)", () => {
-    expect(getScoreLevel(35)).toBe("soso");
-  });
-
-  it("경계값 34 → hard (경계 미포함)", () => {
-    expect(getScoreLevel(34)).toBe("hard");
-  });
-
-  it("점수 0 → hard", () => {
-    expect(getScoreLevel(0)).toBe("hard");
   });
 });

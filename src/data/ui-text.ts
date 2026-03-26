@@ -18,6 +18,16 @@ export const SITE = {
 } as const;
 
 // ─────────────────────────────────────────────
+// 페이지별 heading (시맨틱 SEO)
+// ─────────────────────────────────────────────
+
+export const PAGE_HEADINGS = {
+  mbtiLove: "MBTI 연애 궁합 테스트",
+  mbtiMap: "MBTI 16타입 궁합 맵",
+  groupMatch: "그룹 MBTI 궁합 분석",
+} as const;
+
+// ─────────────────────────────────────────────
 // MBTI 선택 모달
 // ─────────────────────────────────────────────
 
@@ -40,11 +50,14 @@ export const COUPLE = {
   mbtiSeparator: "💕",
   fightTitle: "🔥 싸움 패턴",
   solutionTitle: "🔧 해결 핵심",
-  detailOpenLabel: "📖 더 자세히 보기",
+  detailOpenLabel: "펼치기",
   detailCloseLabel: "접기",
   rankCta: "이 궁합, 전체 중에서 몇 위일까? 👀",
   rankCtaSub: "👉 상위 몇 %인지 확인해보기",
+  groupCta: "그룹 케미도 확인해봐요 >>",
+  groupCtaSub: "친구들과 함께 궁합을 알아보세요",
   detailScoreTitle: "💞 세부 궁합",
+  saveImageLabel: "이미지 저장",
 } as const;
 
 // ─────────────────────────────────────────────
@@ -66,7 +79,7 @@ export const GROUP = {
   emptySubtitle: "멤버를 추가하면 그룹 궁합을 분석해드려요",
   emptyEmoji: "👥",
   previewGuide: "멤버를 추가하면 궁합 맵이 나타나요",
-  graphHint: "선을 클릭하면 상세 궁합을 볼 수 있어요",
+  graphHint: "원을 클릭하면 상세 궁합을 볼 수 있어요",
   pairSectionTitle: "쌍별 궁합",
   roleAccordionOpen: "🎭 그룹 역할 분석 보기",
   roleAccordionClose: "접기",

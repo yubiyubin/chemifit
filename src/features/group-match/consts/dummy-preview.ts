@@ -36,4 +36,3 @@ export const DUMMY_NODES: DummyNode[] = [
 export const DUMMY_BEST = { score: 92, emoji1: "🦊", emoji2: "🦋", label: "최고의 궁합" };
 export const DUMMY_WORST = { score: 45, emoji1: "🦉", emoji2: "🐬", label: "노력이 필요해요" };
 export const DUMMY_AVG = { score: 73, label: "💫 아주 잘 맞아요" };
-export const DUMMY_MEME = "이 그룹, 터지기 직전의 케미";

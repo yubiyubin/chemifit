@@ -327,17 +327,6 @@ export const COMPATIBILITY: Record<MbtiType, Record<MbtiType, number>> = {
   },
 };
 
-export type CompatibilityScore = "perfect" | "great" | "good" | "soso" | "hard";
-
-export function getScoreLevel(score: number): CompatibilityScore {
-  if (score >= 85) return "perfect";
-  if (score >= 70) return "great";
-  if (score >= 50) return "good";
-  if (score >= 35) return "soso";
-  return "hard";
-}
-
-
 export type Member = {
   name: string;
   mbti: MbtiType;

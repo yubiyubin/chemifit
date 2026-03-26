@@ -28,6 +28,7 @@ import { getCoupleTier } from "@/data/labels";
 import { LOVE_DESC } from "@/features/mbti-love/consts/love-descriptions";
 import MbtiSelectModal from "@/components/MbtiSelectModal";
 import DetailScoreCard from "@/components/DetailScoreCard";
+import NeonCard from "@/components/NeonCard";
 
 type Props = {
   myMbti: MbtiType;
@@ -369,12 +370,11 @@ export default function CoupleResult({
         <div ref={resultRef} className="fade-in-up flex flex-col gap-6">
           {/* 메인 카드 (한줄요약 + 히어로 + 싸움패턴 + 아코디언) */}
           {loveDesc && (
-            <div
-              className="rounded-2xl flex flex-col gap-0"
-              style={{
-                background: "rgba(236,72,153,0.06)",
-                border: "1px solid rgba(236,72,153,0.18)",
-              }}
+            <NeonCard
+              rgb="236,72,153"
+              bgAlpha={0.06}
+              borderAlpha={0.34}
+              className="flex flex-col gap-0"
             >
               {/* 메인 영역 — 한줄요약 + 히어로 게이지 + 싸움/해결 */}
               <div
@@ -443,8 +443,12 @@ export default function CoupleResult({
                     </div>
                   </div>
 
-                  {/* 원형 게이지 (점수 시각화) */}
-                  <CircularGauge score={score} />
+                  {/* 원형 게이지 (점수 시각화 — 핑크→퍼플 그라디언트) */}
+                  <CircularGauge
+                    score={score}
+                    gradient={["#ec4899", "#a855f7"]}
+                    textColor="#f472b6"
+                  />
 
                   {/* 티어 라벨 */}
                   <div className="flex flex-col items-center gap-2 z-10">
@@ -459,6 +463,15 @@ export default function CoupleResult({
                       {tier.label}
                     </p>
                   </div>
+
+                  {/* 이미지 저장 버튼 */}
+                  <button
+                    data-testid="save-image-btn"
+                    className="neon-btn z-10 px-6 py-2.5 rounded-xl text-sm font-bold"
+                    style={{ "--neon": "236,72,153" } as React.CSSProperties}
+                  >
+                    {COUPLE.saveImageLabel}
+                  </button>
                 </div>
                 {/* ── 섹션 4: 싸움 패턴 + 해결 핵심 ── */}
                 <div className="w-full flex flex-col gap-4 mt-3">
@@ -529,27 +542,51 @@ export default function CoupleResult({
                 </div>
               )}
 
-              {/* 궁합맵 순위 확인 바로가기 */}
-              <button
-                data-testid="rank-cta"
-                onClick={() => router.push(`/mbti-map?mbti=${myMbti}`)}
-                className="neon-action mx-6 mb-6 py-4 rounded-xl text-center"
-                style={{ "--neon": "168,85,247" } as React.CSSProperties}
-              >
-                <p
-                  className="text-sm font-bold"
-                  style={{ color: "rgba(168,85,247,0.85)" }}
+              {/* CTA 버튼 영역 */}
+              <div className="mx-6 mb-6 flex flex-col gap-3">
+                {/* 궁합맵 순위 확인 바로가기 */}
+                <button
+                  data-testid="rank-cta"
+                  onClick={() => router.push(`/mbti-map?mbti=${myMbti}`)}
+                  className="neon-action py-4 rounded-xl text-center"
+                  style={{ "--neon": "236,72,153" } as React.CSSProperties}
                 >
-                  {COUPLE.rankCta}
-                </p>
-                <p
-                  className="text-xs mt-1"
-                  style={{ color: "rgba(168,85,247,0.55)" }}
+                  <p
+                    className="text-sm font-bold"
+                    style={{ color: "rgba(236,72,153,0.85)" }}
+                  >
+                    {COUPLE.rankCta}
+                  </p>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: "rgba(236,72,153,0.55)" }}
+                  >
+                    {COUPLE.rankCtaSub}
+                  </p>
+                </button>
+
+                {/* 그룹 케미 확인 바로가기 */}
+                <button
+                  data-testid="group-cta"
+                  onClick={() => router.push("/group-match")}
+                  className="neon-action py-4 rounded-xl text-center"
+                  style={{ "--neon": "168,85,247" } as React.CSSProperties}
                 >
-                  {COUPLE.rankCtaSub}
-                </p>
-              </button>
-            </div>
+                  <p
+                    className="text-sm font-bold"
+                    style={{ color: "rgba(168,85,247,0.85)" }}
+                  >
+                    {COUPLE.groupCta}
+                  </p>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: "rgba(168,85,247,0.55)" }}
+                  >
+                    {COUPLE.groupCtaSub}
+                  </p>
+                </button>
+              </div>
+            </NeonCard>
           )}
 
           {/* ── 섹션 6: 세부 궁합 (4개 카테고리 바 게이지) ── */}

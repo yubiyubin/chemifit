@@ -24,7 +24,7 @@ import {
 } from "@/data/compatibility";
 import CompatCard from "@/components/CompatCard";
 import ScoreBar from "@/components/ScoreBar";
-import { getScoreInfo, getLoveFriendLine, getCoupleTier } from "@/data/labels";
+import { getScoreInfo, getCoupleTier } from "@/data/labels";
 import { TITLE1, TITLE2, titleProps } from "@/styles/titles";
 import {
   analyzeGroup,
@@ -922,12 +922,6 @@ export default function GroupGrid({ members }: Props) {
               </p>
             </button>
             <CtaButton
-              title={CTA_TEXTS.group.toLove.title}
-              subtitle={CTA_TEXTS.group.toLove.subtitle}
-              rgb="236,72,153"
-              onClick={() => router.push(`/mbti-love?my=${myInfo.mbti}`)}
-            />
-            <CtaButton
               title={CTA_TEXTS.group.toMap.title}
               subtitle={CTA_TEXTS.group.toMap.subtitle}
               rgb="168,85,247"
@@ -1030,21 +1024,6 @@ export default function GroupGrid({ members }: Props) {
                 }}
               />
             </div>
-            <p
-              className="text-sm font-medium leading-relaxed text-center mb-4"
-              style={{ color: "rgba(255,255,255,0.75)" }}
-            >
-              {getLoveFriendLine(popup.score)}
-            </p>
-            {/* 연애궁합 보기 CTA */}
-            <CtaButton
-              title={CTA_TEXTS.group.toLove.modal}
-              rgb="236,72,153"
-              onClick={() => {
-                router.push(`/mbti-love?my=${popup.mA.mbti}&partner=${popup.mB.mbti}`);
-                setPopup(null);
-              }}
-            />
           </div>
         </ModalOverlay>
       )}

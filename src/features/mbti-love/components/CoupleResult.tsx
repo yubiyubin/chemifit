@@ -77,7 +77,7 @@ function InfoLine({
       mbti === myMbti
         ? (titleColor ?? `rgba(${themeRgb},0.95)`)
         : mbti === partnerMbti
-          ? `color-mix(in srgb, rgb(${themeRgb}) 70%, white)`
+          ? `color-mix(in srgb, rgb(${themeRgb}) 50%, white)`
           : (titleColor ?? `rgba(${themeRgb},0.95)`);
     return (
       <p className="text-sm sm:text-base leading-relaxed">

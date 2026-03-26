@@ -30,6 +30,8 @@ type Props = {
   align?: "flex" | "transform";
   /** transform 모드 시 카드 너비 클래스 (기본: "w-[300px]") */
   widthClass?: string;
+  /** flex 모드 + rgb 사용 시 카드 래퍼 너비 클래스 (기본: "w-full max-w-md") */
+  cardClassName?: string;
   /** NeonCard 스타일 border/glow를 카드 래퍼에 적용할 rgb ("R,G,B") */
   rgb?: string;
   /** 테두리 투명도 (기본: 0.53) — rgb 없으면 무시 */
@@ -44,6 +46,7 @@ export default function ModalOverlay({
   widthClass = "w-[300px]",
   rgb,
   borderAlpha,
+  cardClassName = "w-full max-w-md",
 }: Props) {
   if (align === "transform") {
     return (
@@ -73,7 +76,7 @@ export default function ModalOverlay({
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto pointer-events-none">
         {rgb ? (
           <div
-            className="rounded-2xl overflow-hidden pointer-events-auto"
+            className={`rounded-2xl overflow-hidden pointer-events-auto ${cardClassName}`}
             style={neonBorderStyle(rgb, borderAlpha)}
           >
             {children}

@@ -22,6 +22,7 @@ import CompatCard from "@/components/CompatCard";
 import DetailScoreCard from "@/components/DetailScoreCard";
 import ScoreBar from "@/components/ScoreBar";
 import CompatDetailModal, { type CompatDetailData } from "@/features/mbti-map/components/CompatDetailModal";
+import NeonCard from "@/components/NeonCard";
 
 /** 동일 점수를 가진 MBTI들을 하나의 그룹으로 묶기 위한 타입 */
 type GroupedPair = {
@@ -188,7 +189,8 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
       </div>
 
       {/* ── 섹션 2~4: 이미지 캡처 영역 ── */}
-      <div ref={captureRef} className="flex flex-col gap-6">
+      <div ref={captureRef}>
+      <NeonCard rgb="168,85,247" className="p-5 sm:p-6 flex flex-col gap-6">
         {/* 섹션 2: 최고/최악 궁합 카드 (2열 그리드) */}
         <div className="grid grid-cols-2 gap-3">
           <CompatCard score={best.score} variant="best">
@@ -264,6 +266,7 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
 
         {/* 워터마크 — 캡처 이미지 하단에 포함 */}
         <p className="text-center text-white/20 text-xs pb-1">ChemiFit</p>
+      </NeonCard>
       </div>
 
       {/* ── 공유 버튼 행 (캡처 영역 밖) ── */}

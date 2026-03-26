@@ -30,12 +30,40 @@ type RoleInfo = {
 /** analyzeGroup 반환값의 역할 항목 */
 export type RoleEntry = RoleInfo & { id: RoleId; count: number; effect: string };
 
+/** pairScores 입력 타입 — 두 멤버 이름과 궁합 점수 */
+export type PairScore = { a: string; b: string; score: number };
+
+/** 개인별 그룹 내 통계 */
+export type MemberStat = {
+  name: string;
+  mbti: MbtiType;
+  /** 그룹 내 다른 멤버들과의 평균 궁합 점수 */
+  avgScore: number;
+  /** 가장 궁합이 좋은 상대 이름 */
+  bestPartner: string;
+  /** 가장 궁합이 낮은 상대 이름 */
+  worstPartner: string;
+};
+
 /** analyzeGroup 반환값 */
 export type GroupAnalysis = {
   meme: string;
   roles: RoleEntry[];
   summary: string;
   membersByRole: Partial<Record<RoleId, string[]>>;
+  /** pairScores가 제공된 경우에만 존재. 멤버별 그룹 내 통계 */
+  memberStats?: MemberStat[];
+  /** memberStats 중 avgScore 최고 멤버 이름 */
+  popularMember?: string;
+  /** memberStats 중 avgScore 최저 멤버 이름 */
+  uniqueMember?: string;
+  /** 그룹에 없는 역할 목록 */
+  missingRoles: RoleId[];
+  /**
+   * 5개 역할 분포의 균형 점수 (0~100).
+   * 모든 역할이 균등 분포(20%씩)이면 100, 한 역할에 완전 집중이면 0에 가까움.
+   */
+  balanceScore: number;
 };
 
 // ─────────────────────────────────────────────
@@ -357,6 +385,22 @@ const MEME_RULES: MemeRule[] = [
     ],
   },
   {
+    match: (c) => c.care >= 1 && c.mypace >= 1,
+    lines: [
+      "챙겨주려는데 상대가 혼자 있고 싶어함 🫶🌙",
+      "한쪽은 밥 챙기고 한쪽은 이어폰 꽂음 🍚🎧",
+      "애정 공세 vs 나만의 공간 — 간극이 있음 💕🚪",
+    ],
+  },
+  {
+    match: (c) => c.leader >= 1 && c.mypace >= 1,
+    lines: [
+      "리더가 이끄는데 따르는 사람이 사라짐 🎯👻",
+      "방향은 잡혔는데 일행이 증발 중 🧭💨",
+      "리더 혼자 신나는 상황 발생 주의 👑🌙",
+    ],
+  },
+  {
     match: (c) => c.energy === 0,
     lines: [
       "텐션 올릴 사람이 없음 📉",
@@ -511,6 +555,7 @@ const DEFAULT_SUMMARIES = [
 /** 그룹 멤버의 MBTI 기반으로 역할 분포 분석 + 밈 생성 */
 export function analyzeGroup(
   members: { mbti: MbtiType; name?: string }[],
+  pairScores?: PairScore[],
   avgScore?: number,
 ): GroupAnalysis {
   const counts: Record<RoleId, number> = {
@@ -564,5 +609,82 @@ export function analyzeGroup(
   const summary =
     summaryPool[Math.floor(Math.random() * summaryPool.length)];
 
-  return { meme, roles, summary, membersByRole };
+  // 빠진 역할 목록
+  const missingRoles: RoleId[] = (Object.keys(counts) as RoleId[]).filter(
+    (id) => counts[id] === 0,
+  );
+
+  // 역할 분포 균형 점수 (표준편차 기반, 균등 분포일수록 100에 가까움)
+  // 각 역할의 비율이 이상적인 1/5(=0.2)에 가까울수록 높은 점수
+  const proportions = (Object.keys(counts) as RoleId[]).map(
+    (id) => counts[id] / total,
+  );
+  const ideal = 1 / 5;
+  const variance =
+    proportions.reduce((sum, p) => sum + (p - ideal) ** 2, 0) / 5;
+  const stdDev = Math.sqrt(variance);
+  // 최대 표준편차: 한 역할에 100% → stdDev = sqrt((4*(0-0.2)^2 + (1-0.2)^2) / 5) = 0.4
+  const MAX_STD_DEV = 0.4;
+  const balanceScore = Math.round(100 * (1 - stdDev / MAX_STD_DEV));
+
+  // 개인별 통계 (pairScores가 있고 멤버에 이름이 있을 때만)
+  let memberStats: MemberStat[] | undefined;
+  let popularMember: string | undefined;
+  let uniqueMember: string | undefined;
+
+  if (pairScores && pairScores.length > 0) {
+    const namedMembers = members.filter((m) => m.name);
+    if (namedMembers.length >= 2) {
+      memberStats = namedMembers.map((m) => {
+        const name = m.name!;
+        const pairs = pairScores.filter((p) => p.a === name || p.b === name);
+        const scores = pairs.map((p) => ({
+          partner: p.a === name ? p.b : p.a,
+          score: p.score,
+        }));
+        const avg =
+          scores.length > 0
+            ? Math.round(
+                scores.reduce((s, p) => s + p.score, 0) / scores.length,
+              )
+            : 0;
+        const best = scores.reduce(
+          (best, p) => (p.score > best.score ? p : best),
+          scores[0],
+        );
+        const worst = scores.reduce(
+          (worst, p) => (p.score < worst.score ? p : worst),
+          scores[0],
+        );
+        return {
+          name,
+          mbti: m.mbti,
+          avgScore: avg,
+          bestPartner: best?.partner ?? "",
+          worstPartner: worst?.partner ?? "",
+        };
+      });
+
+      if (memberStats.length > 0) {
+        popularMember = memberStats.reduce((a, b) =>
+          a.avgScore >= b.avgScore ? a : b,
+        ).name;
+        uniqueMember = memberStats.reduce((a, b) =>
+          a.avgScore <= b.avgScore ? a : b,
+        ).name;
+      }
+    }
+  }
+
+  return {
+    meme,
+    roles,
+    summary,
+    membersByRole,
+    memberStats,
+    popularMember,
+    uniqueMember,
+    missingRoles,
+    balanceScore,
+  };
 }

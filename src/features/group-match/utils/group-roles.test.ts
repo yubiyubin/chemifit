@@ -185,16 +185,20 @@ describe("analyzeGroup()", () => {
     expect(totalCount).toBe(8);
   });
 
-  it("반환값에 meme, roles, summary, membersByRole이 있어야 한다", () => {
+  it("반환값에 meme, roles, summary, membersByRole, missingRoles, balanceScore가 있어야 한다", () => {
     const result = analyzeGroup([{ mbti: "INTJ" }]);
     expect(result).toHaveProperty("meme");
     expect(result).toHaveProperty("roles");
     expect(result).toHaveProperty("summary");
     expect(result).toHaveProperty("membersByRole");
+    expect(result).toHaveProperty("missingRoles");
+    expect(result).toHaveProperty("balanceScore");
     expect(typeof result.meme).toBe("string");
     expect(typeof result.summary).toBe("string");
     expect(Array.isArray(result.roles)).toBe(true);
     expect(typeof result.membersByRole).toBe("object");
+    expect(Array.isArray(result.missingRoles)).toBe(true);
+    expect(typeof result.balanceScore).toBe("number");
   });
 });
 
@@ -436,6 +440,7 @@ describe("summary 생성", () => {
   it("avgScore=95 → 높은 점수 summary", () => {
     const result = analyzeGroup(
       [{ mbti: "ENFP" }, { mbti: "ENFJ" }],
+      undefined,
       95,
     );
     expect(result.summary).toContain("전생에 한솥밥");
@@ -444,6 +449,7 @@ describe("summary 생성", () => {
   it("avgScore=25 → 낮은 점수 summary", () => {
     const result = analyzeGroup(
       [{ mbti: "ENFP" }, { mbti: "INTJ" }],
+      undefined,
       25,
     );
     expect(result.summary).toContain("기적적으로 모인 조합");
@@ -512,5 +518,205 @@ describe("효과 캐시 동작", () => {
     const secondEffect = second.roles.find((r) => r.id === "energy")!.effect;
 
     expect(firstEffect).toBe(secondEffect);
+  });
+});
+
+describe("missingRoles", () => {
+  beforeEach(() => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("ENFP 1명(energy만) → 나머지 4개 역할이 missingRoles에 포함", () => {
+    const result = analyzeGroup([{ mbti: "ENFP" }]);
+    expect(result.missingRoles).toHaveLength(4);
+    expect(result.missingRoles).toContain("care");
+    expect(result.missingRoles).toContain("analyst");
+    expect(result.missingRoles).toContain("leader");
+    expect(result.missingRoles).toContain("mypace");
+  });
+
+  it("5개 역할 모두 존재하면 missingRoles가 빈 배열", () => {
+    const result = analyzeGroup([
+      { mbti: "ENFP" },   // energy
+      { mbti: "ENFJ" },   // care
+      { mbti: "INTJ" },   // analyst
+      { mbti: "ENTJ" },   // leader
+      { mbti: "INFP" },   // mypace
+    ]);
+    expect(result.missingRoles).toHaveLength(0);
+  });
+
+  it("energy, care만 있으면 analyst, leader, mypace가 missingRoles", () => {
+    const result = analyzeGroup([{ mbti: "ENFP" }, { mbti: "ISFJ" }]);
+    expect(result.missingRoles).toContain("analyst");
+    expect(result.missingRoles).toContain("leader");
+    expect(result.missingRoles).toContain("mypace");
+    expect(result.missingRoles).not.toContain("energy");
+    expect(result.missingRoles).not.toContain("care");
+  });
+});
+
+describe("balanceScore", () => {
+  beforeEach(() => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("5개 역할 균등(각 1명) → balanceScore = 100", () => {
+    const result = analyzeGroup([
+      { mbti: "ENFP" },   // energy
+      { mbti: "ENFJ" },   // care
+      { mbti: "INTJ" },   // analyst
+      { mbti: "ENTJ" },   // leader
+      { mbti: "INFP" },   // mypace
+    ]);
+    expect(result.balanceScore).toBe(100);
+  });
+
+  it("한 역할에 완전 집중(energy 5명) → balanceScore가 낮아야 함", () => {
+    const result = analyzeGroup([
+      { mbti: "ENFP" },
+      { mbti: "ENTP" },
+      { mbti: "ESFP" },
+      { mbti: "ESTP" },
+      { mbti: "ENFP" },
+    ]);
+    expect(result.balanceScore).toBeLessThan(20);
+  });
+
+  it("balanceScore는 0 이상 100 이하", () => {
+    const cases = [
+      [{ mbti: "ENFP" as const }],
+      [{ mbti: "ENFP" as const }, { mbti: "INTJ" as const }],
+      [
+        { mbti: "ENFP" as const },
+        { mbti: "ENFJ" as const },
+        { mbti: "INTJ" as const },
+        { mbti: "ENTJ" as const },
+        { mbti: "INFP" as const },
+      ],
+    ];
+    cases.forEach((members) => {
+      const result = analyzeGroup(members);
+      expect(result.balanceScore).toBeGreaterThanOrEqual(0);
+      expect(result.balanceScore).toBeLessThanOrEqual(100);
+    });
+  });
+});
+
+describe("memberStats / popularMember / uniqueMember", () => {
+  beforeEach(() => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const pairScores = [
+    { a: "철수", b: "영희", score: 80 },
+    { a: "철수", b: "민수", score: 40 },
+    { a: "영희", b: "민수", score: 60 },
+  ];
+
+  it("pairScores 없이 호출 → memberStats/popularMember/uniqueMember 모두 undefined", () => {
+    const result = analyzeGroup([
+      { mbti: "ENFP", name: "철수" },
+      { mbti: "INTJ", name: "영희" },
+    ]);
+    expect(result.memberStats).toBeUndefined();
+    expect(result.popularMember).toBeUndefined();
+    expect(result.uniqueMember).toBeUndefined();
+  });
+
+  it("pairScores 제공 → memberStats에 각 멤버 통계 포함", () => {
+    const result = analyzeGroup(
+      [
+        { mbti: "ENFP", name: "철수" },
+        { mbti: "INTJ", name: "영희" },
+        { mbti: "ENFJ", name: "민수" },
+      ],
+      pairScores,
+    );
+    expect(result.memberStats).toHaveLength(3);
+    const 철수 = result.memberStats!.find((m) => m.name === "철수")!;
+    expect(철수.avgScore).toBe(60); // (80+40)/2
+    expect(철수.bestPartner).toBe("영희");
+    expect(철수.worstPartner).toBe("민수");
+  });
+
+  it("popularMember → avgScore 가장 높은 멤버", () => {
+    const result = analyzeGroup(
+      [
+        { mbti: "ENFP", name: "철수" },
+        { mbti: "INTJ", name: "영희" },
+        { mbti: "ENFJ", name: "민수" },
+      ],
+      pairScores,
+    );
+    // 영희: (80+60)/2 = 70, 철수: (80+40)/2 = 60, 민수: (40+60)/2 = 50
+    expect(result.popularMember).toBe("영희");
+  });
+
+  it("uniqueMember → avgScore 가장 낮은 멤버", () => {
+    const result = analyzeGroup(
+      [
+        { mbti: "ENFP", name: "철수" },
+        { mbti: "INTJ", name: "영희" },
+        { mbti: "ENFJ", name: "민수" },
+      ],
+      pairScores,
+    );
+    expect(result.uniqueMember).toBe("민수");
+  });
+
+  it("이름 없는 멤버는 memberStats에 포함되지 않음", () => {
+    const result = analyzeGroup(
+      [
+        { mbti: "ENFP", name: "철수" },
+        { mbti: "INTJ" }, // 이름 없음
+      ],
+      [{ a: "철수", b: "영희", score: 70 }],
+    );
+    expect(result.memberStats).toBeUndefined(); // 이름 있는 멤버가 1명뿐 → 2명 미만
+  });
+});
+
+describe("care+mypace, leader+mypace 밈 규칙", () => {
+  beforeEach(() => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("care+mypace 조합 → care+mypace 밈 매칭", () => {
+    // ENFP(energy=1) + ISFJ(care=1) + INFP(mypace=1): 각 33%로 비율 규칙 미해당
+    // energy+mypace 규칙(energy+mypace>=3 조건 미충족) 이후 care+mypace 규칙 매칭
+    const result = analyzeGroup([
+      { mbti: "ENFP" },
+      { mbti: "ISFJ" },
+      { mbti: "INFP" },
+    ]);
+    expect(result.meme).toBe("챙겨주려는데 상대가 혼자 있고 싶어함 🫶🌙");
+  });
+
+  it("leader+mypace 조합 → leader+mypace 밈 매칭", () => {
+    // ENTJ(leader=1) + ENFP(energy=1) + ISFP(mypace=1): 각 33%로 비율 규칙 미해당
+    // energy+mypace(energy+mypace=2<3 미충족), energy+analyst(analyst=0 미충족) 이후 leader+mypace 매칭
+    const result = analyzeGroup([
+      { mbti: "ENTJ" },
+      { mbti: "ENFP" },
+      { mbti: "ISFP" },
+    ]);
+    expect(result.meme).toBe("리더가 이끄는데 따르는 사람이 사라짐 🎯👻");
   });
 });

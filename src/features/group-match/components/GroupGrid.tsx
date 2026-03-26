@@ -15,6 +15,7 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   COMPATIBILITY,
   MbtiType,
@@ -22,9 +23,14 @@ import {
   getScore,
 } from "@/data/compatibility";
 import CompatCard from "@/components/CompatCard";
-import { getScoreInfo, getLoveFriendLine } from "@/data/labels";
+import ScoreBar from "@/components/ScoreBar";
+import { getScoreInfo, getLoveFriendLine, getCoupleTier } from "@/data/labels";
 import { TITLE1, TITLE2, titleProps } from "@/styles/titles";
-import { analyzeGroup } from "@/features/group-match/utils/group-roles";
+import {
+  analyzeGroup,
+  type PairScore,
+  type RoleId,
+} from "@/features/group-match/utils/group-roles";
 import { hslToRgb } from "@/data/colors";
 import { computeGroupLayout } from "@/lib/layout";
 import BatteryGaugeLarge from "./BatteryGaugeLarge";
@@ -47,6 +53,15 @@ import NeonCard from "@/components/NeonCard";
 /** 컴포넌트 Props: 그룹에 포함된 멤버 배열 (첫 번째 멤버가 '나') */
 type Props = { members: Member[] };
 
+/** missingRoles 표시용 — analyzeGroup 내부 ROLES와 동기화 */
+const ROLE_DISPLAY: Record<RoleId, { emoji: string; name: string }> = {
+  energy: { emoji: "🎤", name: "텐션 담당" },
+  care: { emoji: "🫶", name: "케어 담당" },
+  analyst: { emoji: "🧠", name: "분석 담당" },
+  leader: { emoji: "🎯", name: "진행 담당" },
+  mypace: { emoji: "🌙", name: "마이페이스" },
+};
+
 /** 팝업에 표시할 궁합 상세 데이터 */
 type PopupData = { mA: Member; mB: Member; score: number } | null;
 
@@ -65,15 +80,44 @@ type PopupData = { mA: Member; mB: Member; score: number } | null;
 export default function GroupGrid({ members }: Props) {
   const [popup, setPopup] = useState<PopupData>(null);
   const [roleOpen, setRoleOpen] = useState(false);
+  const [allPairsOpen, setAllPairsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [summary, setSummary] = useState<{
     avg: number;
     best: { mA: Member; mB: Member; score: number };
     worst: { mA: Member; mB: Member; score: number };
+    pairs: { mA: Member; mB: Member; score: number }[];
   } | null>(null);
+  const router = useRouter();
   const popupInfo = popup ? getScoreInfo(popup.score) : null;
+  const popupTier = popup ? getCoupleTier(popup.score) : null;
+  /** 모든 멤버 쌍의 궁합 점수 — members에서 직접 계산 (animation 불필요) */
+  const pairScores = useMemo<PairScore[]>(() => {
+    if (members.length < 2) return [];
+    const result: PairScore[] = [];
+    for (let i = 0; i < members.length; i++) {
+      for (let j = i + 1; j < members.length; j++) {
+        result.push({
+          a: members[i].name,
+          b: members[j].name,
+          score: getScore(members[i].mbti, members[j].mbti),
+        });
+      }
+    }
+    return result;
+  }, [members]);
+
+  const avgFromPairs = useMemo(() => {
+    if (!pairScores.length) return undefined;
+    return Math.round(pairScores.reduce((s, p) => s + p.score, 0) / pairScores.length);
+  }, [pairScores]);
+
   const groupAnalysis = useMemo(
-    () => (members.length >= 2 ? analyzeGroup(members) : null),
-    [members],
+    () =>
+      members.length >= 2
+        ? analyzeGroup(members, pairScores, avgFromPairs)
+        : null,
+    [members, pairScores, avgFromPairs],
   );
 
   const myInfo = members[0] ?? null;
@@ -169,7 +213,14 @@ export default function GroupGrid({ members }: Props) {
     [],
   );
 
-  /** 애니메이션 완료 후 요약(평균/최고/최저) 계산 */
+  /** 멤버 이름 → 이모지 조회용 맵 */
+  const memberNameToEmoji = useMemo(() => {
+    const map = new Map<string, string>();
+    members.forEach((m) => map.set(m.name, m.emoji));
+    return map;
+  }, [members]);
+
+  /** 애니메이션 완료 후 요약(평균/최고/최저/전체쌍) 계산 */
   const onAnimComplete = useCallback((nodes: GraphNode[]) => {
     const pairs: { mA: Member; mB: Member; score: number }[] = [];
     for (let i = 0; i < nodes.length; i++) {
@@ -183,12 +234,13 @@ export default function GroupGrid({ members }: Props) {
       }
     }
     if (!pairs.length) return;
+    const sorted = [...pairs].sort((a, b) => b.score - a.score);
     const avg = Math.round(
       pairs.reduce((s, p) => s + p.score, 0) / pairs.length,
     );
     const best = pairs.reduce((a, b) => (a.score > b.score ? a : b));
     const worst = pairs.reduce((a, b) => (a.score < b.score ? a : b));
-    setSummary({ avg, best, worst });
+    setSummary({ avg, best, worst, pairs: sorted });
   }, []);
 
   // ─────────────────────────────────────────────
@@ -601,6 +653,42 @@ export default function GroupGrid({ members }: Props) {
                 >
                   &ldquo;{groupAnalysis.meme}&rdquo;
                 </p>
+                <p
+                  className="text-sm font-medium text-center mt-1"
+                  style={{ color: "rgba(255,255,255,0.45)" }}
+                >
+                  {groupAnalysis.summary}
+                </p>
+                {(groupAnalysis.popularMember || groupAnalysis.uniqueMember) && (
+                  <div className="flex gap-3 mt-2">
+                    {groupAnalysis.popularMember && (
+                      <span
+                        className="text-xs px-2.5 py-1 rounded-full font-medium"
+                        style={{
+                          background: "rgba(0,203,255,0.08)",
+                          border: "1px solid rgba(0,203,255,0.2)",
+                          color: "rgba(0,203,255,0.8)",
+                        }}
+                      >
+                        👑 {memberNameToEmoji.get(groupAnalysis.popularMember)}{" "}
+                        {groupAnalysis.popularMember}
+                      </span>
+                    )}
+                    {groupAnalysis.uniqueMember && (
+                      <span
+                        className="text-xs px-2.5 py-1 rounded-full font-medium"
+                        style={{
+                          background: "rgba(168,85,247,0.08)",
+                          border: "1px solid rgba(168,85,247,0.2)",
+                          color: "rgba(168,85,247,0.8)",
+                        }}
+                      >
+                        🌙 {memberNameToEmoji.get(groupAnalysis.uniqueMember)}{" "}
+                        {groupAnalysis.uniqueMember}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -703,6 +791,59 @@ export default function GroupGrid({ members }: Props) {
                 </p>
               </CompatCard>
             </div>
+
+            {/* 전체 페어 랭킹 아코디언 */}
+            {summary.pairs.length > 2 && (
+              <div className="w-full">
+                <button
+                  onClick={() => setAllPairsOpen((prev) => !prev)}
+                  className="w-full flex items-center justify-between px-1 py-2 text-sm font-bold"
+                  style={{ color: "rgba(0,203,255,0.65)" }}
+                >
+                  <span>{allPairsOpen ? GROUP.pairRankClose : GROUP.pairRankOpen}</span>
+                  <span
+                    className="text-xs transition-transform duration-200"
+                    style={{ transform: allPairsOpen ? "rotate(180deg)" : "rotate(0)" }}
+                  >
+                    {SYMBOLS.dropdown}
+                  </span>
+                </button>
+                {allPairsOpen && (
+                  <div className="flex flex-col gap-1.5 mt-1 fade-in-up">
+                    {summary.pairs.map((p, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-2 cursor-pointer rounded-lg px-2 py-1.5"
+                        style={{ background: "rgba(255,255,255,0.02)" }}
+                        onClick={() => setPopup(p)}
+                      >
+                        <span
+                          className="text-[11px] font-bold w-4 text-right shrink-0"
+                          style={{ color: "rgba(0,203,255,0.4)" }}
+                        >
+                          {i + 1}
+                        </span>
+                        <span
+                          className="text-xs shrink-0"
+                          style={{ color: "rgba(255,255,255,0.65)", minWidth: 0, maxWidth: 120 }}
+                        >
+                          {p.mA.emoji}{p.mA.name} × {p.mB.emoji}{p.mB.name}
+                        </span>
+                        <div className="flex-1">
+                          <ScoreBar score={p.score} height="h-1" />
+                        </div>
+                        <span
+                          className="text-xs font-bold shrink-0"
+                          style={{ color: "rgba(0,203,255,0.7)" }}
+                        >
+                          {p.score}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* 그룹 역할 분석 아코디언 */}
@@ -737,30 +878,114 @@ export default function GroupGrid({ members }: Props) {
                   style={{ borderTop: "1px solid rgba(0,203,255,0.07)" }}
                 >
                   <div className="flex flex-col gap-2 mt-3">
-                    {groupAnalysis.roles.map((role) => (
-                      <div
-                        key={role.id}
-                        className="flex items-center gap-2 px-3 py-2 rounded-xl"
-                        style={{
-                          background: "rgba(255,255,255,0.04)",
-                          border: "1px solid rgba(255,255,255,0.08)",
-                        }}
-                      >
-                        <span className="text-lg shrink-0">{role.emoji}</span>
-                        <span className="text-sm font-bold text-white/70 shrink-0">
-                          {role.name} {role.count}명
-                        </span>
-                        <span className="text-white/30 shrink-0">→</span>
-                        <span className="text-sm text-white/50">
-                          {role.effect}
-                        </span>
-                      </div>
-                    ))}
+                    {groupAnalysis.roles.map((role) => {
+                      const roleMembers = groupAnalysis.membersByRole[role.id];
+                      return (
+                        <div
+                          key={role.id}
+                          className="flex flex-col gap-1.5 px-3 py-2.5 rounded-xl"
+                          style={{
+                            background: "rgba(255,255,255,0.04)",
+                            border: "1px solid rgba(255,255,255,0.08)",
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg shrink-0">{role.emoji}</span>
+                            <span className="text-sm font-bold text-white/70 shrink-0">
+                              {role.name} {role.count}명
+                            </span>
+                            <span className="text-white/30 shrink-0">→</span>
+                            <span className="text-sm text-white/50">
+                              {role.effect}
+                            </span>
+                          </div>
+                          {roleMembers && roleMembers.length > 0 && (
+                            <div className="flex flex-wrap gap-1 ml-7">
+                              {roleMembers.map((name) => (
+                                <span
+                                  key={name}
+                                  className="text-xs px-2 py-0.5 rounded-full"
+                                  style={{
+                                    background: "rgba(0,203,255,0.08)",
+                                    border: "1px solid rgba(0,203,255,0.18)",
+                                    color: "rgba(0,203,255,0.75)",
+                                  }}
+                                >
+                                  {memberNameToEmoji.get(name) ?? ""} {name}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
+                  {/* 빠진 역할 표시 */}
+                  {groupAnalysis.missingRoles.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      {groupAnalysis.missingRoles.map((roleId) => (
+                        <span
+                          key={roleId}
+                          className="text-xs px-2 py-0.5 rounded-full"
+                          style={{
+                            background: "rgba(255,255,255,0.03)",
+                            border: "1px solid rgba(255,255,255,0.07)",
+                            color: "rgba(255,255,255,0.28)",
+                          }}
+                        >
+                          {ROLE_DISPLAY[roleId].emoji} {ROLE_DISPLAY[roleId].name} 없음
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           )}
+
+          {/* 링크 복사 + CTA 버튼 */}
+          <div className="mx-6 mb-6 flex flex-col gap-3">
+            <button
+              onClick={async () => {
+                await navigator.clipboard.writeText(window.location.href);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="neon-action py-3 rounded-xl text-center"
+              style={{ "--neon": "0,203,255" } as React.CSSProperties}
+            >
+              <p
+                className="text-sm font-bold"
+                style={{ color: "rgba(0,203,255,0.85)" }}
+              >
+                {copied ? GROUP.copiedMessage : `🔗 ${GROUP.shareButton}`}
+              </p>
+            </button>
+            <button
+              onClick={() => router.push(`/mbti-love?my=${myInfo.mbti}`)}
+              className="neon-action py-4 rounded-xl text-center"
+              style={{ "--neon": "236,72,153" } as React.CSSProperties}
+            >
+              <p
+                className="text-sm font-bold"
+                style={{ color: "rgba(236,72,153,0.85)" }}
+              >
+                {GROUP.ctaLoveLabel}
+              </p>
+            </button>
+            <button
+              onClick={() => router.push(`/mbti-map?mbti=${myInfo.mbti}`)}
+              className="neon-action py-4 rounded-xl text-center"
+              style={{ "--neon": "168,85,247" } as React.CSSProperties}
+            >
+              <p
+                className="text-sm font-bold"
+                style={{ color: "rgba(168,85,247,0.85)" }}
+              >
+                {GROUP.ctaMapLabel}
+              </p>
+            </button>
+          </div>
         </NeonCard>
       ) : (
         /* 멤버 부족 시: 카드 형태 빈 상태 */
@@ -825,12 +1050,25 @@ export default function GroupGrid({ members }: Props) {
               {popup.mA.emoji} {popup.mA.name}({popup.mA.mbti}) ×{" "}
               {popup.mB.emoji} {popup.mB.name}({popup.mB.mbti})
             </div>
+            {/* 티어 뱃지 */}
+            {popupTier && (
+              <div
+                className="text-xs px-3 py-1 rounded-full inline-block mb-1"
+                style={{
+                  color,
+                  background: `rgba(${rgb},0.1)`,
+                  border: `0.5px solid rgba(${rgb},0.35)`,
+                }}
+              >
+                {popupTier.emoji} {popupTier.label}
+              </div>
+            )}
             <div
               className="text-xs px-3 py-1 rounded-full inline-block mb-4"
               style={{
-                color,
-                background: `rgba(${rgb},0.1)`,
-                border: `0.5px solid rgba(${rgb},0.35)`,
+                color: "rgba(255,255,255,0.4)",
+                background: "rgba(255,255,255,0.04)",
+                border: "0.5px solid rgba(255,255,255,0.1)",
               }}
             >
               {popupInfo?.label}
@@ -849,11 +1087,27 @@ export default function GroupGrid({ members }: Props) {
               />
             </div>
             <p
-              className="text-sm font-medium leading-relaxed text-center"
+              className="text-sm font-medium leading-relaxed text-center mb-4"
               style={{ color: "rgba(255,255,255,0.75)" }}
             >
               {getLoveFriendLine(popup.score)}
             </p>
+            {/* 연애궁합 보기 CTA */}
+            <button
+              onClick={() => {
+                router.push(`/mbti-love?my=${popup.mA.mbti}&partner=${popup.mB.mbti}`);
+                setPopup(null);
+              }}
+              className="neon-action w-full py-3 rounded-xl text-center"
+              style={{ "--neon": "236,72,153" } as React.CSSProperties}
+            >
+              <p
+                className="text-sm font-bold"
+                style={{ color: "rgba(236,72,153,0.85)" }}
+              >
+                {GROUP.popupLoveCta}
+              </p>
+            </button>
           </div>
         </ModalOverlay>
       )}

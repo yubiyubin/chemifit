@@ -84,6 +84,18 @@ export const GROUP = {
   roleAccordionClose: "접기",
   batteryLabel: "그룹 케미 충전량",
   avgCompatLabel: "그룹 평균 궁합",
+  // 공유
+  shareButton: "링크 복사",
+  copiedMessage: "복사 완료!",
+  // 전체 페어 랭킹
+  pairRankTitle: "전체 궁합 랭킹",
+  pairRankOpen: "전체 궁합 순위 보기",
+  pairRankClose: "접기",
+  // CTA 버튼
+  ctaLoveLabel: "연애 궁합 보기",
+  ctaMapLabel: "내 MBTI 전체 순위 보기",
+  // 팝업
+  popupLoveCta: "이 조합 연애궁합 보기",
 } as const;
 
 // ─────────────────────────────────────────────

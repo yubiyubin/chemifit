@@ -44,9 +44,6 @@ import { SECTION_EMOJIS, LINE_EMOJIS, DEFAULT_BULLET_EMOJI } from "@/features/mb
 import { COUPLE, MBTI_SELECT, EMOJIS } from "@/data/ui-text";
 import { SYMBOLS } from "@/data/symbols";
 
-/** myMbti/partnerMbti에 따른 뱃지 색상 — 히어로 카드와 동일한 팔레트 */
-const MY_MBTI_RGB = "168,85,247";    // 보라
-const PARTNER_MBTI_RGB = "236,72,153"; // 핑크
 
 /**
  * "ENFP: 텍스트" 형식의 줄을 뱃지 + 텍스트로 파싱.
@@ -56,51 +53,45 @@ const PARTNER_MBTI_RGB = "236,72,153"; // 핑크
 function InfoLine({
   line,
   themeRgb,
+  titleColor,
   myMbti,
   partnerMbti,
+  mbtiSuffix,
 }: {
   line: string;
   themeRgb: string;
+  /** MBTI 텍스트 및 → 줄에 적용할 색상 (미지정 시 rgba(themeRgb,0.9)) */
+  titleColor?: string;
   myMbti?: string;
   partnerMbti?: string;
+  /** MBTI 텍스트 뒤에 붙일 접미사 (예: "에게") */
+  mbtiSuffix?: string;
 }) {
   // MBTI 뱃지 패턴: "XXXX: ..."
   const mbtiMatch = line.match(/^([A-Z]{4}):\s*(.+)$/);
   if (mbtiMatch) {
     const [, mbti, text] = mbtiMatch;
-    const badgeRgb =
+    // myMbti → titleColor(밝음), partnerMbti → rgba 흐린 버전으로 시각적 구분
+    const mbtiColor =
       mbti === myMbti
-        ? MY_MBTI_RGB
+        ? (titleColor ?? `rgba(${themeRgb},0.95)`)
         : mbti === partnerMbti
-          ? PARTNER_MBTI_RGB
-          : themeRgb;
+          ? `rgba(${themeRgb},0.58)`
+          : (titleColor ?? `rgba(${themeRgb},0.95)`);
     return (
-      <div className="flex items-start gap-2">
-        <span
-          className="shrink-0 mt-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-black tracking-wide"
-          style={{
-            background: `rgba(${badgeRgb},0.18)`,
-            border: `1px solid rgba(${badgeRgb},0.4)`,
-            color: `rgba(${badgeRgb},0.95)`,
-          }}
-        >
-          {mbti}
-        </span>
-        <span
-          className="text-sm sm:text-base leading-relaxed font-medium"
-          style={{ color: "rgba(255,255,255,0.82)" }}
-        >
-          {text}
-        </span>
-      </div>
+      <p className="text-sm sm:text-base leading-relaxed">
+        <span className="font-black mr-2" style={{ color: mbtiColor }}>{mbti}{mbtiSuffix}</span>
+        <span className="font-medium" style={{ color: "rgba(255,255,255,0.82)" }}>{text}</span>
+      </p>
     );
   }
   // → 요약 라인 (구분선 + TITLE3 스타일)
   if (line.startsWith("→")) {
+    const arrowColor = titleColor ?? `rgba(${themeRgb},0.9)`;
     return (
       <div className="flex flex-col gap-2 pt-1">
         <div style={{ height: 1, background: `rgba(${themeRgb},0.15)` }} />
-        <p {...titleProps(TITLE3, `rgba(${themeRgb},0.9)`, themeRgb)}>
+        <p {...titleProps(TITLE3, arrowColor, themeRgb)}>
           {line}
         </p>
       </div>
@@ -124,12 +115,14 @@ function InfoCard({
   body,
   myMbti,
   partnerMbti,
+  mbtiSuffix,
 }: {
   theme: CardTheme;
   title: string;
   body: string;
   myMbti?: string;
   partnerMbti?: string;
+  mbtiSuffix?: string;
 }) {
   const lines = body.split("\n").filter((l) => l.trim());
   return (
@@ -150,8 +143,10 @@ function InfoCard({
             key={i}
             line={line}
             themeRgb={theme.rgb}
+            titleColor={theme.title}
             myMbti={myMbti}
             partnerMbti={partnerMbti}
+            mbtiSuffix={mbtiSuffix}
           />
         ))}
       </div>
@@ -566,6 +561,7 @@ export default function CoupleResult({
                     body={loveDesc.solution}
                     myMbti={myMbti}
                     partnerMbti={partnerMbti}
+                    mbtiSuffix="에게"
                   />
                 </div>
               </div>

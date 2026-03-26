@@ -68,6 +68,9 @@ export const MBTI_MAP = {
   otherMbtiEmoji: "👇",
   rankTitle: "📊 궁합 순위",
   groupCtaLabel: "그룹 케미 확인",
+  saveImageBtn: "이미지 저장",
+  copyLinkBtn: "링크 복사",
+  copiedMessage: "복사 완료!",
 } as const;
 
 // ─────────────────────────────────────────────

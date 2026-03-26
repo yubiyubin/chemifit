@@ -185,19 +185,21 @@ describe("analyzeGroup()", () => {
     expect(totalCount).toBe(8);
   });
 
-  it("반환값에 meme, roles, summary, membersByRole, missingRoles, balanceScore가 있어야 한다", () => {
+  it("반환값에 meme, roles, summary, membersByRole, missingRoles, suggestions, balanceScore가 있어야 한다", () => {
     const result = analyzeGroup([{ mbti: "INTJ" }]);
     expect(result).toHaveProperty("meme");
     expect(result).toHaveProperty("roles");
     expect(result).toHaveProperty("summary");
     expect(result).toHaveProperty("membersByRole");
     expect(result).toHaveProperty("missingRoles");
+    expect(result).toHaveProperty("suggestions");
     expect(result).toHaveProperty("balanceScore");
     expect(typeof result.meme).toBe("string");
     expect(typeof result.summary).toBe("string");
     expect(Array.isArray(result.roles)).toBe(true);
     expect(typeof result.membersByRole).toBe("object");
     expect(Array.isArray(result.missingRoles)).toBe(true);
+    expect(Array.isArray(result.suggestions)).toBe(true);
     expect(typeof result.balanceScore).toBe("number");
   });
 });
@@ -521,7 +523,7 @@ describe("효과 캐시 동작", () => {
   });
 });
 
-describe("missingRoles", () => {
+describe("missingRoles & suggestions", () => {
   beforeEach(() => {
     vi.spyOn(Math, "random").mockReturnValue(0);
   });
@@ -539,7 +541,7 @@ describe("missingRoles", () => {
     expect(result.missingRoles).toContain("mypace");
   });
 
-  it("5개 역할 모두 존재하면 missingRoles가 빈 배열", () => {
+  it("5개 역할 모두 존재하면 missingRoles와 suggestions 모두 빈 배열", () => {
     const result = analyzeGroup([
       { mbti: "ENFP" },   // energy
       { mbti: "ENFJ" },   // care
@@ -548,6 +550,7 @@ describe("missingRoles", () => {
       { mbti: "INFP" },   // mypace
     ]);
     expect(result.missingRoles).toHaveLength(0);
+    expect(result.suggestions).toHaveLength(0);
   });
 
   it("energy, care만 있으면 analyst, leader, mypace가 missingRoles", () => {
@@ -557,6 +560,38 @@ describe("missingRoles", () => {
     expect(result.missingRoles).toContain("mypace");
     expect(result.missingRoles).not.toContain("energy");
     expect(result.missingRoles).not.toContain("care");
+  });
+
+  it("suggestions 길이가 missingRoles 길이와 동일", () => {
+    const result = analyzeGroup([{ mbti: "ENFP" }, { mbti: "ISFJ" }]);
+    expect(result.suggestions).toHaveLength(result.missingRoles.length);
+  });
+
+  it("energy 없을 때 suggestions에 텐션 담당 제안 문구 포함", () => {
+    // INTJ(analyst)만 → energy 없음
+    const result = analyzeGroup([{ mbti: "INTJ" }]);
+    const energySuggestion = result.suggestions.find((s) =>
+      s.includes("텐션 담당"),
+    );
+    expect(energySuggestion).toBeDefined();
+    expect(energySuggestion).toContain("ENFP");
+  });
+
+  it("leader 없을 때 suggestions에 진행 담당 제안 문구 포함", () => {
+    const result = analyzeGroup([{ mbti: "ENFP" }, { mbti: "ISFJ" }]);
+    const leaderSuggestion = result.suggestions.find((s) =>
+      s.includes("진행 담당"),
+    );
+    expect(leaderSuggestion).toBeDefined();
+    expect(leaderSuggestion).toContain("ENTJ");
+  });
+
+  it("suggestions의 각 항목은 비어있지 않은 문자열", () => {
+    const result = analyzeGroup([{ mbti: "ENFP" }]);
+    result.suggestions.forEach((s) => {
+      expect(typeof s).toBe("string");
+      expect(s.length).toBeGreaterThan(0);
+    });
   });
 });
 

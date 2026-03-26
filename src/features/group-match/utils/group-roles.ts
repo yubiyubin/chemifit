@@ -25,6 +25,8 @@ type RoleInfo = {
   name: string;
   /** 인원 수별 효과 문구 — [1명 후보[], 2명 후보[], 3명+ 후보[]] */
   effects: [string[], string[], string[]];
+  /** 이 역할이 그룹에 없을 때 표시할 긍정적 제안 문구 */
+  suggestion: string;
 };
 
 /** analyzeGroup 반환값의 역할 항목 */
@@ -59,6 +61,8 @@ export type GroupAnalysis = {
   uniqueMember?: string;
   /** 그룹에 없는 역할 목록 */
   missingRoles: RoleId[];
+  /** 빠진 역할별 긍정적 제안 문구 (missingRoles 순서와 동일) */
+  suggestions: string[];
   /**
    * 5개 역할 분포의 균형 점수 (0~100).
    * 모든 역할이 균등 분포(20%씩)이면 100, 한 역할에 완전 집중이면 0에 가까움.
@@ -88,6 +92,8 @@ const ROLES: Record<RoleId, RoleInfo> = {
   energy: {
     emoji: "🎤",
     name: "텐션 담당",
+    suggestion:
+      "ENFP, ENTP 같은 텐션 담당을 추가하면 분위기가 살아나요 🎤",
     effects: [
       [
         "혼자서 분위기 띄우느라 지침 😮‍💨",
@@ -110,6 +116,8 @@ const ROLES: Record<RoleId, RoleInfo> = {
   care: {
     emoji: "🫶",
     name: "케어 담당",
+    suggestion:
+      "ENFJ, ESFJ 같은 케어 담당이 있으면 그룹이 더 따뜻해져요 🫶",
     effects: [
       [
         "혼자 다 챙김 🍚",
@@ -132,6 +140,8 @@ const ROLES: Record<RoleId, RoleInfo> = {
   analyst: {
     emoji: "🧠",
     name: "분석 담당",
+    suggestion:
+      "INTJ, INTP 같은 분석 담당이 있으면 균형이 잡혀요 🧠",
     effects: [
       [
         "가끔 흐름 끊음 🔇",
@@ -154,6 +164,8 @@ const ROLES: Record<RoleId, RoleInfo> = {
   leader: {
     emoji: "🎯",
     name: "진행 담당",
+    suggestion:
+      "ENTJ, ESTJ 같은 진행 담당이 있으면 추진력이 생겨요 🎯",
     effects: [
       [
         "방향은 잡아줌 🧭",
@@ -175,6 +187,8 @@ const ROLES: Record<RoleId, RoleInfo> = {
   mypace: {
     emoji: "🌙",
     name: "마이페이스",
+    suggestion:
+      "INFP, INFJ 같은 마이페이스가 있으면 깊이가 더해져요 🌙",
     effects: [
       [
         "조용히 빠짐 🚪",
@@ -609,10 +623,11 @@ export function analyzeGroup(
   const summary =
     summaryPool[Math.floor(Math.random() * summaryPool.length)];
 
-  // 빠진 역할 목록
+  // 빠진 역할 목록 + 긍정적 제안 문구
   const missingRoles: RoleId[] = (Object.keys(counts) as RoleId[]).filter(
     (id) => counts[id] === 0,
   );
+  const suggestions: string[] = missingRoles.map((id) => ROLES[id].suggestion);
 
   // 역할 분포 균형 점수 (표준편차 기반, 균등 분포일수록 100에 가까움)
   // 각 역할의 비율이 이상적인 1/5(=0.2)에 가까울수록 높은 점수
@@ -685,6 +700,7 @@ export function analyzeGroup(
     popularMember,
     uniqueMember,
     missingRoles,
+    suggestions,
     balanceScore,
   };
 }

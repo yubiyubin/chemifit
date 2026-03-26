@@ -29,7 +29,6 @@ import { TITLE1, TITLE2, titleProps } from "@/styles/titles";
 import {
   analyzeGroup,
   type PairScore,
-  type RoleId,
 } from "@/features/group-match/utils/group-roles";
 import { hslToRgb } from "@/data/colors";
 import { computeGroupLayout } from "@/lib/layout";
@@ -53,14 +52,6 @@ import NeonCard from "@/components/NeonCard";
 /** 컴포넌트 Props: 그룹에 포함된 멤버 배열 (첫 번째 멤버가 '나') */
 type Props = { members: Member[] };
 
-/** missingRoles 표시용 — analyzeGroup 내부 ROLES와 동기화 */
-const ROLE_DISPLAY: Record<RoleId, { emoji: string; name: string }> = {
-  energy: { emoji: "🎤", name: "텐션 담당" },
-  care: { emoji: "🫶", name: "케어 담당" },
-  analyst: { emoji: "🧠", name: "분석 담당" },
-  leader: { emoji: "🎯", name: "진행 담당" },
-  mypace: { emoji: "🌙", name: "마이페이스" },
-};
 
 /** 팝업에 표시할 궁합 상세 데이터 */
 type PopupData = { mA: Member; mB: Member; score: number } | null;
@@ -920,21 +911,17 @@ export default function GroupGrid({ members }: Props) {
                       );
                     })}
                   </div>
-                  {/* 빠진 역할 표시 */}
-                  {groupAnalysis.missingRoles.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-1">
-                      {groupAnalysis.missingRoles.map((roleId) => (
-                        <span
-                          key={roleId}
-                          className="text-xs px-2 py-0.5 rounded-full"
-                          style={{
-                            background: "rgba(255,255,255,0.03)",
-                            border: "1px solid rgba(255,255,255,0.07)",
-                            color: "rgba(255,255,255,0.28)",
-                          }}
+                  {/* 역할 제안 (긍정적 문구) */}
+                  {groupAnalysis.suggestions.length > 0 && (
+                    <div className="flex flex-col gap-1.5 mt-2">
+                      {groupAnalysis.suggestions.map((suggestion, i) => (
+                        <p
+                          key={i}
+                          className="text-xs leading-relaxed"
+                          style={{ color: "rgba(0,203,255,0.55)" }}
                         >
-                          {ROLE_DISPLAY[roleId].emoji} {ROLE_DISPLAY[roleId].name} 없음
-                        </span>
+                          💡 {suggestion}
+                        </p>
                       ))}
                     </div>
                   )}

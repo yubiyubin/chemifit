@@ -85,7 +85,7 @@ export default function CompatCard({
         {score}%
       </div>
       <div
-        className={`${compact ? "text-[10px] mb-1" : "text-xs mb-3"} font-bold text-white/70 z-10`}
+        className={`${compact ? "text-[10px] mb-1 h-[14px]" : "text-xs mb-3 h-[2.5rem]"} font-bold text-white/70 z-10 flex items-center justify-center`}
       >
         {info.label}
       </div>
@@ -94,7 +94,7 @@ export default function CompatCard({
         score={score}
         overrideHue={hue}
         height={compact ? "h-1" : "h-1.5"}
-        className="mt-auto w-full z-10"
+        className="mt-2 w-full z-10"
       />
 
       {children && (

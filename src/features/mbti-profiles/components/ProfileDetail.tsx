@@ -37,14 +37,15 @@ export default function ProfileDetail({ profile }: Props) {
 
   const handleSaveImage = async () => {
     if (!detailRef.current) return;
-    const { default: html2canvas } = await import("html2canvas");
-    const canvas = await html2canvas(detailRef.current, {
-      background: "#0f0f1a",
-      scale: 2,
-    } as Parameters<typeof html2canvas>[1]);
+    const { toPng } = await import("html-to-image");
+    await document.fonts.ready;
+    const dataUrl = await toPng(detailRef.current, {
+      backgroundColor: "#0f0f1a",
+      pixelRatio: 2,
+    });
     const link = document.createElement("a");
     link.download = `chemifit-${profile.type}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.href = dataUrl;
     link.click();
   };
 

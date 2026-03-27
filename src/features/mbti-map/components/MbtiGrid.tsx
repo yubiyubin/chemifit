@@ -129,22 +129,18 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
     ],
   };
 
-  /** off-screen ReceiptShareImage를 html2canvas로 캡처해 PNG 다운로드 */
+  /** off-screen ReceiptShareImage를 html-to-image로 캡처해 PNG 다운로드 */
   async function handleSaveImage() {
     if (!captureRef.current) return;
-    const { default: html2canvas } = await import("html2canvas");
+    const { toPng } = await import("html-to-image");
     const card = captureRef.current.querySelector<HTMLElement>(".rc-card");
     if (!card) return;
     // 폰트 로딩 완료 대기 (한글 폰트가 로드되어야 깨지지 않음)
     await document.fonts.ready;
-    const canvas = await html2canvas(card, {
-      useCORS: true,
-      allowTaint: true,
-      scale: 2,
-    } as Parameters<typeof html2canvas>[1]);
+    const dataUrl = await toPng(card, { pixelRatio: 2 });
     const link = document.createElement("a");
     link.download = `chemifit-map-${selectedMbti}.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.href = dataUrl;
     link.click();
   }
 

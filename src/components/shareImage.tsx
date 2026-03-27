@@ -78,7 +78,7 @@ export default function ReceiptShareImage({ data = defaultData }) {
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
   const wrapRef = useRef(null);
 
-  // Google Fonts를 <link> 태그로 동적 삽입 (html2canvas가 @import를 무시하므로)
+  // Google Fonts를 <link> 태그로 동적 삽입 (html-to-image 캡처 전 폰트 로딩 보장)
   useEffect(() => {
     const FONT_ID = "chemifit-share-fonts";
     if (!document.getElementById(FONT_ID)) {

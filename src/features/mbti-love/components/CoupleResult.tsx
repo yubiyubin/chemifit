@@ -415,9 +415,12 @@ export default function CoupleResult({
     const { default: html2canvas } = await import("html2canvas");
     const card = captureRef.current.querySelector<HTMLElement>(".rc-card");
     if (!card) return;
+    // 폰트 로딩 완료 대기 (한글 폰트가 로드되어야 깨지지 않음)
+    await document.fonts.ready;
     const canvas = await html2canvas(card, {
       useCORS: true,
-      scale: 1,
+      allowTaint: true,
+      scale: 2,
     } as Parameters<typeof html2canvas>[1]);
     const link = document.createElement("a");
     link.download = `chemifit-love-${myMbti}-${partnerMbti}.png`;

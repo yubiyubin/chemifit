@@ -169,16 +169,20 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
       <NeonCard rgb="168,85,247" className="p-5 sm:p-6 flex flex-col gap-6">
         {/* ── 캐치프레이즈 ── */}
         <div className="text-center flex flex-col gap-0.5">
-          <p
-            className="text-2xl sm:text-3xl font-black tracking-widest"
-            style={{
-              color: "rgba(168,85,247,1)",
-              textShadow:
-                "0 0 12px rgba(168,85,247,0.8), 0 0 30px rgba(168,85,247,0.4)",
-            }}
-          >
-            ✨ {selectedMbti} ✨
-          </p>
+          <div className="flex items-center gap-3">
+            <span className="flex-1 h-px" style={{ background: "rgba(168,85,247,0.35)" }} />
+            <p
+              className="text-2xl sm:text-3xl font-black tracking-widest"
+              style={{
+                color: "rgba(168,85,247,1)",
+                textShadow:
+                  "0 0 12px rgba(168,85,247,0.8), 0 0 30px rgba(168,85,247,0.4)",
+              }}
+            >
+              {selectedMbti}
+            </p>
+            <span className="flex-1 h-px" style={{ background: "rgba(168,85,247,0.35)" }} />
+          </div>
           <p className="text-xs sm:text-sm font-semibold text-white/50 tracking-wide">
             {MBTI_MAP.mapTitle}
           </p>

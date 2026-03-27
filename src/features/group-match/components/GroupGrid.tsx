@@ -48,7 +48,7 @@ import {
 import { GROUP, EMOJIS, CTA_TEXTS } from "@/data/ui-text";
 import CtaButton from "@/components/CtaButton";
 import { SYMBOLS } from "@/data/symbols";
-import { VARIANT_CONFIG, CYAN_RGB } from "@/styles/card-themes";
+import { VARIANT_CONFIG, CYAN_RGB, PURPLE_RGB } from "@/styles/card-themes";
 import NeonCard from "@/components/NeonCard";
 
 /** 컴포넌트 Props: 그룹에 포함된 멤버 배열 (첫 번째 멤버가 '나') */
@@ -1039,6 +1039,15 @@ export default function GroupGrid({ members }: Props) {
               rgb="236,72,153"
               onClick={() => {
                 router.push(`/mbti-love?my=${popup.mA.mbti}&partner=${popup.mB.mbti}`);
+                setPopup(null);
+              }}
+            />
+            {/* 궁합맵 보기 CTA */}
+            <CtaButton
+              title={CTA_TEXTS.group.toMap.modal}
+              rgb={PURPLE_RGB}
+              onClick={() => {
+                router.push(`/mbti-map?mbti=${popup.mA.mbti}`);
                 setPopup(null);
               }}
             />

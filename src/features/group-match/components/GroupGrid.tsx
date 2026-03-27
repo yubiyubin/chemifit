@@ -18,15 +18,13 @@ import { useState, useCallback, useMemo } from "react";
 import { useCopyLink } from "@/hooks/useCopyLink";
 import { useRouter } from "next/navigation";
 import {
-  COMPATIBILITY,
-  MbtiType,
   Member,
   getScore,
 } from "@/data/compatibility";
 import CompatCard from "@/components/CompatCard";
 import ScoreBar from "@/components/ScoreBar";
 import { getCoupleTier } from "@/data/labels";
-import { TITLE1, TITLE2, titleProps } from "@/styles/titles";
+import { TITLE1, titleProps } from "@/styles/titles";
 import {
   analyzeGroup,
   type PairScore,
@@ -966,6 +964,7 @@ export default function GroupGrid({ members }: Props) {
       {/* ── 궁합 상세 팝업 (모달) ── */}
       {popup && (
         <ScoreDetailPopup
+          testId="group-score-popup"
           onClose={() => setPopup(null)}
           rgb={CYAN_RGB}
           score={popup.score}

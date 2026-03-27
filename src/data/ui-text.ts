@@ -25,6 +25,7 @@ export const PAGE_HEADINGS = {
   mbtiLove: "MBTI 연애 궁합 테스트",
   mbtiMap: "MBTI 16타입 궁합 맵",
   groupMatch: "그룹 MBTI 궁합 분석",
+  mbtiProfiles: "MBTI 16타입 유형 설명",
 } as const;
 
 // ─────────────────────────────────────────────
@@ -52,10 +53,6 @@ export const COUPLE = {
   solutionTitle: "🔧 해결 핵심",
   detailOpenLabel: "펼치기",
   detailCloseLabel: "접기",
-  rankCta: "이 궁합, 전체 중에서 몇 위일까? 👀",
-  rankCtaSub: "👉 상위 몇 %인지 확인해보기",
-  groupCta: "그룹 케미도 확인해봐요 >>",
-  groupCtaSub: "친구들과 함께 궁합을 알아보세요",
   detailScoreTitle: "💞 세부 궁합",
 } as const;
 
@@ -67,7 +64,6 @@ export const MBTI_MAP = {
   otherMbtiLabel: "다른 MBTI로 보기",
   otherMbtiEmoji: "👇",
   rankTitle: "📊 궁합 순위",
-  groupCtaLabel: "그룹 케미 확인",
   copyLinkBtn: "링크 복사",
   copiedMessage: "복사 완료!",
   badgeClickHint: "MBTI를 클릭하면 상세 궁합을 볼 수 있어요",
@@ -86,20 +82,13 @@ export const GROUP = {
   pairSectionTitle: "쌍별 궁합",
   roleAccordionOpen: "🎭 그룹 역할 분석 보기",
   roleAccordionClose: "접기",
-  batteryLabel: "그룹 케미 충전량",
   avgCompatLabel: "그룹 평균 궁합",
   // 공유
   shareButton: "링크 복사",
   copiedMessage: "복사 완료!",
   // 전체 페어 랭킹
-  pairRankTitle: "전체 궁합 랭킹",
   pairRankOpen: "전체 궁합 순위 보기",
   pairRankClose: "접기",
-  // CTA 버튼
-  ctaLoveLabel: "연애 궁합 보기",
-  ctaMapLabel: "내 MBTI 전체 순위 보기",
-  // 팝업
-  popupLoveCta: "이 조합 연애궁합 보기",
 } as const;
 
 // ─────────────────────────────────────────────
@@ -107,11 +96,6 @@ export const GROUP = {
 // ─────────────────────────────────────────────
 
 export const COMPAT_DETAIL = {
-  loveCtaLabel: "💜 이 MBTI랑 연애하면?",
-  closeLabel: "닫기",
-  // 공유 / 바이럴
-  copyLinkBtn: "링크 복사",
-  copiedMessage: "복사 완료!",
   percentileLabel: "전체 조합 중 상위",
 } as const;
 
@@ -172,6 +156,35 @@ export const CTA_TEXTS = {
       modal: "내 MBTI 궁합 지도 펼쳐보기 🗺️",
     },
   },
+} as const;
+
+// ─────────────────────────────────────────────
+// 유형 설명 페이지 (ProfileGrid, ProfileDetail)
+// ─────────────────────────────────────────────
+
+export const PROFILES = {
+  pageTitle: "MBTI 유형 설명",
+  pageSubtitle: "16가지 성격 유형의 특징을 알아보세요",
+  gridHint: "유형을 클릭해서 상세 설명을 확인하세요",
+  cardClickHint: "클릭하면 상세 설명을 볼 수 있어요",
+  summaryTitle: "성격 요약",
+  tagsTitle: "키워드",
+  strengthsTitle: "✅ 장점",
+  weaknessesTitle: "⚠️ 단점",
+  loveStyleTitle: "💘 연애 스타일",
+  compatTitle: "💞 추천 궁합",
+  bestLabel: "베스트 궁합",
+  worstLabel: "워스트 궁합",
+  celebritiesTitle: "🌟 유명 인물·캐릭터",
+  // CTA
+  loveCtaLabel: "연애 궁합 보기",
+  mapCtaLabel: "궁합 맵 보기",
+  groupCtaLabel: "그룹 궁합 보기",
+  // 공유
+  shareButton: "링크 복사",
+  saveImageBtn: "이미지 저장",
+  copiedMessage: "복사 완료!",
+  backToGrid: "← 전체 유형 보기",
 } as const;
 
 // ─────────────────────────────────────────────

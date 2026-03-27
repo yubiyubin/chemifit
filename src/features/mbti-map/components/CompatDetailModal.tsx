@@ -48,7 +48,6 @@ export default function CompatDetailModal({ data, onClose }: Props) {
         style={{ background: "#0d0d1a" }}
       >
         <CloseButton onClick={onClose} />
-        {/* 하단 닫기 버튼 — E2E에서 compat-detail-close testid로 접근 */}
 
         {/* 등급 이모지 */}
         <div className="text-4xl mb-2">{info.emoji}</div>
@@ -128,14 +127,6 @@ export default function CompatDetailModal({ data, onClose }: Props) {
           onClick={() => { onClose(); router.push("/group-match"); }}
         />
 
-        {/* 닫기 버튼 */}
-        <button
-          data-testid="compat-detail-close"
-          onClick={onClose}
-          className="neon-ghost mt-2 w-full py-2 rounded-xl text-sm"
-        >
-          {COMPAT_DETAIL.closeLabel}
-        </button>
       </div>
     </ModalOverlay>
   );

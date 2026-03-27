@@ -23,8 +23,8 @@ test.describe("궁합 맵 탐색", () => {
     const modal = page.getByTestId("compat-detail-modal");
     await expect(modal).toBeVisible({ timeout: 5000 });
 
-    // 6. compat-detail-close 클릭 → 모달 닫힘
-    const closeBtn = page.getByTestId("compat-detail-close");
+    // 6. close-btn(✕) 클릭 → 모달 닫힘
+    const closeBtn = page.getByTestId("close-btn");
     await expect(closeBtn).toBeVisible();
     await closeBtn.click();
 
@@ -50,7 +50,7 @@ test.describe("궁합 맵 탐색", () => {
     const firstModalText = await modal.textContent();
 
     // 모달 닫기
-    await page.getByTestId("compat-detail-close").click();
+    await page.getByTestId("close-btn").click();
     await expect(modal).not.toBeVisible({ timeout: 5000 });
 
     // 다른 배지(ENFP) 클릭

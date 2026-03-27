@@ -52,17 +52,6 @@ describe("CompatDetailModal", () => {
     expect(screen.getByText("ENFP × INTJ")).toBeInTheDocument();
   });
 
-  it("compat-detail-close 버튼 클릭 시 onClose가 호출된다", () => {
-    const onClose = vi.fn();
-    render(
-      <CompatDetailModal
-        data={{ my: "ENFP", other: "INTJ", score: 75 }}
-        onClose={onClose}
-      />,
-    );
-    fireEvent.click(screen.getByTestId("compat-detail-close"));
-    expect(onClose).toHaveBeenCalledTimes(1);
-  });
 
   it("연인 궁합 버튼 클릭 시 router.push가 /mbti-love 경로로 호출된다", () => {
     pushMock.mockClear();

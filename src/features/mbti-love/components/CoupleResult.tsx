@@ -417,8 +417,12 @@ export default function CoupleResult({
     const { toPng } = await import("html-to-image");
     const card = captureRef.current.querySelector<HTMLElement>(".rc-card");
     if (!card) return;
+    // 부모 .rc-wrap의 scale 트랜스폼 리셋 — 캡처 시 여백 방지
+    const wrap = captureRef.current.querySelector<HTMLElement>(".rc-wrap");
+    if (wrap) wrap.style.transform = "none";
     await document.fonts.ready;
-    const dataUrl = await toPng(card, { pixelRatio: 2 });
+    const dataUrl = await toPng(card, { pixelRatio: 2, width: 1080, height: 1350 });
+    if (wrap) wrap.style.transform = "";
     setPreviewUrl(dataUrl);
   }
 
@@ -704,7 +708,7 @@ export default function CoupleResult({
         <div
           ref={captureRef}
           aria-hidden="true"
-          style={{ position: "absolute", left: "-9999px", top: 0, pointerEvents: "none" }}
+          style={{ position: "absolute", left: "-9999px", top: 0, width: "1080px", height: "1350px", overflow: "hidden", pointerEvents: "none" }}
         >
           <ReceiptShareImage data={shareData} />
         </div>

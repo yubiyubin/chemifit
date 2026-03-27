@@ -44,6 +44,8 @@ export default function ProfileDetail({ profile }: Props) {
     const dataUrl = await toPng(detailRef.current, {
       backgroundColor: "#0f0f1a",
       pixelRatio: 2,
+      width: detailRef.current.offsetWidth,
+      height: detailRef.current.offsetHeight,
     });
     setPreviewUrl(dataUrl);
   };

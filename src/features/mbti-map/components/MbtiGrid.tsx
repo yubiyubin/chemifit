@@ -63,7 +63,7 @@ type Props = {
 export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
   const setSelectedMbti = onSelect ?? (() => {});
   const scrollRef = useRef<HTMLDivElement>(null);
-  const captureRef = useRef<HTMLDivElement>(null); // off-screen 이미지 캡처 영역
+  const cardRef = useRef<HTMLDivElement>(null); // ReceiptShareImage .rc-card 직접 참조
   const [previewUrl, setPreviewUrl] = useState<string | null>(null); // 이미지 미리보기 URL
   const { copied, copy: handleCopyLink } = useCopyLink();
 
@@ -131,18 +131,12 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
     ],
   };
 
-  /** off-screen ReceiptShareImage를 html-to-image로 캡처해 미리보기 모달 열기 */
+  /** off-screen ReceiptShareImage의 .rc-card를 직접 캡처해 미리보기 모달 열기 */
   async function handleSaveImage() {
-    if (!captureRef.current) return;
+    if (!cardRef.current) return;
     const { toPng } = await import("html-to-image");
-    const card = captureRef.current.querySelector<HTMLElement>(".rc-card");
-    if (!card) return;
-    // 부모 .rc-wrap의 scale 트랜스폼 리셋 — 캡처 시 여백 방지
-    const wrap = captureRef.current.querySelector<HTMLElement>(".rc-wrap");
-    if (wrap) wrap.style.transform = "none";
     await document.fonts.ready;
-    const dataUrl = await toPng(card, { pixelRatio: 2, width: 1080, height: 1350 });
-    if (wrap) wrap.style.transform = "";
+    const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, width: 1080, height: 1350 });
     setPreviewUrl(dataUrl);
   }
 
@@ -324,13 +318,12 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
       {/* ── 상세 팝업 패널 (배지 클릭 시 활성화) ── */}
       <CompatDetailModal data={panel} onClose={() => setPanel(null)} />
 
-      {/* ── off-screen 캡처 영역: ReceiptShareImage 렌더링 (화면에 보이지 않음) ── */}
+      {/* ── off-screen 캡처 영역: fixed+opacity:0으로 숨겨 scale 트랜스폼 없이 캡처 ── */}
       <div
-        ref={captureRef}
         aria-hidden="true"
-        style={{ position: "absolute", left: "-9999px", top: 0, width: "1080px", height: "1350px", overflow: "hidden", pointerEvents: "none" }}
+        style={{ position: "fixed", top: 0, left: 0, zIndex: -9999, pointerEvents: "none", opacity: 0 }}
       >
-        <ReceiptShareImage data={shareData} />
+        <ReceiptShareImage data={shareData} cardRef={cardRef} />
       </div>
 
       {/* ── 이미지 미리보기 모달 ── */}

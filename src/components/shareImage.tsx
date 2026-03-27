@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import type React from "react";
 
 const STAT_COLORS = [
   {
@@ -72,7 +73,14 @@ const defaultData = {
   ],
 };
 
-export default function ReceiptShareImage({ data = defaultData }) {
+type ShareData = typeof defaultData;
+
+type ReceiptShareImageProps = {
+  data?: ShareData;
+  cardRef?: React.Ref<HTMLDivElement>;
+};
+
+export default function ReceiptShareImage({ data = defaultData, cardRef }: ReceiptShareImageProps) {
   const { typeA, typeB, score, category, copy, tagline, matchType, stats } =
     data;
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
@@ -152,7 +160,7 @@ export default function ReceiptShareImage({ data = defaultData }) {
       `}</style>
 
       <div ref={wrapRef} className="rc-wrap">
-        <div className="rc-card">
+        <div ref={cardRef} className="rc-card">
           <div className="rc-bg" />
           <div className="rc-orb" />
           <div className="rc-noise" />

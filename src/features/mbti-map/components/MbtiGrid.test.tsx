@@ -15,10 +15,18 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
 }));
 
+vi.mock("@/data/type-profiles", () => ({
+  TYPE_PROFILES: Object.fromEntries(
+    ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP",
+     "ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"]
+      .map((t) => [t, { nickname: "test" }])
+  ),
+}));
+
 vi.spyOn(Math, "random").mockReturnValue(0);
 
 describe("MbtiGrid", () => {
-  it("16개 MBTI 선택 버튼이 모두 렌더된다", { timeout: 15000 }, () => {
+  it("16개 MBTI 선택 버튼이 모두 렌더된다", () => {
     render(<MbtiGrid selectedMbti="ENFP" />);
     MBTI_TYPES.forEach((type) => {
       expect(screen.getByTestId(`map-mbti-btn-${type}`)).toBeInTheDocument();

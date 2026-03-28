@@ -206,7 +206,7 @@ export default function ReceiptShareImage({ data = defaultData, cardRef }: Recei
                 &rdquo;
               </div>
               <div className="rc-csb">
-                {category} · {tagline}
+                {category}{tagline ? ` · ${tagline}` : ""}
               </div>
             </div>
 

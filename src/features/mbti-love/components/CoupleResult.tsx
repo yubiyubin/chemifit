@@ -400,7 +400,7 @@ export default function CoupleResult({
           score,
           category: `${tier.emoji} ${tier.label}`,
           copy: { before: "", highlight: loveDesc.preview, after: "" },
-          tagline: loveDesc.fightStyle,
+          tagline: "",
           matchType: "연인 궁합",
           stats: categories.map((c) => ({
             icon: c.emoji,

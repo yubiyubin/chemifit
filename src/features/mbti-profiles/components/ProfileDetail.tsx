@@ -269,7 +269,7 @@ export default function ProfileDetail({ profile }: Props) {
                       {celeb.name}
                     </span>
                     <span
-                      className="text-sm shrink-0 transition-transform"
+                      className="text-xl shrink-0 transition-transform"
                       style={{
                         color: `rgba(${MINT_RGB},${isOpen ? 1.0 : 0.85})`,
                         transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",

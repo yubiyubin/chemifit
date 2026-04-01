@@ -454,7 +454,12 @@ describe("summary 생성", () => {
       undefined,
       25,
     );
-    expect(result.summary).toContain("기적적으로 모인 조합");
+    const lowScoreLines = [
+      "이 멤버들 어쩌다 한 팀이 된 거예요? 🫠",
+      "궁합 점수가 바닥을 뚫은 전설의 조합 💀",
+      "케미? 그거 먹는 건가요 수준의 조합 🤔",
+    ];
+    expect(lowScoreLines.some((line) => result.summary.includes(line))).toBe(true);
   });
 
   it("avgScore 없이 호출 → 역할 기반 summary", () => {

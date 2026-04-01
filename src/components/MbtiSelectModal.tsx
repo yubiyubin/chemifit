@@ -15,7 +15,6 @@
 
 import type { MbtiType } from "@/data/compatibility";
 import { MBTI_GROUPS } from "@/data/groups";
-import CloseButton from "./CloseButton";
 import ModalOverlay from "./ModalOverlay";
 import { MBTI_SELECT } from "@/data/ui-text";
 import { SYMBOLS } from "@/data/symbols";

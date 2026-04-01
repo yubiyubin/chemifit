@@ -72,6 +72,32 @@ button, select, [role="button"] {
   to { stroke-dashoffset: var(--gauge-target); }
 }
 
+/* ===== 네트워크 그래프 공용 애니메이션 (MbtiGraph + GroupGrid) ===== */
+
+/* 노드 scale 펄스 (best/worst 노드 강조) */
+@keyframes mbti-pulse {
+  0%, 100% { transform: translate(-50%,-50%) scale(1); }
+  50%       { transform: translate(-50%,-50%) scale(1.08); }
+}
+
+/* 힌트 오버레이 fade-in */
+@keyframes hint-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* 힌트 뱃지 글로우 펄스 (궁합맵 — 보라) */
+@keyframes hint-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(168,85,247,0.35), 0 0 20px rgba(168,85,247,0.15); }
+  50%       { box-shadow: 0 0 22px rgba(168,85,247,0.75), 0 0 40px rgba(168,85,247,0.35); }
+}
+
+/* 힌트 뱃지 글로우 펄스 (그룹궁합 — 시안) */
+@keyframes hint-glow-cyan {
+  0%, 100% { box-shadow: 0 0 10px rgba(0,203,255,0.35), 0 0 20px rgba(0,203,255,0.15); }
+  50%       { box-shadow: 0 0 22px rgba(0,203,255,0.75), 0 0 40px rgba(0,203,255,0.35); }
+}
+
 /* ===== 네온 버튼 시스템 =====
  *
  * CSS custom property `--neon`(R,G,B)으로 색상 테마를 지정한다.

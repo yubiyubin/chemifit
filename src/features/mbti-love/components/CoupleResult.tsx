@@ -38,7 +38,6 @@ type Props = {
 
 import { TITLE1, TITLE2, TITLE3, titleProps } from "@/styles/titles";
 import { FIGHT_THEME, SOLUTION_THEME, PINK_RGB, PURPLE_RGB, CYAN_RGB, type CardTheme } from "@/styles/card-themes";
-import { getCategoryComment } from "@/features/mbti-love/consts/category-comments";
 import { getCategoryScores } from "@/features/mbti-love/consts/categories";
 import { SECTION_EMOJIS, LINE_EMOJIS, DEFAULT_BULLET_EMOJI } from "@/features/mbti-love/consts/detail-emojis";
 import { COUPLE, MBTI_SELECT, EMOJIS, CTA_TEXTS } from "@/data/ui-text";
@@ -342,6 +341,7 @@ export default function CoupleResult({
   const cardRef = useRef<HTMLDivElement>(null); // ReceiptShareImage .rc-card 직접 참조
   const [detailOpen, setDetailOpen] = useState(false); // 아코디언 펼침 상태
   const [isModalOpen, setIsModalOpen] = useState(!partnerMbti);
+  const [previewOpen, setPreviewOpen] = useState(false); // 이미지 미리보기 모달 열림 여부
   const [previewUrl, setPreviewUrl] = useState<string | null>(null); // 이미지 미리보기 URL
 
   // 선택된 상대 MBTI 버튼이 보이도록 자동 스크롤
@@ -411,13 +411,20 @@ export default function CoupleResult({
         }
       : null;
 
-  /** off-screen ReceiptShareImage의 .rc-card를 직접 캡처해 미리보기 모달 열기 */
+  /** 모달을 즉시 열고(로딩 상태) 백그라운드에서 캡처 후 이미지 교체 */
   async function handleSaveImage() {
     if (!cardRef.current || !shareData || !partnerMbti) return;
+    setPreviewUrl(null);
+    setPreviewOpen(true); // 로딩 상태로 모달 즉시 표시
     const { toPng } = await import("html-to-image");
     await document.fonts.ready;
     const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, width: 1080, height: 1350 });
-    setPreviewUrl(dataUrl);
+    setPreviewUrl(dataUrl); // 이미지 준비되면 교체
+  }
+
+  function handlePreviewClose() {
+    setPreviewOpen(false);
+    setPreviewUrl(null);
   }
 
   return (
@@ -709,9 +716,10 @@ export default function CoupleResult({
 
       {/* ── 이미지 미리보기 모달 ── */}
       <ImagePreviewModal
+        open={previewOpen}
         imageDataUrl={previewUrl}
         fileName={`chemifit-love-${myMbti}-${partnerMbti ?? "unknown"}.png`}
-        onClose={() => setPreviewUrl(null)}
+        onClose={handlePreviewClose}
       />
     </div>
   );

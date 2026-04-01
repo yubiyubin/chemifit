@@ -12,6 +12,7 @@
 export const COMMON = {
   saveBtn: "저장",
   previewTitle: "이미지 미리보기",
+  loadingText: "이미지 생성 중...",
 } as const;
 
 // ─────────────────────────────────────────────
@@ -78,7 +79,8 @@ export const MBTI_MAP = {
   rankTitle: "📊 궁합 순위",
   copyLinkBtn: "링크 복사",
   copiedMessage: "복사 완료!",
-  badgeClickHint: "MBTI를 클릭하면 상세 궁합을 볼 수 있어요",
+  badgeClickHint: "원을 클릭하면 상세 궁합을 볼 수 있어요",
+  graphTapHint: "원들을 탭해보세요",
   saveImageBtn: "이미지 저장",
 } as const;
 
@@ -189,7 +191,9 @@ export const PROFILES = {
   bestLabel: "베스트 궁합",
   worstLabel: "워스트 궁합",
   celebritiesTitle: "🌟 유명 인물·캐릭터",
+  celebritiesHint: "탭해서 설명 보기",
   // CTA
+  detailCtaLabel: "상세 프로필 보기",
   loveCtaLabel: "연애 궁합 보기",
   mapCtaLabel: "궁합 맵 보기",
   groupCtaLabel: "그룹 궁합 보기",

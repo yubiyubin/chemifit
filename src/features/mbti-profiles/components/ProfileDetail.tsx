@@ -35,10 +35,13 @@ export default function ProfileDetail({ profile }: Props) {
   const router = useRouter();
   const detailRef = useRef<HTMLDivElement>(null);
   const { copied, copy } = useCopyLink();
+  const [previewOpen, setPreviewOpen] = useState(false); // 이미지 미리보기 모달 열림 여부
   const [previewUrl, setPreviewUrl] = useState<string | null>(null); // 이미지 미리보기 URL
 
   const handleSaveImage = async () => {
     if (!detailRef.current) return;
+    setPreviewUrl(null);
+    setPreviewOpen(true); // 로딩 상태로 모달 즉시 표시
     const { toPng } = await import("html-to-image");
     await document.fonts.ready;
     const dataUrl = await toPng(detailRef.current, {
@@ -47,8 +50,13 @@ export default function ProfileDetail({ profile }: Props) {
       width: detailRef.current.offsetWidth,
       height: detailRef.current.offsetHeight,
     });
-    setPreviewUrl(dataUrl);
+    setPreviewUrl(dataUrl); // 이미지 준비되면 교체
   };
+
+  function handlePreviewClose() {
+    setPreviewOpen(false);
+    setPreviewUrl(null);
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -272,9 +280,10 @@ export default function ProfileDetail({ profile }: Props) {
 
       {/* ── 이미지 미리보기 모달 ── */}
       <ImagePreviewModal
+        open={previewOpen}
         imageDataUrl={previewUrl}
         fileName={`chemifit-${profile.type}.png`}
-        onClose={() => setPreviewUrl(null)}
+        onClose={handlePreviewClose}
       />
     </div>
   );

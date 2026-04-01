@@ -12,6 +12,7 @@
 export const COMMON = {
   saveBtn: "저장",
   previewTitle: "이미지 미리보기",
+  loadingText: "이미지 생성 중...",
 } as const;
 
 // ─────────────────────────────────────────────

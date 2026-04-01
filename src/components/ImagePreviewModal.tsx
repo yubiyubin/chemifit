@@ -76,7 +76,7 @@ export default function ImagePreviewModal({ open, imageDataUrl, fileName, onClos
                   background: "linear-gradient(90deg,rgba(168,85,247,0.8),rgba(236,72,153,0.8))",
                   boxShadow: "0 0 10px rgba(168,85,247,0.4)",
                   transform: "translateX(-100%)",
-                  animation: "loading-progress 10s linear forwards",
+                  animation: "loading-progress 8s linear forwards",
                 }}
               />
             </div>

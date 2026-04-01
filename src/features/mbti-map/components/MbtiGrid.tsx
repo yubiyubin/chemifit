@@ -203,7 +203,7 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
         <div className="text-center flex flex-col items-center gap-1.5">
           <div className="flex items-center gap-3 w-full">
             <span className="flex-1 h-px" style={{ background: `rgba(${PURPLE_RGB},0.35)` }} />
-            <p {...titleProps(TITLE1, "#fff", PURPLE_RGB, "tracking-widest")}>
+            <p {...titleProps(TITLE1, "rgba(255,255,255,0.9)", PURPLE_RGB, "tracking-widest")}>
               {selectedMbti}
             </p>
             <span className="flex-1 h-px" style={{ background: `rgba(${PURPLE_RGB},0.35)` }} />

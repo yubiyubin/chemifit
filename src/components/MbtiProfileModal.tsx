@@ -34,9 +34,9 @@ export default function MbtiProfileModal({ mbtiType, rgb, onClose }: Props) {
   return (
     <ModalOverlay
       onClose={onClose}
-      blur
+      align="transform"
+      widthClass="w-[340px]"
       rgb={rgb}
-      cardClassName="w-full max-w-md"
     >
       <div className="relative flex flex-col gap-4 p-6 bg-[#0f0f1a] rounded-2xl">
         <CloseButton onClick={onClose} />

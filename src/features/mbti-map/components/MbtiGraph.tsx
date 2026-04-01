@@ -44,6 +44,10 @@ export default function MbtiGraph({ selectedMbti }: Props) {
         from { opacity: 0; }
         to   { opacity: 1; }
       }
+      @keyframes hint-glow {
+        0%, 100% { box-shadow: 0 0 10px rgba(168,85,247,0.35), 0 0 20px rgba(168,85,247,0.15); }
+        50%       { box-shadow: 0 0 22px rgba(168,85,247,0.75), 0 0 40px rgba(168,85,247,0.35); }
+      }
     `;
     document.head.appendChild(style);
   }, []);
@@ -267,14 +271,16 @@ export default function MbtiGraph({ selectedMbti }: Props) {
             style={{ animation: "hint-fade-in 0.4s ease forwards", zIndex: 10 }}
           >
             <span
-              className="px-4 py-2 rounded-full text-sm font-bold"
+              className="px-4 py-2 rounded-full font-bold"
               style={{
+                fontSize: "15px",
                 background: "rgba(168,85,247,0.22)",
                 border: "1px solid rgba(168,85,247,0.45)",
                 color: "rgba(255,255,255,0.9)",
                 backdropFilter: "blur(8px)",
                 WebkitBackdropFilter: "blur(8px)",
                 textShadow: "0 0 8px rgba(168,85,247,0.6)",
+                animation: "hint-glow 2.5s ease-in-out infinite",
               }}
             >
               {MBTI_MAP.graphTapHint}

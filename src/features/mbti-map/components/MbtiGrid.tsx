@@ -25,7 +25,8 @@ import ScoreBar from "@/components/ScoreBar";
 import CompatDetailModal, { type CompatDetailData } from "@/features/mbti-map/components/CompatDetailModal";
 import NeonCard from "@/components/NeonCard";
 import { TYPE_PROFILES } from "@/data/type-profiles";
-import { TITLE2, titleProps } from "@/styles/titles";
+import { TITLE1, TITLE2, titleProps } from "@/styles/titles";
+import { PURPLE_RGB } from "@/styles/card-themes";
 // import ReceiptShareImage from "@/components/shareImage";
 // import ImagePreviewModal from "@/components/ImagePreviewModal";
 
@@ -201,20 +202,13 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
         {/* ── 캐치프레이즈 ── */}
         <div className="text-center flex flex-col items-center gap-1.5">
           <div className="flex items-center gap-3 w-full">
-            <span className="flex-1 h-px" style={{ background: "rgba(168,85,247,0.35)" }} />
-            <p
-              className="text-2xl sm:text-3xl font-black tracking-widest"
-              style={{
-                color: "rgba(168,85,247,1)",
-                textShadow:
-                  "0 0 12px rgba(168,85,247,0.8), 0 0 30px rgba(168,85,247,0.4)",
-              }}
-            >
+            <span className="flex-1 h-px" style={{ background: `rgba(${PURPLE_RGB},0.35)` }} />
+            <p {...titleProps(TITLE1, "#fff", PURPLE_RGB, "tracking-widest")}>
               {selectedMbti}
             </p>
-            <span className="flex-1 h-px" style={{ background: "rgba(168,85,247,0.35)" }} />
+            <span className="flex-1 h-px" style={{ background: `rgba(${PURPLE_RGB},0.35)` }} />
           </div>
-          <p {...titleProps(TITLE2, "rgba(168,85,247,0.75)", "168,85,247", "italic")}>
+          <p {...titleProps(TITLE2, `rgba(${PURPLE_RGB},0.7)`, PURPLE_RGB)}>
             &ldquo;{TYPE_PROFILES[selectedMbti].nickname}&rdquo;
           </p>
           <span

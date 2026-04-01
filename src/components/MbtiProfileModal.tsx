@@ -36,9 +36,9 @@ export default function MbtiProfileModal({ mbtiType, rgb, onClose }: Props) {
       onClose={onClose}
       blur
       rgb={rgb}
-      cardClassName="w-full max-w-sm sm:max-w-md"
+      cardClassName="w-full max-w-md"
     >
-      <div className="relative flex flex-col gap-4 p-5 bg-[#0f0f1a] rounded-2xl">
+      <div className="relative flex flex-col gap-4 p-6 bg-[#0f0f1a] rounded-2xl">
         <CloseButton onClick={onClose} />
 
         {/* 타입명 + nickname */}

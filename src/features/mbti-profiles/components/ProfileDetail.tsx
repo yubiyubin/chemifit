@@ -79,6 +79,7 @@ export default function ProfileDetail({ profile }: Props) {
         {PROFILES.backToGrid}
       </button>
 
+      <NeonCard rgb={MINT_RGB} className="p-5 sm:p-6 flex flex-col gap-5">
       {/* 캡처 영역 */}
       <div ref={detailRef} className="flex flex-col gap-5">
         {/* ① 한 줄 밈 + 타입명 헤더 */}
@@ -318,6 +319,7 @@ export default function ProfileDetail({ profile }: Props) {
           {copied ? `✅ ${PROFILES.copiedMessage}` : `🔗 ${PROFILES.shareButton}`}
         </button>
       </div>
+      </NeonCard>
 
       {/* ── 이미지 미리보기 모달 ── */}
       <ImagePreviewModal

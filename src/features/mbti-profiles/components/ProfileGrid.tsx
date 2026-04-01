@@ -13,6 +13,8 @@ import { MBTI_TYPES } from "@/data/compatibility";
 import type { MbtiType } from "@/data/compatibility";
 import { PROFILES } from "@/data/ui-text";
 import ProfileCard from "./ProfileCard";
+import NeonCard from "@/components/NeonCard";
+import { MINT_RGB } from "@/styles/card-themes";
 
 type Props = {
   selectedMbti: MbtiType | null;
@@ -22,7 +24,7 @@ export default function ProfileGrid({ selectedMbti }: Props) {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col gap-4">
+    <NeonCard rgb={MINT_RGB} className="p-5 sm:p-6 flex flex-col gap-4">
       {/* 힌트 텍스트 */}
       <p className="text-xs text-white/40 text-center">{PROFILES.gridHint}</p>
 
@@ -40,6 +42,6 @@ export default function ProfileGrid({ selectedMbti }: Props) {
           />
         ))}
       </div>
-    </div>
+    </NeonCard>
   );
 }

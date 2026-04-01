@@ -80,7 +80,7 @@ export const MBTI_MAP = {
   copyLinkBtn: "링크 복사",
   copiedMessage: "복사 완료!",
   badgeClickHint: "원을 클릭하면 상세 궁합을 볼 수 있어요",
-  graphTapHint: "원을 탭해보세요",
+  graphTapHint: "원들을 탭해보세요",
   saveImageBtn: "이미지 저장",
 } as const;
 

@@ -23,6 +23,12 @@ export default function MbtiGraph({ selectedMbti }: Props) {
   const [showHint, setShowHint] = useState(false);
   const hintShownRef = useRef(false); // 힌트는 최초 1회만 표시
 
+  /** 팝업 열기 + 힌트가 남아있으면 함께 닫기 */
+  const openPopup = useCallback((data: Exclude<CompatDetailData, null>) => {
+    setPopup(data);
+    setShowHint(false);
+  }, []);
+
   // best/worst 펄스 + 힌트 fade keyframes 주입 (1회)
   useEffect(() => {
     const STYLE_ID = "mbti-graph-keyframes";
@@ -34,11 +40,9 @@ export default function MbtiGraph({ selectedMbti }: Props) {
         0%, 100% { transform: translate(-50%,-50%) scale(1); }
         50%       { transform: translate(-50%,-50%) scale(1.08); }
       }
-      @keyframes hint-auto-fade {
-        0%   { opacity: 0; }
-        10%  { opacity: 1; }
-        80%  { opacity: 1; }
-        100% { opacity: 0; }
+      @keyframes hint-fade-in {
+        from { opacity: 0; }
+        to   { opacity: 1; }
       }
     `;
     document.head.appendChild(style);
@@ -181,7 +185,7 @@ export default function MbtiGraph({ selectedMbti }: Props) {
           );
           el.onclick = (e) => {
             e.stopPropagation();
-            setPopup({ my: selectedMbti, other: mbti, score });
+            openPopup({ my: selectedMbti, other: mbti, score });
           };
 
           // best/worst 노드 펄스 (hover 시 일시 정지, leave 시 재개)
@@ -199,7 +203,7 @@ export default function MbtiGraph({ selectedMbti }: Props) {
         }
       });
     },
-    [selectedMbti],
+    [selectedMbti, openPopup],
   );
 
   // ─────────────────────────────────────────────
@@ -211,9 +215,9 @@ export default function MbtiGraph({ selectedMbti }: Props) {
     (a: GraphNode, b: GraphNode, score: number) => {
       const my = a.isCenter ? a.mbti : b.mbti;
       const other = a.isCenter ? b.mbti : a.mbti;
-      setPopup({ my, other, score });
+      openPopup({ my, other, score });
     },
-    [],
+    [openPopup],
   );
 
   /** 애니메이션 완료 후 배지(🏆💀) 페이드인 + 최초 1회 힌트 표시 */
@@ -260,8 +264,7 @@ export default function MbtiGraph({ selectedMbti }: Props) {
         {showHint && (
           <div
             className="absolute inset-0 flex items-center justify-center rounded-2xl pointer-events-none"
-            style={{ animation: "hint-auto-fade 3s ease forwards", zIndex: 10 }}
-            onAnimationEnd={() => setShowHint(false)}
+            style={{ animation: "hint-fade-in 0.4s ease forwards", zIndex: 10 }}
           >
             <span
               className="px-4 py-2 rounded-full text-sm font-bold"

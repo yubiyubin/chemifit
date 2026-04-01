@@ -113,6 +113,17 @@ describe("TYPE_PROFILES", () => {
     });
   });
 
+  it("celebrities의 각 항목에 name과 desc 필드가 있어야 한다", () => {
+    MBTI_TYPES.forEach((t) => {
+      TYPE_PROFILES[t].celebrities.forEach((c) => {
+        expect(typeof c.name).toBe("string");
+        expect(c.name.length).toBeGreaterThan(0);
+        expect(typeof c.desc).toBe("string");
+        expect(c.desc.length).toBeGreaterThan(0);
+      });
+    });
+  });
+
   it("INTJ bestTypes가 [INTP, ENTP, INFJ]이어야 한다", () => {
     expect(TYPE_PROFILES.INTJ.bestTypes).toEqual(["INTP", "ENTP", "INFJ"]);
   });

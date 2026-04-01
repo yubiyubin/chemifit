@@ -24,8 +24,8 @@ export type MbtiProfile = {
   bestTypes: MbtiType[];
   /** 궁합 worst 3 (COMPATIBILITY 점수 오름차순) */
   worstTypes: MbtiType[];
-  /** 유명 캐릭터/인물 3~4명 */
-  celebrities: string[];
+  /** 유명 캐릭터/인물 3~4명 (이름 + 재치 있는 한 줄 설명) */
+  celebrities: { name: string; desc: string }[];
 };
 
 export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
@@ -59,10 +59,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["INTP", "ENTP", "INFJ"],
     worstTypes: ["ESFP", "ESFJ", "ISFP"],
     celebrities: [
-      "라이트 야가미(데스노트)",
-      "베지터(드래곤볼Z)",
-      "셜록 홈즈",
-      "일론 머스크",
+      { name: "라이트 야가미(데스노트)", desc: "노트 한 권으로 세계 지배 계획 세운 역대급 INTJ. 계획은 완벽했는데 감정 관리가 문제였어요." },
+      { name: "베지터(드래곤볼Z)", desc: "사이야인의 왕자라는 자존심 하나로 수십 년을 버틴 사람. 훈련 계획표는 누구보다 철저해요." },
+      { name: "셜록 홈즈", desc: "관찰 하나로 당신의 3일 치 일정을 맞히는 사람. 감정은 비효율이라고 생각해요." },
+      { name: "일론 머스크", desc: "화성 이주 계획을 실제로 짜고 있는 사람. 비효율은 바로 개선, 말 많은 회의는 바로 퇴장." },
     ],
   },
 
@@ -96,10 +96,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ENTP", "INTJ", "ISTP"],
     worstTypes: ["ESFJ", "ESFP", "ISFJ"],
     celebrities: [
-      "L(데스노트)",
-      "알버트 아인슈타인",
-      "하우스(닥터 하우스)",
-      "빌 게이츠",
+      { name: "L(데스노트)", desc: "쭈그려 앉아서 과자 먹으며 세계 최고 범죄자를 추적하는 사람. 자세가 아닌 뇌가 무기예요." },
+      { name: "알버트 아인슈타인", desc: "양말은 시간 낭비라며 안 신었다는 사람. 그 절약한 시간으로 상대성이론 만들었어요." },
+      { name: "하우스(닥터 하우스)", desc: "환자 진단보다 '왜 거짓말하는지' 더 궁금한 의사. 공감 제로, 논리 만점." },
+      { name: "빌 게이츠", desc: "운영체제를 팔기로 한 순간부터 이미 결말을 알고 있었던 사람. 귀차니즘과 천재성의 콜라보." },
     ],
   },
 
@@ -133,10 +133,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ENTP", "ENFP", "INTJ"],
     worstTypes: ["ISFP", "ISFJ", "ESFP"],
     celebrities: [
-      "로이 머스탱(강철의 연금술사)",
-      "나폴레옹 보나파르트",
-      "고든 램지",
-      "스티브 잡스",
+      { name: "로이 머스탱(강철의 연금술사)", desc: "비 오는 날 콧대 세운 채 나라 한 개쯤 바꿔버리려는 사람. 목표 앞에선 감상 없어요." },
+      { name: "나폴레옹 보나파르트", desc: "키 작다고 무시하면 안 되는 이유. 유럽 절반을 혼자 재편한 전략가예요." },
+      { name: "고든 램지", desc: "요리가 틀리면 즉각 팩트폭격. '이게 소고기야 고무야'는 사랑의 표현이에요." },
+      { name: "스티브 잡스", desc: "프레젠테이션 한 번으로 사람들이 원하는 것을 바꿔버린 사람. 타협은 없어요." },
     ],
   },
 
@@ -170,10 +170,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["INTP", "INTJ", "ENTJ"],
     worstTypes: ["ISFJ", "ESFJ", "ISTJ"],
     celebrities: [
-      "토니 스타크(아이언맨)",
-      "소크라테스",
-      "벤 샤피로",
-      "채드윅 보스만",
+      { name: "토니 스타크(아이언맨)", desc: "동굴에서 아이언맨 슈트 만들고 '별거 아님'이라고 하는 사람. 반박 환영해요." },
+      { name: "소크라테스", desc: "아무것도 모른다는 걸 아는 게 지혜라며 사람들을 논쟁으로 끌어들인 원조 토론러." },
+      { name: "벤 샤피로", desc: "말 빠르기로 상대방의 말문을 막는 사람. 'facts don't care about your feelings'가 모토예요." },
+      { name: "채드윅 보스만", desc: "블랙팬서를 연기하며 아프리카 왕의 품격을 실제로 구현한 사람. 카리스마는 꾸미는 게 아니에요." },
     ],
   },
 
@@ -207,10 +207,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ENFP", "ENFJ", "INTJ"],
     worstTypes: ["ESTP", "ISTP", "ESFP"],
     celebrities: [
-      "아라레(닥터 슬럼프)",
-      "요다(스타워즈)",
-      "넬슨 만델라",
-      "아리아나 그란데",
+      { name: "아라레(닥터 슬럼프)", desc: "외모는 꼬마인데 내면은 우주급 에너지. 보이는 게 전부가 아님을 몸소 보여줘요." },
+      { name: "요다(스타워즈)", desc: "말 순서는 이상한데 지혜는 은하계 최고. '두려움이 곧 다크사이드로 가는 길' 같은 말이 딱 INFJ예요." },
+      { name: "넬슨 만델라", desc: "27년 감옥 생활 후에도 신념을 잃지 않은 사람. INFJ식 '멀리 보는 눈'의 역대급 실사판이에요." },
+      { name: "아리아나 그란데", desc: "조용해 보이지만 무대 위에서 우주를 펼치는 사람. 내면이 얼마나 깊은지는 노래가 증명해요." },
     ],
   },
 
@@ -244,10 +244,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ENFJ", "ENFP", "INFJ"],
     worstTypes: ["ESTP", "ESTJ", "ISTJ"],
     celebrities: [
-      "루피(원피스)",
-      "앤 셜리(빨간 머리 앤)",
-      "윌리엄 셰익스피어",
-      "커트 코베인",
+      { name: "루피(원피스)", desc: "해적왕이 되겠다는 꿈 하나로 바다를 건너는 사람. 논리는 없지만 진심은 최고예요." },
+      { name: "앤 셜리(빨간 머리 앤)", desc: "머릿속 이야기가 넘쳐서 현실과 상상이 섞이는 빨간 머리 소녀. INFP 교과서 그 자체예요." },
+      { name: "윌리엄 셰익스피어", desc: "인간의 감정을 언어로 가장 아름답게 담아낸 사람. 사랑과 비극 모두 INFP의 영역이에요." },
+      { name: "커트 코베인", desc: "너바나로 세대를 관통한 음악가. 강한 신념과 예민한 감수성이 동시에 공존했어요." },
     ],
   },
 
@@ -281,10 +281,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["INFP", "INFJ", "ENFP"],
     worstTypes: ["ISTP", "INTP", "ISTJ"],
     celebrities: [
-      "오프라 윈프리",
-      "에렌 예거(진격의 거인)",
-      "버락 오바마",
-      "제니퍼 로렌스",
+      { name: "오프라 윈프리", desc: "당신의 이야기를 들으면서 진짜 눈물 흘리는 MC. '당신도 차 받아요!' 에너지 실화예요." },
+      { name: "에렌 예거(진격의 거인)", desc: "자유를 위해 세계를 바꾸겠다는 비전을 품은 사람. 방향은 충격적이었지만 신념은 ENFJ 그 자체예요." },
+      { name: "버락 오바마", desc: "연설 한 번으로 사람들 마음을 움직인 대통령. '우리는 할 수 있다'가 ENFJ의 기본값이에요." },
+      { name: "제니퍼 로렌스", desc: "시상식에서 넘어지고도 웃으며 일어난 사람. 사람들 챙기는 에너지가 진짜로 넘쳐요." },
     ],
   },
 
@@ -318,10 +318,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["INFJ", "ENTJ", "INFP"],
     worstTypes: ["ISTJ", "ESTJ", "ISTP"],
     celebrities: [
-      "나루토(나루토)",
-      "앤 오브 그린 게이블스",
-      "로빈 윌리엄스",
-      "케이티 페리",
+      { name: "나루토(나루토)", desc: "아무도 알아주지 않아도 '나는 꼭 화카게가 된다!'를 외친 사람. 열정 하나로 다 커버해요." },
+      { name: "앤 오브 그린 게이블스", desc: "상상의 나래가 끝없이 펼쳐지는 빨간 머리 소녀. 오늘 만난 사람도 평생 친구가 될 수 있어요." },
+      { name: "로빈 윌리엄스", desc: "웃음으로 세상을 밝혔지만 내면엔 깊은 감수성이 있었던 사람. ENFP의 명과 암 모두 담겨있어요." },
+      { name: "케이티 페리", desc: "'Firework'처럼 번쩍이는 존재감. 무대와 일상 모두 이벤트로 만드는 에너지 보유자예요." },
     ],
   },
 
@@ -355,10 +355,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ESTJ", "ISFJ", "ISTP"],
     worstTypes: ["INFP", "INTP", "ENTP"],
     celebrities: [
-      "에르빈 스미스(진격의 거인)",
-      "조지 워싱턴",
-      "나쓰메 소세키",
-      "워렌 버핏",
+      { name: "에르빈 스미스(진격의 거인)", desc: "조사병단을 이끌며 목숨을 담보로 전략을 짜는 지휘관. 책임감이 전신에 흘러요." },
+      { name: "조지 워싱턴", desc: "대통령이 될 수 있었는데 임기 후 자진 퇴임한 사람. 원칙이 권력보다 높았어요." },
+      { name: "나쓰메 소세키", desc: "일본 근대문학의 기둥. 묵묵히 쓰고, 묵묵히 남긴 사람이에요." },
+      { name: "워렌 버핏", desc: "수십 년째 같은 아침식사에 같은 루틴으로 세계 최고 투자자가 된 사람. 꾸준함이 곧 전략이에요." },
     ],
   },
 
@@ -392,10 +392,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ESFJ", "ISTJ", "ENFJ"],
     worstTypes: ["INTP", "ENTP", "INTJ"],
     celebrities: [
-      "이노우에 오리히메(블리치)",
-      "도라에몽",
-      "캐서린 미들턴",
-      "스테파니 메이어",
+      { name: "이노우에 오리히메(블리치)", desc: "싸우는 중에도 모두 밥은 먹었는지 걱정하는 사람. 배려가 전투력이에요." },
+      { name: "도라에몽", desc: "노비타를 위해 미래에서 온 로봇 고양이. 도구가 없어도 곁에 있어주는 것만으로 힘이 돼요." },
+      { name: "캐서린 미들턴", desc: "왕실 진입 후에도 따뜻하고 단정한 모습을 유지한 사람. 조용하지만 든든한 존재감이에요." },
+      { name: "스테파니 메이어", desc: "트와일라잇으로 전 세계 십대에게 로맨스를 주입한 작가. 사람 감정을 쓰는 데 ISFJ가 최강이에요." },
     ],
   },
 
@@ -429,10 +429,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ISTJ", "ESTP", "ESFJ"],
     worstTypes: ["INFP", "INTP", "INFJ"],
     celebrities: [
-      "박정희(역사인물)",
-      "로이 머스탱(강철의 연금술사)",
-      "힐러리 클린턴",
-      "드웨인 존슨",
+      { name: "박정희(역사 인물)", desc: "산업화를 진두지휘한 추진력의 상징. 좋든 싫든 '목표 → 실행'의 전형적인 ESTJ 패턴이에요." },
+      { name: "힐러리 클린턴", desc: "평생 시스템 안에서 정상을 향해 오른 사람. 규칙을 지키면서 최고 자리까지 가는 법을 보여줬어요." },
+      { name: "드웨인 존슨", desc: "NFL 탈락 후 프로레슬러 → 배우로 커리어를 재건한 사람. 포기 대신 계획을 바꿨어요." },
+      { name: "앤젤라 메르켈", desc: "독일을 16년간 안정적으로 이끈 총리. 감정보다 데이터, 이슈보다 구조가 먼저예요." },
     ],
   },
 
@@ -466,10 +466,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ISFJ", "ESFP", "ESTJ"],
     worstTypes: ["INTJ", "INTP", "ENTP"],
     celebrities: [
-      "비비(원피스)",
-      "도라에몽(의외로 ESFJ설 多)",
-      "제니퍼 가너",
-      "테일러 스위프트",
+      { name: "비비(원피스)", desc: "나라를 지키기 위해 혼자 적진에 뛰어든 공주. 모두를 챙기는 마음이 진짜 힘이에요." },
+      { name: "도라에몽(의외로 ESFJ설 多)", desc: "노비타가 울면 바로 주머니 여는 사람. 거절 못 하고 다 해주다가 결국 노비타 망가뜨렸잖아요(?)." },
+      { name: "제니퍼 가너", desc: "공식 석상에서도 아이들 먼저 챙기는 배우. 가족과 주변 사람 중심의 따뜻한 에너지예요." },
+      { name: "테일러 스위프트", desc: "팬 한 명 한 명 기억하고 서프라이즈 선물 보내는 아티스트. 관계에 에너지 100% 쏟는 ESFJ 실사판이에요." },
     ],
   },
 
@@ -503,10 +503,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ESTP", "INTP", "ISFP"],
     worstTypes: ["ENFJ", "INFJ", "INFP"],
     celebrities: [
-      "레비(진격의 거인)",
-      "제임스 딘",
-      "이소룡",
-      "클린트 이스트우드",
+      { name: "레비(진격의 거인)", desc: "인류 최강 병사인데 말은 3줄 이내. 설명 없이 결과로 보여주는 사람이에요." },
+      { name: "제임스 딘", desc: "영화 세 편으로 반항아의 아이콘이 된 사람. 규칙보다 본능을 따르는 삶이 인상에 남아요." },
+      { name: "이소룡", desc: "철학 공부하며 무술을 예술로 끌어올린 사람. 'Be water'는 ISTP의 삶의 방식이에요." },
+      { name: "클린트 이스트우드", desc: "말 없이 총 뽑는 서부극의 아이콘. 설명은 필요 없어요, 행동이 답이에요." },
     ],
   },
 
@@ -540,10 +540,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ESFP", "ISTP", "ENFJ"],
     worstTypes: ["INTJ", "ENTJ", "INTP"],
     celebrities: [
-      "지드래곤",
-      "오기가미 나오코(감독)",
-      "린 미네다(귀멸의 칼날 넷플리스 팬 추정)",
-      "마이클 잭슨",
+      { name: "지드래곤", desc: "패션이 곧 언어인 아티스트. 무대 위에서도 일상에서도 자기 자신 그대로가 작품이에요." },
+      { name: "오기가미 나오코(감독)", desc: "잔잔하고 아름다운 일상을 영화로 담는 감독. ISFP의 시선이 그대로 스크린에 담겨요." },
+      { name: "탄지로(귀멸의 칼날)", desc: "싸우면서도 적의 슬픔에 공감하는 사람. 강함보다 따뜻함이 먼저인 전사예요." },
+      { name: "마이클 잭슨", desc: "댄스와 음악으로 세계를 바꾼 아티스트. 무대 위 그 순간만큼은 세상에서 가장 자유로운 사람이었어요." },
     ],
   },
 
@@ -577,10 +577,10 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
     bestTypes: ["ESTJ", "ISTP", "ESFP"],
     worstTypes: ["INFP", "INFJ", "INTJ"],
     celebrities: [
-      "도플라밍고(원피스)",
-      "타이거 우즈",
-      "어니스트 헤밍웨이",
-      "마이크 타이슨",
+      { name: "도플라밍고(원피스)", desc: "위험을 즐기며 세계를 게임판으로 보는 사람. 리스크? 그게 재미잖아요." },
+      { name: "타이거 우즈", desc: "필드 위에서 순간 판단으로 역사를 써내려간 골퍼. 계획보다 감각이 앞서는 타입이에요." },
+      { name: "어니스트 헤밍웨이", desc: "글쓰기보다 모험이 먼저인 작가. 경험 없이는 문장도 없다고 생각한 사람이에요." },
+      { name: "마이크 타이슨", desc: "링 위의 폭발력은 타의 추종을 불허. 순간적인 본능과 반사신경으로 정상에 오른 사람이에요." },
     ],
   },
 
@@ -613,6 +613,11 @@ export const TYPE_PROFILES: Record<MbtiType, MbtiProfile> = {
       "ESFP는 연애에서도 설레고 즐거운 에너지를 최대로 쏟아요. 파트너를 웃게 만들고 특별하게 느끼게 해주는 데 천재적이에요. 함께 하는 모든 순간을 축제처럼 만들어요.\n\n감정이 풍부하고 표현이 직접적이라 파트너가 사랑받는다는 느낌을 강하게 받아요. 다만 너무 자유분방해 안정감을 원하는 파트너와는 조율이 필요해요.",
     bestTypes: ["ESFJ", "ISFP", "ESTP"],
     worstTypes: ["INTJ", "INTP", "ENTJ"],
-    celebrities: ["마닐라 루손(드랙레이스)", "아델", "윌 스미스", "BTS 제이홉"],
+    celebrities: [
+      { name: "마닐라 루손(드랙레이스)", desc: "무대 자체가 축제인 사람. 어디서든 가장 화려하고 에너지 넘치는 존재감이에요." },
+      { name: "아델", desc: "공연장 전체를 하나로 만드는 가수. 감정을 숨기지 않고 폭발시키는 ESFP의 진수예요." },
+      { name: "윌 스미스", desc: "레드카펫도 토크쇼도 어디서나 파티 분위기로 만드는 사람. 즉흥 유머는 천재급이에요." },
+      { name: "BTS 제이홉", desc: "무대 위 에너지가 조명보다 밝은 사람. '호비'가 웃으면 공연장 전체가 따라 웃어요." },
+    ],
   },
 };

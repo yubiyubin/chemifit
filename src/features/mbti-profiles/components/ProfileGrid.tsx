@@ -15,6 +15,7 @@ import { PROFILES } from "@/data/ui-text";
 import ProfileCard from "./ProfileCard";
 import NeonCard from "@/components/NeonCard";
 import { MINT_RGB } from "@/styles/card-themes";
+import { titleProps, TITLE1, TITLE2 } from "@/styles/titles";
 
 type Props = {
   selectedMbti: MbtiType | null;
@@ -25,6 +26,12 @@ export default function ProfileGrid({ selectedMbti }: Props) {
 
   return (
     <NeonCard rgb={MINT_RGB} className="p-5 sm:p-6 flex flex-col gap-4">
+      {/* 섹션 타이틀 */}
+      <div className="text-center">
+        <p {...titleProps(TITLE1, "#fff", MINT_RGB, "text-center")}>{PROFILES.pageTitle}</p>
+        <p {...titleProps(TITLE2, `rgba(${MINT_RGB},0.7)`, MINT_RGB, "text-center mt-1")}>{PROFILES.pageSubtitle}</p>
+      </div>
+
       {/* 힌트 텍스트 */}
       <p className="text-xs text-white/40 text-center">{PROFILES.gridHint}</p>
 

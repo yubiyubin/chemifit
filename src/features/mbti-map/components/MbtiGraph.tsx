@@ -6,20 +6,32 @@
  */
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { MBTI_TYPES, COMPATIBILITY, MbtiType } from "@/data/compatibility";
 import { getGraphColor as getColor, hslToRgb } from "@/data/colors";
 import CompatDetailModal, { type CompatDetailData } from "./CompatDetailModal";
 import NetworkGraph, { type GraphNode } from "@/components/NetworkGraph";
+import MbtiProfileModal from "@/components/MbtiProfileModal";
 import { resolveCollisions } from "@/lib/layout";
 import { applyNodeHover } from "@/lib/node-styles";
 import { ANGLE_OFFSETS_16 as ANGLE_OFFSETS, DIST_MULTS_16 as DIST_MULTS } from "@/data/graph-constants";
-import { EMOJIS } from "@/data/ui-text";
+import { EMOJIS, MBTI_MAP } from "@/data/ui-text";
+import { PURPLE_RGB } from "@/styles/card-themes";
 
 type Props = { selectedMbti: MbtiType };
 
 export default function MbtiGraph({ selectedMbti }: Props) {
   const [popup, setPopup] = useState<CompatDetailData>(null);
+  const [showHint, setShowHint] = useState(false);
+  const hintShownRef = useRef(false); // 힌트는 최초 1회만 표시
+
+  const [profileType, setProfileType] = useState<MbtiType | null>(null); // 중앙 노드 클릭 시 프로필 모달
+
+  /** 팝업 열기 + 힌트가 남아있으면 함께 닫기 */
+  const openPopup = useCallback((data: Exclude<CompatDetailData, null>) => {
+    setPopup(data);
+    setShowHint(false);
+  }, []);
 
   // ─────────────────────────────────────────────
   // buildPositions: 중앙 1 + 궤도 16 노드 위치·크기 계산
@@ -151,19 +163,41 @@ export default function MbtiGraph({ selectedMbti }: Props) {
           <span style="font-size:${ms}px;font-weight:800;color:rgba(${rgb},1);text-shadow:0 0 8px rgba(${rgb},${isHighlight ? 0.9 : 0.6});line-height:1.2;">${isCenter ? "" : score + "%"}</span>
         `;
 
-        if (!isCenter) {
+        if (isCenter) {
+          applyNodeHover(el, rgb, r,
+            { size: glowSz, opacity: glowOp, innerOpacity: 0.14 },
+            0.85,
+          );
+          el.onclick = (e) => {
+            e.stopPropagation();
+            setProfileType(selectedMbti);
+          };
+        } else {
           applyNodeHover(el, rgb, r,
             { size: glowSz, opacity: glowOp, innerOpacity: isHighlight ? 0.1 : 0.05 },
             isHighlight ? 0.65 : 0.35,
           );
           el.onclick = (e) => {
             e.stopPropagation();
-            setPopup({ my: selectedMbti, other: mbti, score });
+            openPopup({ my: selectedMbti, other: mbti, score });
           };
+
+          // best/worst 노드 펄스 (hover 시 일시 정지, leave 시 재개)
+          if (isBest || isWorst) {
+            el.style.animation = "mbti-pulse 2.5s ease-in-out infinite";
+            const prevLeave = el.onmouseleave;
+            el.onmouseleave = (e) => {
+              prevLeave?.call(el, e as MouseEvent);
+              // inline transform 제거 → animation 재개
+              el.style.transform = "";
+            };
+          } else {
+            el.style.animation = "";
+          }
         }
       });
     },
-    [selectedMbti],
+    [selectedMbti, openPopup, setProfileType],
   );
 
   // ─────────────────────────────────────────────
@@ -175,12 +209,12 @@ export default function MbtiGraph({ selectedMbti }: Props) {
     (a: GraphNode, b: GraphNode, score: number) => {
       const my = a.isCenter ? a.mbti : b.mbti;
       const other = a.isCenter ? b.mbti : a.mbti;
-      setPopup({ my, other, score });
+      openPopup({ my, other, score });
     },
-    [],
+    [openPopup],
   );
 
-  /** 애니메이션 완료 후 배지(🏆💀) 페이드인 */
+  /** 애니메이션 완료 후 배지(🏆💀) 페이드인 + 최초 1회 힌트 표시 */
   const onAnimComplete = useCallback(
     (_nodes: GraphNode[], container: HTMLDivElement) => {
       requestAnimationFrame(() => {
@@ -190,6 +224,10 @@ export default function MbtiGraph({ selectedMbti }: Props) {
             el.style.opacity = "1";
           });
       });
+      if (!hintShownRef.current) {
+        hintShownRef.current = true;
+        setShowHint(true);
+      }
     },
     [],
   );
@@ -203,18 +241,49 @@ export default function MbtiGraph({ selectedMbti }: Props) {
 
   return (
     <>
-      <NetworkGraph
-        buildPositions={buildPositions}
-        applyNodeStyles={applyNodeStyles}
-        onLineClick={onLineClick}
-        onAnimComplete={onAnimComplete}
-        getLineColorKey={getLineColorKey}
-        heightRatio={1.0}
-        maxHeight={580}
-        animDuration={2500}
-        fadeIn={true}
-      />
+      {/* 그래프 래퍼 — 힌트 오버레이 포지셔닝용 */}
+      <div className="relative">
+        <NetworkGraph
+          buildPositions={buildPositions}
+          applyNodeStyles={applyNodeStyles}
+          onLineClick={onLineClick}
+          onAnimComplete={onAnimComplete}
+          getLineColorKey={getLineColorKey}
+          heightRatio={1.0}
+          maxHeight={580}
+          animDuration={2500}
+          fadeIn={true}
+        />
+        {/* 클릭 유도 힌트 오버레이 — 최초 1회, 3초 후 자동 fade-out */}
+        {showHint && (
+          <div
+            className="absolute inset-0 flex items-center justify-center rounded-2xl pointer-events-none"
+            style={{ animation: "hint-fade-in 0.4s ease forwards", zIndex: 10 }}
+          >
+            <span
+              className="px-4 py-2 rounded-full font-bold"
+              style={{
+                fontSize: "15px",
+                background: "rgba(168,85,247,0.22)",
+                border: "1px solid rgba(168,85,247,0.45)",
+                color: "rgba(255,255,255,0.9)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                textShadow: "0 0 8px rgba(168,85,247,0.6)",
+                animation: "hint-glow 2.5s ease-in-out infinite",
+              }}
+            >
+              {MBTI_MAP.graphTapHint}
+            </span>
+          </div>
+        )}
+      </div>
       <CompatDetailModal data={popup} onClose={() => setPopup(null)} />
+      <MbtiProfileModal
+        mbtiType={profileType}
+        rgb={PURPLE_RGB}
+        onClose={() => setProfileType(null)}
+      />
     </>
   );
 }

@@ -6,7 +6,7 @@
  * Canvas/React 의존 없이 테스트 가능하도록 분리했다.
  */
 
-import { COMPATIBILITY, MbtiType, Member, getScore } from "@/data/compatibility";
+import { MbtiType, Member, getScore } from "@/data/compatibility";
 
 /** 노드 위치·크기 정보 (GraphNode의 레이아웃 관련 서브셋) */
 export type LayoutNode = {

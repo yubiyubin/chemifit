@@ -7,7 +7,7 @@
 
 import { useMbti } from "@/context/MbtiContext";
 import ProfileGrid from "@/features/mbti-profiles/components/ProfileGrid";
-import { PAGE_HEADINGS, PROFILES } from "@/data/ui-text";
+import { PAGE_HEADINGS } from "@/data/ui-text";
 
 export default function MbtiProfilesPage() {
   const { selectedMbti } = useMbti();
@@ -15,12 +15,6 @@ export default function MbtiProfilesPage() {
   return (
     <div>
       <h2 className="sr-only">{PAGE_HEADINGS.mbtiProfiles}</h2>
-
-      {/* 섹션 타이틀 */}
-      <div className="text-center mb-6">
-        <p className="text-base font-bold text-white/80">{PROFILES.pageTitle}</p>
-        <p className="text-xs text-white/40 mt-1">{PROFILES.pageSubtitle}</p>
-      </div>
 
       <ProfileGrid selectedMbti={selectedMbti} />
     </div>

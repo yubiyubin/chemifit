@@ -12,6 +12,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSyncExternalStore } from "react";
 import { useMbti } from "@/context/MbtiContext";
 
 type Tab = {
@@ -29,6 +30,12 @@ type Props = {
 export default function TabSwitcher({ tabs, activeNeon }: Props) {
   const pathname = usePathname();
   const { selectedMbti } = useMbti();
+  // useSyncExternalStore: 서버에서는 false, 클라이언트에서는 true → Hydration Mismatch 방지
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   return (
     <div
@@ -43,14 +50,18 @@ export default function TabSwitcher({ tabs, activeNeon }: Props) {
           pathname === `/${tab.id}` || pathname.startsWith(`/${tab.id}/`);
 
         let href = `/${tab.id}`;
-        if (typeof window !== "undefined") {
+        let search = "";
+        
+        // Hydration Mismatch 방지: 서버 및 첫 클라이언트 렌더링 시에는 window.location.search 접근 우회
+        if (mounted) {
           const params = new URLSearchParams(window.location.search);
           if (selectedMbti) params.set("mbti", selectedMbti);
-          const search = params.toString();
-          if (search) href += `?${search}`;
+          search = params.toString();
         } else if (selectedMbti) {
-          href += `?mbti=${selectedMbti}`;
+          search = `mbti=${selectedMbti}`;
         }
+        
+        if (search) href += `?${search}`;
 
         return (
           <Link

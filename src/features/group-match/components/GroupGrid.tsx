@@ -14,12 +14,13 @@
  */
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { useCopyLink } from "@/hooks/useCopyLink";
 import { useRouter } from "next/navigation";
 import {
   Member,
   getScore,
+  type MbtiType,
 } from "@/data/compatibility";
 import CompatCard from "@/components/CompatCard";
 import ScoreBar from "@/components/ScoreBar";
@@ -42,10 +43,11 @@ import {
   DUMMY_WORST,
   DUMMY_AVG,
 } from "@/features/group-match/consts/dummy-preview";
-import { GROUP, EMOJIS, CTA_TEXTS } from "@/data/ui-text";
+import { GROUP, EMOJIS, CTA_TEXTS, MBTI_MAP } from "@/data/ui-text";
 import CtaButton from "@/components/CtaButton";
 import { SYMBOLS } from "@/data/symbols";
 import { VARIANT_CONFIG, CYAN_RGB, PURPLE_RGB } from "@/styles/card-themes";
+import MbtiProfileModal from "@/components/MbtiProfileModal";
 import NeonCard from "@/components/NeonCard";
 
 /** 컴포넌트 Props: 그룹에 포함된 멤버 배열 (첫 번째 멤버가 '나') */
@@ -69,6 +71,9 @@ type PopupData = { mA: Member; mB: Member; score: number } | null;
 
 export default function GroupGrid({ members }: Props) {
   const [popup, setPopup] = useState<PopupData>(null);
+  const [profileType, setProfileType] = useState<MbtiType | null>(null); // 중앙 노드 클릭 시 프로필 모달
+  const [showHint, setShowHint] = useState(false);
+  const hintShownRef = useRef(false); // 힌트는 최초 1회만 표시
   const [roleOpen, setRoleOpen] = useState(false);
   const [allPairsOpen, setAllPairsOpen] = useState(false);
   const { copied, copy: handleCopy } = useCopyLink();
@@ -119,14 +124,31 @@ export default function GroupGrid({ members }: Props) {
     (W: number, H: number): GraphNode[] => {
       if (!myInfo) return [];
       const layoutNodes = computeGroupLayout(members, W, H);
-      return layoutNodes.map((ln) => ({
-        ...ln,
-        isHighlight: false,
-        highlightType: null as "best" | "worst" | null,
-        data: ln.isCenter
-          ? myInfo
-          : members.find((m) => `${m.name}_${m.mbti}_${m.emoji}` === ln.id),
-      }));
+
+      // 비중앙 노드들의 점수 계산 → best/worst 결정
+      const nonCenterScores = layoutNodes
+        .filter((ln) => !ln.isCenter)
+        .map((ln) => ln.score);
+      const maxScore = nonCenterScores.length ? Math.max(...nonCenterScores) : -1;
+      const minScore = nonCenterScores.length ? Math.min(...nonCenterScores) : -1;
+
+      return layoutNodes.map((ln) => {
+        const highlightType: "best" | "worst" | null = ln.isCenter
+          ? null
+          : ln.score === maxScore
+            ? "best"
+            : ln.score === minScore
+              ? "worst"
+              : null;
+        return {
+          ...ln,
+          isHighlight: highlightType !== null,
+          highlightType,
+          data: ln.isCenter
+            ? myInfo
+            : members.find((m) => `${m.name}_${m.mbti}_${m.emoji}` === ln.id),
+        };
+      });
     },
     [members, myInfo],
   );
@@ -140,12 +162,18 @@ export default function GroupGrid({ members }: Props) {
       nodes.forEach((pos, idx) => {
         const el = els[idx];
         if (!el) return;
-        const { r, isCenter, score } = pos;
+        const { r, isCenter, score, highlightType } = pos;
         const m = pos.data as Member;
+        const isBest = highlightType === "best";
+        const isWorst = highlightType === "worst";
 
         const color = isCenter
           ? "hsl(180,100%,65%)"
-          : `hsl(${Math.round(260 - (score / 100) * 80)},${Math.round(40 + (score / 100) * 60)}%,${Math.round(35 + (score / 100) * 33)}%)`;
+          : isBest
+            ? "hsl(36,88%,56%)"
+            : isWorst
+              ? "hsl(340,75%,56%)"
+              : `hsl(${Math.round(260 - (score / 100) * 80)},${Math.round(40 + (score / 100) * 60)}%,${Math.round(35 + (score / 100) * 33)}%)`;
         const rgb = hslToRgb(color);
         const glowSz = isCenter ? 26 : Math.max(r * 0.58, 7);
         const glowOp = isCenter ? 0.48 : 0.18 + (score / 100) * 0.17;
@@ -158,13 +186,28 @@ export default function GroupGrid({ members }: Props) {
         const ns = Math.max(r * 0.24, 5.5);
         const es = Math.max(r * 0.5, 9);
         const ms = Math.max(r * 0.27, 6);
+        const badge = isBest ? EMOJIS.best : isWorst ? EMOJIS.worst : "";
         el.innerHTML = `
+          ${badge ? `<span class="mbti-badge" style="font-size:${es}px;line-height:1;opacity:0;transition:opacity 2s ease;">${badge}</span>` : ""}
           <span style="font-size:${ns}px;font-weight:700;color:rgba(${rgb},0.85);text-shadow:0 0 6px rgba(${rgb},0.7);line-height:1.25;">${m.name}</span>
           <span style="font-size:${es}px;line-height:1;filter:drop-shadow(0 0 ${Math.max(r * 0.1, 2)}px rgba(${rgb},0.8));">${m.emoji}</span>
           <span style="font-size:${ms}px;font-weight:800;color:rgba(${rgb},1);letter-spacing:0.3px;text-shadow:0 0 8px rgba(${rgb},0.9);line-height:1.25;">${m.mbti}</span>
         `;
 
-        if (!isCenter) {
+        if (isCenter) {
+          applyNodeHover(
+            el,
+            rgb,
+            r,
+            { size: glowSz, opacity: glowOp, innerOpacity: innerOp },
+            0.85,
+          );
+          el.onclick = (e) => {
+            e.stopPropagation();
+            setShowHint(false);
+            setProfileType(m.mbti);
+          };
+        } else {
           applyNodeHover(
             el,
             rgb,
@@ -175,12 +218,25 @@ export default function GroupGrid({ members }: Props) {
           );
           el.onclick = (e) => {
             e.stopPropagation();
+            setShowHint(false);
             if (myInfo) setPopup({ mA: myInfo, mB: m, score });
           };
+
+          // best/worst 노드 펄스
+          if (isBest || isWorst) {
+            el.style.animation = "mbti-pulse 2.5s ease-in-out infinite";
+            const prevLeave = el.onmouseleave;
+            el.onmouseleave = (e) => {
+              prevLeave?.call(el, e as MouseEvent);
+              el.style.transform = "";
+            };
+          } else {
+            el.style.animation = "";
+          }
         }
       });
     },
-    [myInfo],
+    [myInfo, setProfileType, setShowHint],
   );
 
   // ─────────────────────────────────────────────
@@ -197,6 +253,7 @@ export default function GroupGrid({ members }: Props) {
   /** 연결선 클릭 → 궁합 상세 팝업 */
   const onLineClick = useCallback(
     (a: GraphNode, b: GraphNode, score: number) => {
+      setShowHint(false);
       setPopup({ mA: a.data as Member, mB: b.data as Member, score });
     },
     [],
@@ -209,8 +266,21 @@ export default function GroupGrid({ members }: Props) {
     return map;
   }, [members]);
 
-  /** 애니메이션 완료 후 요약(평균/최고/최저/전체쌍) 계산 */
-  const onAnimComplete = useCallback((nodes: GraphNode[]) => {
+  /** 애니메이션 완료 후 요약(평균/최고/최저/전체쌍) 계산 + 배지 페이드인 + 힌트 표시 */
+  const onAnimComplete = useCallback((nodes: GraphNode[], container: HTMLDivElement) => {
+    // 배지 페이드인
+    requestAnimationFrame(() => {
+      container
+        .querySelectorAll<HTMLElement>(".mbti-badge")
+        .forEach((el) => { el.style.opacity = "1"; });
+    });
+
+    // 힌트 최초 1회 표시
+    if (!hintShownRef.current) {
+      hintShownRef.current = true;
+      setShowHint(true);
+    }
+
     const pairs: { mA: Member; mB: Member; score: number }[] = [];
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
@@ -667,13 +737,29 @@ export default function GroupGrid({ members }: Props) {
                 resetOnDataChange={false}
                 colorTheme="cyan"
               />
-              {/* 그래프 인터랙션 힌트 */}
-              <p
-                className="text-center text-[11px] font-medium mt-1"
-                style={{ color: "rgba(255,255,255,0.25)" }}
-              >
-                {GROUP.graphHint}
-              </p>
+              {/* 클릭 유도 힌트 오버레이 — 최초 1회, 노드 탭할 때까지 유지 */}
+              {showHint && (
+                <div
+                  className="absolute inset-0 flex items-center justify-center rounded-2xl pointer-events-none"
+                  style={{ animation: "hint-fade-in 0.4s ease forwards", zIndex: 10 }}
+                >
+                  <span
+                    className="px-4 py-2 rounded-full font-bold"
+                    style={{
+                      fontSize: "15px",
+                      background: "rgba(0,203,255,0.18)",
+                      border: "1px solid rgba(0,203,255,0.45)",
+                      color: "rgba(255,255,255,0.9)",
+                      backdropFilter: "blur(8px)",
+                      WebkitBackdropFilter: "blur(8px)",
+                      textShadow: "0 0 8px rgba(0,203,255,0.6)",
+                      animation: "hint-glow-cyan 2.5s ease-in-out infinite",
+                    }}
+                  >
+                    {MBTI_MAP.graphTapHint}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* 구분선 + 소제목 */}
@@ -1022,6 +1108,13 @@ export default function GroupGrid({ members }: Props) {
           />
         </ScoreDetailPopup>
       )}
+
+      {/* ── 중앙 노드 클릭 시 MBTI 프로필 모달 ── */}
+      <MbtiProfileModal
+        mbtiType={profileType}
+        rgb={CYAN_RGB}
+        onClose={() => setProfileType(null)}
+      />
     </div>
   );
 }

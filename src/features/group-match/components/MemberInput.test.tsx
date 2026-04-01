@@ -16,7 +16,6 @@ vi.mock("./DropdownPicker", () => ({
   default: ({
     value,
     onChange,
-    options,
     renderOption,
   }: {
     value: string;

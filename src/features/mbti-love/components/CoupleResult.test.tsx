@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import CoupleResult from "./CoupleResult";
-import { COUPLE, CTA_TEXTS } from "@/data/ui-text";
+import { CTA_TEXTS } from "@/data/ui-text";
 
 const pushMock = vi.fn();
 

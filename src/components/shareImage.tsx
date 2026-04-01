@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type React from "react";
 
 const STAT_COLORS = [
@@ -113,9 +113,6 @@ export default function ReceiptShareImage({ data = defaultData, cardRef }: Recei
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
   }, []);
-
-  const copyText = copy.before + copy.highlight + copy.after;
-  const copyParts = copyText.split(copy.highlight);
 
   return (
     <>

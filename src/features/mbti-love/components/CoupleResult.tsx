@@ -38,7 +38,6 @@ type Props = {
 
 import { TITLE1, TITLE2, TITLE3, titleProps } from "@/styles/titles";
 import { FIGHT_THEME, SOLUTION_THEME, PINK_RGB, PURPLE_RGB, CYAN_RGB, type CardTheme } from "@/styles/card-themes";
-import { getCategoryComment } from "@/features/mbti-love/consts/category-comments";
 import { getCategoryScores } from "@/features/mbti-love/consts/categories";
 import { SECTION_EMOJIS, LINE_EMOJIS, DEFAULT_BULLET_EMOJI } from "@/features/mbti-love/consts/detail-emojis";
 import { COUPLE, MBTI_SELECT, EMOJIS, CTA_TEXTS } from "@/data/ui-text";

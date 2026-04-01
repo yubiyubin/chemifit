@@ -36,7 +36,7 @@ import {
   GLOW_1, GLOW_2, GLOW_3,
   TRACK_SAT, TRACK_LIT, TRACK_OP,
 } from "@/styles/score-bar";
-import { TITLE4, titleProps } from "@/styles/titles";
+import { TITLE4 } from "@/styles/titles";
 
 export default function ScoreBar({
   score,

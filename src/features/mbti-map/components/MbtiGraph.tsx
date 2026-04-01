@@ -6,7 +6,7 @@
  */
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MBTI_TYPES, COMPATIBILITY, MbtiType } from "@/data/compatibility";
 import { getGraphColor as getColor, hslToRgb } from "@/data/colors";
 import CompatDetailModal, { type CompatDetailData } from "./CompatDetailModal";
@@ -14,12 +14,35 @@ import NetworkGraph, { type GraphNode } from "@/components/NetworkGraph";
 import { resolveCollisions } from "@/lib/layout";
 import { applyNodeHover } from "@/lib/node-styles";
 import { ANGLE_OFFSETS_16 as ANGLE_OFFSETS, DIST_MULTS_16 as DIST_MULTS } from "@/data/graph-constants";
-import { EMOJIS } from "@/data/ui-text";
+import { EMOJIS, MBTI_MAP } from "@/data/ui-text";
 
 type Props = { selectedMbti: MbtiType };
 
 export default function MbtiGraph({ selectedMbti }: Props) {
   const [popup, setPopup] = useState<CompatDetailData>(null);
+  const [showHint, setShowHint] = useState(false);
+  const hintShownRef = useRef(false); // 힌트는 최초 1회만 표시
+
+  // best/worst 펄스 + 힌트 fade keyframes 주입 (1회)
+  useEffect(() => {
+    const STYLE_ID = "mbti-graph-keyframes";
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.textContent = `
+      @keyframes mbti-pulse {
+        0%, 100% { transform: translate(-50%,-50%) scale(1); }
+        50%       { transform: translate(-50%,-50%) scale(1.08); }
+      }
+      @keyframes hint-auto-fade {
+        0%   { opacity: 0; }
+        10%  { opacity: 1; }
+        80%  { opacity: 1; }
+        100% { opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }, []);
 
   // ─────────────────────────────────────────────
   // buildPositions: 중앙 1 + 궤도 16 노드 위치·크기 계산
@@ -160,6 +183,19 @@ export default function MbtiGraph({ selectedMbti }: Props) {
             e.stopPropagation();
             setPopup({ my: selectedMbti, other: mbti, score });
           };
+
+          // best/worst 노드 펄스 (hover 시 일시 정지, leave 시 재개)
+          if (isBest || isWorst) {
+            el.style.animation = "mbti-pulse 2.5s ease-in-out infinite";
+            const prevLeave = el.onmouseleave;
+            el.onmouseleave = (e) => {
+              prevLeave?.call(el, e as MouseEvent);
+              // inline transform 제거 → animation 재개
+              el.style.transform = "";
+            };
+          } else {
+            el.style.animation = "";
+          }
         }
       });
     },
@@ -180,7 +216,7 @@ export default function MbtiGraph({ selectedMbti }: Props) {
     [],
   );
 
-  /** 애니메이션 완료 후 배지(🏆💀) 페이드인 */
+  /** 애니메이션 완료 후 배지(🏆💀) 페이드인 + 최초 1회 힌트 표시 */
   const onAnimComplete = useCallback(
     (_nodes: GraphNode[], container: HTMLDivElement) => {
       requestAnimationFrame(() => {
@@ -190,6 +226,10 @@ export default function MbtiGraph({ selectedMbti }: Props) {
             el.style.opacity = "1";
           });
       });
+      if (!hintShownRef.current) {
+        hintShownRef.current = true;
+        setShowHint(true);
+      }
     },
     [],
   );
@@ -203,17 +243,42 @@ export default function MbtiGraph({ selectedMbti }: Props) {
 
   return (
     <>
-      <NetworkGraph
-        buildPositions={buildPositions}
-        applyNodeStyles={applyNodeStyles}
-        onLineClick={onLineClick}
-        onAnimComplete={onAnimComplete}
-        getLineColorKey={getLineColorKey}
-        heightRatio={1.0}
-        maxHeight={580}
-        animDuration={2500}
-        fadeIn={true}
-      />
+      {/* 그래프 래퍼 — 힌트 오버레이 포지셔닝용 */}
+      <div className="relative">
+        <NetworkGraph
+          buildPositions={buildPositions}
+          applyNodeStyles={applyNodeStyles}
+          onLineClick={onLineClick}
+          onAnimComplete={onAnimComplete}
+          getLineColorKey={getLineColorKey}
+          heightRatio={1.0}
+          maxHeight={580}
+          animDuration={2500}
+          fadeIn={true}
+        />
+        {/* 클릭 유도 힌트 오버레이 — 최초 1회, 3초 후 자동 fade-out */}
+        {showHint && (
+          <div
+            className="absolute inset-0 flex items-center justify-center rounded-2xl pointer-events-none"
+            style={{ animation: "hint-auto-fade 3s ease forwards" }}
+            onAnimationEnd={() => setShowHint(false)}
+          >
+            <span
+              className="px-4 py-2 rounded-full text-sm font-bold"
+              style={{
+                background: "rgba(168,85,247,0.22)",
+                border: "1px solid rgba(168,85,247,0.45)",
+                color: "rgba(255,255,255,0.9)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                textShadow: "0 0 8px rgba(168,85,247,0.6)",
+              }}
+            >
+              {MBTI_MAP.graphTapHint}
+            </span>
+          </div>
+        )}
+      </div>
       <CompatDetailModal data={popup} onClose={() => setPopup(null)} />
     </>
   );

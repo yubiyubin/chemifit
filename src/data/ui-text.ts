@@ -79,7 +79,8 @@ export const MBTI_MAP = {
   rankTitle: "📊 궁합 순위",
   copyLinkBtn: "링크 복사",
   copiedMessage: "복사 완료!",
-  badgeClickHint: "MBTI를 클릭하면 상세 궁합을 볼 수 있어요",
+  badgeClickHint: "원을 클릭하면 상세 궁합을 볼 수 있어요",
+  graphTapHint: "원을 탭해보세요",
   saveImageBtn: "이미지 저장",
 } as const;
 

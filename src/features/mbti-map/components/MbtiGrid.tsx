@@ -199,8 +199,8 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
       {/* ── 섹션 2~4: 결과 영역 ── */}
       <NeonCard rgb="168,85,247" className="p-5 sm:p-6 flex flex-col gap-6">
         {/* ── 캐치프레이즈 ── */}
-        <div className="text-center flex flex-col gap-0.5">
-          <div className="flex items-center gap-3">
+        <div className="text-center flex flex-col items-center gap-1.5">
+          <div className="flex items-center gap-3 w-full">
             <span className="flex-1 h-px" style={{ background: "rgba(168,85,247,0.35)" }} />
             <p
               className="text-2xl sm:text-3xl font-black tracking-widest"
@@ -217,9 +217,16 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
           <p {...titleProps(TITLE2, "rgba(168,85,247,0.75)", "168,85,247", "italic")}>
             &ldquo;{TYPE_PROFILES[selectedMbti].nickname}&rdquo;
           </p>
-          <p {...titleProps(TITLE2, "#fff", "168,85,247", "tracking-wide")}>
+          <span
+            className="text-xs font-bold px-3 py-0.5 rounded-full mt-0.5"
+            style={{
+              color: "rgba(168,85,247,0.9)",
+              background: "rgba(168,85,247,0.1)",
+              border: "0.5px solid rgba(168,85,247,0.35)",
+            }}
+          >
             {MBTI_MAP.mapTitle}
-          </p>
+          </span>
         </div>
 
         {/* 섹션 2: 최고/최악 궁합 카드 (2열 그리드) */}

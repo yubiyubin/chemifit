@@ -11,10 +11,12 @@ import { MBTI_TYPES, COMPATIBILITY, MbtiType } from "@/data/compatibility";
 import { getGraphColor as getColor, hslToRgb } from "@/data/colors";
 import CompatDetailModal, { type CompatDetailData } from "./CompatDetailModal";
 import NetworkGraph, { type GraphNode } from "@/components/NetworkGraph";
+import MbtiProfileModal from "@/components/MbtiProfileModal";
 import { resolveCollisions } from "@/lib/layout";
 import { applyNodeHover } from "@/lib/node-styles";
 import { ANGLE_OFFSETS_16 as ANGLE_OFFSETS, DIST_MULTS_16 as DIST_MULTS } from "@/data/graph-constants";
 import { EMOJIS, MBTI_MAP } from "@/data/ui-text";
+import { PURPLE_RGB } from "@/styles/card-themes";
 
 type Props = { selectedMbti: MbtiType };
 
@@ -22,6 +24,8 @@ export default function MbtiGraph({ selectedMbti }: Props) {
   const [popup, setPopup] = useState<CompatDetailData>(null);
   const [showHint, setShowHint] = useState(false);
   const hintShownRef = useRef(false); // 힌트는 최초 1회만 표시
+
+  const [profileType, setProfileType] = useState<MbtiType | null>(null); // 중앙 노드 클릭 시 프로필 모달
 
   /** 팝업 열기 + 힌트가 남아있으면 함께 닫기 */
   const openPopup = useCallback((data: Exclude<CompatDetailData, null>) => {
@@ -182,7 +186,16 @@ export default function MbtiGraph({ selectedMbti }: Props) {
           <span style="font-size:${ms}px;font-weight:800;color:rgba(${rgb},1);text-shadow:0 0 8px rgba(${rgb},${isHighlight ? 0.9 : 0.6});line-height:1.2;">${isCenter ? "" : score + "%"}</span>
         `;
 
-        if (!isCenter) {
+        if (isCenter) {
+          applyNodeHover(el, rgb, r,
+            { size: glowSz, opacity: glowOp, innerOpacity: 0.14 },
+            0.85,
+          );
+          el.onclick = (e) => {
+            e.stopPropagation();
+            setProfileType(selectedMbti);
+          };
+        } else {
           applyNodeHover(el, rgb, r,
             { size: glowSz, opacity: glowOp, innerOpacity: isHighlight ? 0.1 : 0.05 },
             isHighlight ? 0.65 : 0.35,
@@ -207,7 +220,7 @@ export default function MbtiGraph({ selectedMbti }: Props) {
         }
       });
     },
-    [selectedMbti, openPopup],
+    [selectedMbti, openPopup, setProfileType],
   );
 
   // ─────────────────────────────────────────────
@@ -289,6 +302,11 @@ export default function MbtiGraph({ selectedMbti }: Props) {
         )}
       </div>
       <CompatDetailModal data={popup} onClose={() => setPopup(null)} />
+      <MbtiProfileModal
+        mbtiType={profileType}
+        rgb={PURPLE_RGB}
+        onClose={() => setProfileType(null)}
+      />
     </>
   );
 }

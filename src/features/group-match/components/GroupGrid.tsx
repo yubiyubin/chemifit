@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import {
   Member,
   getScore,
+  type MbtiType,
 } from "@/data/compatibility";
 import CompatCard from "@/components/CompatCard";
 import ScoreBar from "@/components/ScoreBar";
@@ -46,6 +47,7 @@ import { GROUP, EMOJIS, CTA_TEXTS } from "@/data/ui-text";
 import CtaButton from "@/components/CtaButton";
 import { SYMBOLS } from "@/data/symbols";
 import { VARIANT_CONFIG, CYAN_RGB, PURPLE_RGB } from "@/styles/card-themes";
+import MbtiProfileModal from "@/components/MbtiProfileModal";
 import NeonCard from "@/components/NeonCard";
 
 /** 컴포넌트 Props: 그룹에 포함된 멤버 배열 (첫 번째 멤버가 '나') */
@@ -69,6 +71,7 @@ type PopupData = { mA: Member; mB: Member; score: number } | null;
 
 export default function GroupGrid({ members }: Props) {
   const [popup, setPopup] = useState<PopupData>(null);
+  const [profileType, setProfileType] = useState<MbtiType | null>(null); // 중앙 노드 클릭 시 프로필 모달
   const [roleOpen, setRoleOpen] = useState(false);
   const [allPairsOpen, setAllPairsOpen] = useState(false);
   const { copied, copy: handleCopy } = useCopyLink();
@@ -164,7 +167,19 @@ export default function GroupGrid({ members }: Props) {
           <span style="font-size:${ms}px;font-weight:800;color:rgba(${rgb},1);letter-spacing:0.3px;text-shadow:0 0 8px rgba(${rgb},0.9);line-height:1.25;">${m.mbti}</span>
         `;
 
-        if (!isCenter) {
+        if (isCenter) {
+          applyNodeHover(
+            el,
+            rgb,
+            r,
+            { size: glowSz, opacity: glowOp, innerOpacity: innerOp },
+            0.85,
+          );
+          el.onclick = (e) => {
+            e.stopPropagation();
+            setProfileType(m.mbti);
+          };
+        } else {
           applyNodeHover(
             el,
             rgb,
@@ -180,7 +195,7 @@ export default function GroupGrid({ members }: Props) {
         }
       });
     },
-    [myInfo],
+    [myInfo, setProfileType],
   );
 
   // ─────────────────────────────────────────────
@@ -1022,6 +1037,13 @@ export default function GroupGrid({ members }: Props) {
           />
         </ScoreDetailPopup>
       )}
+
+      {/* ── 중앙 노드 클릭 시 MBTI 프로필 모달 ── */}
+      <MbtiProfileModal
+        mbtiType={profileType}
+        rgb={CYAN_RGB}
+        onClose={() => setProfileType(null)}
+      />
     </div>
   );
 }

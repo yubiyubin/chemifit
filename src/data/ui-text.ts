@@ -192,6 +192,7 @@ export const PROFILES = {
   worstLabel: "워스트 궁합",
   celebritiesTitle: "🌟 유명 인물·캐릭터",
   // CTA
+  detailCtaLabel: "상세 프로필 보기",
   loveCtaLabel: "연애 궁합 보기",
   mapCtaLabel: "궁합 맵 보기",
   groupCtaLabel: "그룹 궁합 보기",

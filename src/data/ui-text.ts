@@ -191,6 +191,7 @@ export const PROFILES = {
   bestLabel: "베스트 궁합",
   worstLabel: "워스트 궁합",
   celebritiesTitle: "🌟 유명 인물·캐릭터",
+  celebritiesHint: "탭해서 설명 보기",
   // CTA
   detailCtaLabel: "상세 프로필 보기",
   loveCtaLabel: "연애 궁합 보기",

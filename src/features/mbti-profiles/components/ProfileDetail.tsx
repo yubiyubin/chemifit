@@ -240,9 +240,14 @@ export default function ProfileDetail({ profile }: Props) {
 
         {/* ⑦ 유명 인물·캐릭터 */}
         <NeonCard rgb={MINT_RGB} className="p-4">
-          <h2 className="text-xs font-black mb-3" style={{ color: `rgba(${MINT_RGB},0.8)` }}>
-            {PROFILES.celebritiesTitle}
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-black" style={{ color: `rgba(${MINT_RGB},0.8)` }}>
+              {PROFILES.celebritiesTitle}
+            </h2>
+            <span className="text-[10px] font-medium" style={{ color: `rgba(${MINT_RGB},0.5)` }}>
+              {PROFILES.celebritiesHint}
+            </span>
+          </div>
           <ul className="flex flex-col gap-2">
             {profile.celebrities.map((celeb) => {
               const isOpen = expandedCelebs.has(celeb.name);
@@ -264,10 +269,11 @@ export default function ProfileDetail({ profile }: Props) {
                       {celeb.name}
                     </span>
                     <span
-                      className="text-[10px] shrink-0 transition-transform"
+                      className="text-sm shrink-0 transition-transform"
                       style={{
-                        color: `rgba(${MINT_RGB},0.6)`,
+                        color: `rgba(${MINT_RGB},${isOpen ? 1.0 : 0.85})`,
                         transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                        display: "inline-block",
                       }}
                     >
                       ▾

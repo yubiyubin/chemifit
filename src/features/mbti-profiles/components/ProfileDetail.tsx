@@ -37,6 +37,16 @@ export default function ProfileDetail({ profile }: Props) {
   const { copied, copy } = useCopyLink();
   const [previewOpen, setPreviewOpen] = useState(false); // 이미지 미리보기 모달 열림 여부
   const [previewUrl, setPreviewUrl] = useState<string | null>(null); // 이미지 미리보기 URL
+  const [expandedCelebs, setExpandedCelebs] = useState<Set<string>>(new Set());
+
+  const toggleCeleb = (name: string) => {
+    setExpandedCelebs((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
 
   const handleSaveImage = async () => {
     if (!detailRef.current) return;
@@ -233,20 +243,45 @@ export default function ProfileDetail({ profile }: Props) {
           <h2 className="text-xs font-black mb-3" style={{ color: `rgba(${MINT_RGB},0.8)` }}>
             {PROFILES.celebritiesTitle}
           </h2>
-          <div className="flex flex-wrap gap-2">
-            {profile.celebrities.map((name) => (
-              <span
-                key={name}
-                className="text-xs px-3 py-1.5 rounded-xl font-semibold text-white/80"
-                style={{
-                  background: `rgba(${MINT_RGB},0.08)`,
-                  border: `0.5px solid rgba(${MINT_RGB},0.2)`,
-                }}
-              >
-                {name}
-              </span>
-            ))}
-          </div>
+          <ul className="flex flex-col gap-2">
+            {profile.celebrities.map((celeb) => {
+              const isOpen = expandedCelebs.has(celeb.name);
+              return (
+                <li
+                  key={celeb.name}
+                  role="button"
+                  onClick={() => toggleCeleb(celeb.name)}
+                  className="flex flex-col gap-1 p-2.5 rounded-xl cursor-pointer select-none transition-all"
+                  style={{
+                    background: isOpen
+                      ? `rgba(${MINT_RGB},0.14)`
+                      : `rgba(${MINT_RGB},0.08)`,
+                    border: `0.5px solid rgba(${MINT_RGB},${isOpen ? 0.35 : 0.2})`,
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-bold text-white/90">
+                      {celeb.name}
+                    </span>
+                    <span
+                      className="text-[10px] shrink-0 transition-transform"
+                      style={{
+                        color: `rgba(${MINT_RGB},0.6)`,
+                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      }}
+                    >
+                      ▾
+                    </span>
+                  </div>
+                  {isOpen && (
+                    <span className="text-[11px] text-white/60 leading-relaxed break-keep">
+                      {celeb.desc}
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </NeonCard>
       </div>
 

@@ -208,7 +208,7 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
             </p>
             <span className="flex-1 h-px" style={{ background: `rgba(${PURPLE_RGB},0.35)` }} />
           </div>
-          <p {...titleProps(TITLE2, "rgba(255,255,255,0.5)", PURPLE_RGB)}>
+          <p {...titleProps(TITLE2, "rgba(210,170,255,0.85)", PURPLE_RGB)}>
             &ldquo;{TYPE_PROFILES[selectedMbti].nickname}&rdquo;
           </p>
           <span

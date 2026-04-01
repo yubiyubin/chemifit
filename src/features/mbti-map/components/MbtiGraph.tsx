@@ -6,7 +6,7 @@
  */
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { MBTI_TYPES, COMPATIBILITY, MbtiType } from "@/data/compatibility";
 import { getGraphColor as getColor, hslToRgb } from "@/data/colors";
 import CompatDetailModal, { type CompatDetailData } from "./CompatDetailModal";
@@ -31,29 +31,6 @@ export default function MbtiGraph({ selectedMbti }: Props) {
   const openPopup = useCallback((data: Exclude<CompatDetailData, null>) => {
     setPopup(data);
     setShowHint(false);
-  }, []);
-
-  // best/worst 펄스 + 힌트 fade keyframes 주입 (1회)
-  useEffect(() => {
-    const STYLE_ID = "mbti-graph-keyframes";
-    if (document.getElementById(STYLE_ID)) return;
-    const style = document.createElement("style");
-    style.id = STYLE_ID;
-    style.textContent = `
-      @keyframes mbti-pulse {
-        0%, 100% { transform: translate(-50%,-50%) scale(1); }
-        50%       { transform: translate(-50%,-50%) scale(1.08); }
-      }
-      @keyframes hint-fade-in {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-      }
-      @keyframes hint-glow {
-        0%, 100% { box-shadow: 0 0 10px rgba(168,85,247,0.35), 0 0 20px rgba(168,85,247,0.15); }
-        50%       { box-shadow: 0 0 22px rgba(168,85,247,0.75), 0 0 40px rgba(168,85,247,0.35); }
-      }
-    `;
-    document.head.appendChild(style);
   }, []);
 
   // ─────────────────────────────────────────────

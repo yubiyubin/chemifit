@@ -260,7 +260,7 @@ export default function MbtiGraph({ selectedMbti }: Props) {
         {showHint && (
           <div
             className="absolute inset-0 flex items-center justify-center rounded-2xl pointer-events-none"
-            style={{ animation: "hint-auto-fade 3s ease forwards" }}
+            style={{ animation: "hint-auto-fade 3s ease forwards", zIndex: 10 }}
             onAnimationEnd={() => setShowHint(false)}
           >
             <span

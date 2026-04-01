@@ -217,7 +217,7 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
           <p {...titleProps(TITLE2, "rgba(168,85,247,0.75)", "168,85,247", "italic")}>
             &ldquo;{TYPE_PROFILES[selectedMbti].nickname}&rdquo;
           </p>
-          <p {...titleProps(TITLE2, "rgba(168,85,247,0.7)", "168,85,247", "tracking-wide")}>
+          <p {...titleProps(TITLE2, "#fff", "168,85,247", "tracking-wide")}>
             {MBTI_MAP.mapTitle}
           </p>
         </div>

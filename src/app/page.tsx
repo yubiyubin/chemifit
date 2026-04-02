@@ -13,6 +13,7 @@ import { TYPE_PROFILES } from "@/data/type-profiles";
 import { COUPLE_TIERS } from "@/data/labels";
 import { SITE } from "@/data/ui-text";
 import SiteFooter from "@/components/SiteFooter";
+import ScrollReveal from "@/components/ScrollReveal";
 
 /** 상위 5개 궁합 조합을 추출 (중복 없이) */
 function getTopCouples(count: number) {
@@ -37,22 +38,13 @@ function getTierEmoji(score: number): string {
   return tier.emoji;
 }
 
-/** MBTI 그룹 색상 */
-const GROUP_COLORS: Record<string, string> = {
-  NT: "168,85,247",   // 분석가 — 보라
-  NF: "236,72,153",   // 외교관 — 핑크
-  SJ: "0,203,255",    // 관리자 — 시안
-  SP: "102,237,195",  // 탐험가 — 민트
-};
-
-function getMbtiGroup(type: MbtiType): string {
-  const s = type[1]; // S or N
-  const j = type[3]; // J or P
-  if (s === "N" && (type[2] === "T")) return "NT";
-  if (s === "N" && (type[2] === "F")) return "NF";
-  if (s === "S" && j === "J") return "SJ";
-  return "SP";
-}
+/** MBTI 그룹 정의 */
+const MBTI_GROUPS = [
+  { key: "NT", label: "분석가", rgb: "168,85,247", types: ["INTJ", "INTP", "ENTJ", "ENTP"] as MbtiType[] },
+  { key: "NF", label: "외교관", rgb: "236,72,153", types: ["INFJ", "INFP", "ENFJ", "ENFP"] as MbtiType[] },
+  { key: "SJ", label: "관리자", rgb: "0,203,255", types: ["ISTJ", "ISFJ", "ESTJ", "ESFJ"] as MbtiType[] },
+  { key: "SP", label: "탐험가", rgb: "102,237,195", types: ["ISTP", "ISFP", "ESTP", "ESFP"] as MbtiType[] },
+] as const;
 
 const FEATURES = [
   {
@@ -66,7 +58,7 @@ const FEATURES = [
   {
     emoji: "🌐",
     title: "궁합 맵",
-    desc: "내 MBTI와 16타입의 궁합 순위를 네트워크 그래프로 시각화",
+    desc: "16타입 궁합 순위를 네트워크 그래프로 시각화",
     href: "/mbti-map",
     rgb: "168,85,247",
     stats: "16타입 순위",
@@ -74,7 +66,7 @@ const FEATURES = [
   {
     emoji: "👥",
     title: "그룹 궁합",
-    desc: "2~8명의 MBTI로 그룹 케미, 최고/최악 조합, 팀 역할까지 분석",
+    desc: "2~8명의 MBTI로 그룹 케미와 팀 역할까지 분석",
     href: "/group-match",
     rgb: "0,203,255",
     stats: "팀 역할 분석",
@@ -83,54 +75,73 @@ const FEATURES = [
 
 export default function LandingPage() {
   const topCouples = getTopCouples(5);
+  const maxScore = topCouples[0]?.score ?? 100;
 
   return (
     <main className="min-h-screen bg-[#0f0f1a] text-white overflow-hidden">
-      {/* ── 배경 글로우 (페이지 전체에 깔리는 조명 효과) ── */}
+
+      {/* ── 배경: 움직이는 네온 오브 + 노이즈 텍스처 ── */}
       <div className="fixed inset-0 pointer-events-none -z-10">
-        <div className="absolute top-[-20%] left-[50%] -translate-x-1/2 w-[800px] h-[800px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(236,72,153,0.08) 0%, rgba(168,85,247,0.04) 40%, transparent 70%)" }} />
-        <div className="absolute bottom-[-10%] left-[20%] w-[600px] h-[600px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(168,85,247,0.06) 0%, transparent 60%)" }} />
-        <div className="absolute top-[40%] right-[-10%] w-[500px] h-[500px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(0,203,255,0.04) 0%, transparent 60%)" }} />
+        <div
+          className="absolute top-[-15%] left-[50%] -translate-x-1/2 w-[900px] h-[900px] rounded-full opacity-[0.14]"
+          style={{ background: "radial-gradient(circle, rgba(236,72,153,1) 0%, transparent 60%)", animation: "float-orb 25s ease-in-out infinite" }}
+        />
+        <div
+          className="absolute bottom-[-5%] left-[15%] w-[700px] h-[700px] rounded-full opacity-[0.10]"
+          style={{ background: "radial-gradient(circle, rgba(168,85,247,1) 0%, transparent 55%)", animation: "float-orb 30s ease-in-out infinite reverse" }}
+        />
+        <div
+          className="absolute top-[35%] right-[-8%] w-[600px] h-[600px] rounded-full opacity-[0.08]"
+          style={{ background: "radial-gradient(circle, rgba(0,203,255,1) 0%, transparent 55%)", animation: "float-orb 22s ease-in-out infinite 5s" }}
+        />
+        {/* 노이즈 텍스처 오버레이 */}
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "128px 128px" }}
+        />
       </div>
 
-      <div className="relative max-w-3xl mx-auto px-4 pt-12 pb-8 flex flex-col gap-20">
+      <div className="relative max-w-3xl mx-auto px-4 pt-8 pb-8 flex flex-col">
 
         {/* ══════════════════════════════════════════════════════
             Hero Section
            ══════════════════════════════════════════════════════ */}
-        <section className="flex flex-col items-center gap-8 pt-8 sm:pt-16">
+        <section className="flex flex-col items-center gap-8 pt-12 sm:pt-20 pb-20">
           {/* 로고 */}
           <Link href="/" className="hover:opacity-80 transition-opacity">
-            <Image src="/chemifit.svg" alt="ChemiFit 로고" width={180} height={60} priority />
+            <Image src="/chemifit.svg" alt="ChemiFit 로고" width={200} height={65} priority />
           </Link>
+
+          {/* 네온 구분선 */}
+          <div className="w-16 h-[2px] rounded-full" style={{ background: "rgba(236,72,153,0.6)", boxShadow: "0 0 12px rgba(236,72,153,0.5), 0 0 30px rgba(236,72,153,0.2)" }} />
 
           {/* 헤드라인 */}
           <div className="relative text-center">
-            <div className="absolute inset-0 -z-10 blur-[100px] opacity-40"
-              style={{ background: "radial-gradient(ellipse at center, rgba(236,72,153,0.5) 0%, rgba(168,85,247,0.3) 50%, transparent 80%)" }} />
-            <h1 className="text-4xl sm:text-6xl font-black leading-tight tracking-tight">
-              <span className="block sm:inline">MBTI 궁합,</span>{" "}
-              <span
-                className="bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent"
-                style={{ textShadow: "0 0 60px rgba(236,72,153,0.3)" }}
-              >
-                한눈에
+            <h1 className="text-5xl sm:text-7xl font-black leading-tight tracking-tight">
+              <span className="block sm:inline text-white/95">MBTI 궁합,</span>
+              <br className="hidden sm:block" />{" "}
+              {/* 그라디언트 텍스트 + 복제 글로우 */}
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent relative z-10">
+                  한눈에
+                </span>
+                {/* blur된 복제본으로 실제 글로우 효과 */}
+                <span
+                  className="absolute inset-0 bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent blur-2xl opacity-60"
+                  aria-hidden="true"
+                >
+                  한눈에
+                </span>
               </span>
             </h1>
           </div>
 
-          <p className="text-base sm:text-lg text-white/50 max-w-lg text-center leading-relaxed">
-            연인 궁합부터 그룹 케미까지.
-            <br className="sm:hidden" />{" "}
-            256가지 MBTI 조합을
-            <br className="sm:hidden" />{" "}
-            점수 · 그래프 · 상세 분석으로
+          <p className="text-base sm:text-lg text-white/45 max-w-md text-center leading-relaxed">
+            연인 궁합부터 그룹 케미까지
+            <br />
+            256가지 MBTI 조합을 점수 · 그래프 · 상세 분석으로
           </p>
 
-          {/* CTA */}
+          {/* CTA — 네온 맥동 */}
           <Link
             href="/mbti-love"
             className="px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105 hover:-translate-y-0.5"
@@ -138,189 +149,295 @@ export default function LandingPage() {
               background: "rgba(236,72,153,0.15)",
               border: "1.5px solid rgba(236,72,153,0.55)",
               color: "#f9a8d4",
-              boxShadow: "0 0 20px rgba(236,72,153,0.3), 0 0 50px rgba(236,72,153,0.15), 0 0 100px rgba(236,72,153,0.08)",
+              animation: "cta-glow 3s ease-in-out infinite",
             }}
           >
             지금 궁합 확인하기
           </Link>
 
-          <p className="text-xs text-white/25">{SITE.subtitle}</p>
+          <p className="text-xs text-white/20">{SITE.subtitle}</p>
         </section>
 
-        {/* ══════════════════════════════════════════════════════
-            Features Section — 3가지 기능
-           ══════════════════════════════════════════════════════ */}
-        <section className="flex flex-col gap-6">
-          <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl font-black">
-              <span className="text-white/90">무엇을 할 수 있나요?</span>
-            </h2>
-          </div>
+        {/* 섹션 디바이더 */}
+        <div className="w-full h-px mx-auto mb-16"
+          style={{ background: "linear-gradient(90deg, transparent, rgba(236,72,153,0.3), rgba(168,85,247,0.3), rgba(0,203,255,0.3), transparent)" }}
+        />
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {FEATURES.map((f) => (
+        {/* ══════════════════════════════════════════════════════
+            Features — 비대칭 레이아웃 (1 큰 + 2 작은)
+           ══════════════════════════════════════════════════════ */}
+        <ScrollReveal>
+          <section className="flex flex-col gap-6 mb-20">
+            <h2 className="text-2xl sm:text-3xl font-black text-center text-white/90">
+              무엇을 할 수 있나요?
+            </h2>
+
+            <div className="flex flex-col gap-4">
+              {/* 메인 피처: 연인 궁합 — 풀 너비 */}
               <Link
-                key={f.href}
-                href={f.href}
-                className="group relative rounded-2xl p-6 sm:p-7 flex flex-col gap-4 transition-all duration-300 hover:-translate-y-1"
+                href={FEATURES[0].href}
+                className="group relative rounded-2xl p-7 sm:p-8 flex flex-col sm:flex-row gap-5 sm:items-center transition-all duration-300 hover:-translate-y-1 overflow-hidden"
                 style={{
-                  background: `rgba(${f.rgb},0.06)`,
-                  border: `1.5px solid rgba(${f.rgb},0.25)`,
-                  boxShadow: `0 0 15px rgba(${f.rgb},0.1), 0 0 40px rgba(${f.rgb},0.05)`,
+                  background: `rgba(${FEATURES[0].rgb},0.06)`,
+                  border: `1.5px solid rgba(${FEATURES[0].rgb},0.3)`,
+                  boxShadow: `0 0 20px rgba(${FEATURES[0].rgb},0.1), 0 0 50px rgba(${FEATURES[0].rgb},0.05)`,
                 }}
               >
-                {/* 호버 글로우 */}
+                {/* 상단 네온 라인 */}
+                <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `rgb(${FEATURES[0].rgb})`, boxShadow: `0 0 10px rgba(${FEATURES[0].rgb},0.5)` }} />
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ boxShadow: `0 0 25px rgba(${f.rgb},0.25), 0 0 60px rgba(${f.rgb},0.12)` }} />
+                  style={{ boxShadow: `0 0 30px rgba(${FEATURES[0].rgb},0.2), 0 0 70px rgba(${FEATURES[0].rgb},0.1)` }} />
 
-                <div className="relative z-10 flex flex-col gap-3">
-                  <span className="text-4xl">{f.emoji}</span>
-                  <div>
-                    <h3 className="text-lg font-black mb-1" style={{ color: `rgb(${f.rgb})` }}>{f.title}</h3>
-                    <span
-                      className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold"
-                      style={{ background: `rgba(${f.rgb},0.15)`, color: `rgba(${f.rgb},0.9)` }}
-                    >
-                      {f.stats}
+                <span className="text-5xl relative z-10">{FEATURES[0].emoji}</span>
+                <div className="relative z-10 flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-black" style={{ color: `rgb(${FEATURES[0].rgb})` }}>{FEATURES[0].title}</h3>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                      style={{ background: `rgba(${FEATURES[0].rgb},0.15)`, color: `rgba(${FEATURES[0].rgb},0.9)` }}>
+                      {FEATURES[0].stats}
                     </span>
                   </div>
-                  <p className="text-sm text-white/45 leading-relaxed">{f.desc}</p>
+                  <p className="text-sm text-white/45 leading-relaxed">{FEATURES[0].desc}</p>
                 </div>
               </Link>
-            ))}
-          </div>
-        </section>
+
+              {/* 서브 피처 2개 — 반반 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {FEATURES.slice(1).map((f) => (
+                  <Link
+                    key={f.href}
+                    href={f.href}
+                    className="group relative rounded-2xl p-6 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                    style={{
+                      background: `rgba(${f.rgb},0.06)`,
+                      border: `1.5px solid rgba(${f.rgb},0.25)`,
+                      boxShadow: `0 0 15px rgba(${f.rgb},0.08)`,
+                    }}
+                  >
+                    <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `rgb(${f.rgb})`, boxShadow: `0 0 10px rgba(${f.rgb},0.5)` }} />
+                    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{ boxShadow: `0 0 25px rgba(${f.rgb},0.2), 0 0 60px rgba(${f.rgb},0.1)` }} />
+
+                    <div className="relative z-10 flex flex-col gap-3">
+                      <span className="text-4xl">{f.emoji}</span>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-lg font-black" style={{ color: `rgb(${f.rgb})` }}>{f.title}</h3>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                            style={{ background: `rgba(${f.rgb},0.15)`, color: `rgba(${f.rgb},0.9)` }}>
+                            {f.stats}
+                          </span>
+                        </div>
+                        <p className="text-sm text-white/45 leading-relaxed">{f.desc}</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        </ScrollReveal>
+
+        {/* 섹션 디바이더 */}
+        <div className="w-full h-px mx-auto mb-16"
+          style={{ background: "linear-gradient(90deg, transparent, rgba(236,72,153,0.2), rgba(168,85,247,0.2), transparent)" }}
+        />
 
         {/* ══════════════════════════════════════════════════════
-            Best Couples — 인기 궁합 TOP 5
+            Best Couples — 바 게이지 포함
            ══════════════════════════════════════════════════════ */}
-        <section className="flex flex-col gap-6">
-          <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl font-black text-white/90">베스트 궁합 TOP 5</h2>
-            <p className="text-sm text-white/35 mt-2">가장 높은 점수를 받은 MBTI 조합</p>
-          </div>
+        <ScrollReveal>
+          <section className="flex flex-col gap-6 mb-20">
+            <div className="text-center">
+              <h2 className="text-2xl sm:text-3xl font-black text-white/90">베스트 궁합 TOP 5</h2>
+              <p className="text-sm text-white/30 mt-2">가장 높은 점수를 받은 MBTI 조합</p>
+            </div>
 
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{
-              background: "rgba(236,72,153,0.05)",
-              border: "1.5px solid rgba(236,72,153,0.2)",
-              boxShadow: "0 0 20px rgba(236,72,153,0.1), 0 0 50px rgba(236,72,153,0.05)",
-            }}
-          >
-            {topCouples.map(({ a, b, score }, i) => (
-              <Link
-                key={`${a}-${b}`}
-                href={`/mbti-love/${a.toLowerCase()}/${b.toLowerCase()}`}
-                className="flex items-center gap-4 px-5 sm:px-6 py-4 transition-all duration-200 hover:bg-white/[0.03]"
-                style={{ borderBottom: i < 4 ? "1px solid rgba(236,72,153,0.08)" : "none" }}
-              >
-                {/* 순위 */}
-                <span
-                  className="text-2xl font-black w-8 text-center shrink-0"
-                  style={{
-                    color: i === 0 ? "#fbbf24" : i === 1 ? "#94a3b8" : i === 2 ? "#cd7f32" : "rgba(255,255,255,0.2)",
-                    textShadow: i < 3 ? `0 0 12px rgba(${i === 0 ? "251,191,36" : i === 1 ? "148,163,184" : "205,127,50"},0.5)` : "none",
-                  }}
-                >
-                  {i + 1}
-                </span>
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: "rgba(236,72,153,0.04)",
+                border: "1.5px solid rgba(236,72,153,0.2)",
+                boxShadow: "0 0 25px rgba(236,72,153,0.08)",
+              }}
+            >
+              {topCouples.map(({ a, b, score }, i) => (
+                <ScrollReveal key={`${a}-${b}`} delay={i * 100}>
+                  <Link
+                    href={`/mbti-love/${a.toLowerCase()}/${b.toLowerCase()}`}
+                    className="relative flex items-center gap-4 px-5 sm:px-6 py-4 sm:py-5 transition-all duration-200 hover:bg-white/[0.03] overflow-hidden"
+                    style={{
+                      borderBottom: i < 4 ? "1px solid rgba(236,72,153,0.08)" : "none",
+                      ...(i === 0 ? { background: "rgba(236,72,153,0.06)" } : {}),
+                    }}
+                  >
+                    {/* 배경 바 게이지 */}
+                    <div
+                      className="landing-gauge absolute inset-y-0 left-0 rounded-r-lg"
+                      style={{
+                        width: `${(score / maxScore) * 100}%`,
+                        background: `linear-gradient(90deg, rgba(236,72,153,${i === 0 ? 0.08 : 0.04}), transparent)`,
+                        transitionDelay: `${i * 150}ms`,
+                      }}
+                    />
 
-                {/* MBTI 뱃지 쌍 */}
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <span
-                    className="px-3 py-1 rounded-lg text-sm font-black shrink-0"
-                    style={{ background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: "#c084fc" }}
-                  >
-                    {a}
-                  </span>
-                  <span className="text-white/20 text-xs">×</span>
-                  <span
-                    className="px-3 py-1 rounded-lg text-sm font-black shrink-0"
-                    style={{ background: "rgba(236,72,153,0.15)", border: "1px solid rgba(236,72,153,0.3)", color: "#f472b6" }}
-                  >
-                    {b}
-                  </span>
-                </div>
+                    {/* 순위 뱃지 */}
+                    <div className="relative z-10 shrink-0">
+                      <span
+                        className="flex items-center justify-center w-8 h-8 rounded-full text-sm font-black"
+                        style={{
+                          background: i === 0 ? "rgba(251,191,36,0.15)" : i === 1 ? "rgba(148,163,184,0.12)" : i === 2 ? "rgba(205,127,50,0.12)" : "rgba(255,255,255,0.05)",
+                          border: `1px solid ${i === 0 ? "rgba(251,191,36,0.4)" : i === 1 ? "rgba(148,163,184,0.3)" : i === 2 ? "rgba(205,127,50,0.3)" : "rgba(255,255,255,0.1)"}`,
+                          color: i === 0 ? "#fbbf24" : i === 1 ? "#94a3b8" : i === 2 ? "#cd7f32" : "rgba(255,255,255,0.3)",
+                          boxShadow: i < 3 ? `0 0 10px rgba(${i === 0 ? "251,191,36" : i === 1 ? "148,163,184" : "205,127,50"},0.25)` : "none",
+                        }}
+                      >
+                        {i + 1}
+                      </span>
+                    </div>
 
-                {/* 점수 + 티어 */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-lg">{getTierEmoji(score)}</span>
-                  <span
-                    className="text-xl font-black tabular-nums"
-                    style={{ color: "#f472b6", textShadow: "0 0 10px rgba(236,72,153,0.4)" }}
-                  >
-                    {score}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+                    {/* MBTI 뱃지 쌍 */}
+                    <div className="relative z-10 flex items-center gap-2 flex-1 min-w-0">
+                      <span
+                        className="px-3 py-1 rounded-lg text-sm font-black shrink-0"
+                        style={{ background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: "#c084fc" }}
+                      >
+                        {a}
+                      </span>
+                      <span className="text-white/20 text-xs">×</span>
+                      <span
+                        className="px-3 py-1 rounded-lg text-sm font-black shrink-0"
+                        style={{ background: "rgba(236,72,153,0.15)", border: "1px solid rgba(236,72,153,0.3)", color: "#f472b6" }}
+                      >
+                        {b}
+                      </span>
+                    </div>
+
+                    {/* 점수 + 티어 */}
+                    <div className="relative z-10 flex items-center gap-2 shrink-0">
+                      <span className="text-lg">{getTierEmoji(score)}</span>
+                      <span
+                        className="text-xl font-black tabular-nums"
+                        style={{ color: "#f472b6", textShadow: "0 0 10px rgba(236,72,153,0.4)" }}
+                      >
+                        {score}
+                      </span>
+                    </div>
+                  </Link>
+                </ScrollReveal>
+              ))}
+            </div>
+          </section>
+        </ScrollReveal>
+
+        {/* 섹션 디바이더 */}
+        <div className="w-full h-px mx-auto mb-16"
+          style={{ background: "linear-gradient(90deg, transparent, rgba(102,237,195,0.2), rgba(0,203,255,0.2), transparent)" }}
+        />
 
         {/* ══════════════════════════════════════════════════════
-            16 MBTI Types Grid
+            16 MBTI Types — 그룹별 정리
            ══════════════════════════════════════════════════════ */}
-        <section className="flex flex-col gap-6">
-          <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl font-black text-white/90">16가지 MBTI 유형</h2>
-            <p className="text-sm text-white/35 mt-2">클릭하면 성격 특징, 장단점, 궁합을 확인할 수 있어요</p>
-          </div>
+        <ScrollReveal>
+          <section className="flex flex-col gap-6 mb-20">
+            <div className="text-center">
+              <h2 className="text-2xl sm:text-3xl font-black text-white/90">16가지 MBTI 유형</h2>
+              <p className="text-sm text-white/30 mt-2">클릭하면 성격 특징, 장단점, 궁합을 확인할 수 있어요</p>
+            </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {MBTI_TYPES.map((type) => {
-              const group = getMbtiGroup(type);
-              const rgb = GROUP_COLORS[group];
-              const profile = TYPE_PROFILES[type];
-              return (
-                <Link
-                  key={type}
-                  href={`/mbti-profiles/${type.toLowerCase()}`}
-                  className="group relative rounded-xl p-4 flex flex-col gap-2 transition-all duration-300 hover:-translate-y-1"
-                  style={{
-                    background: `rgba(${rgb},0.06)`,
-                    border: `1px solid rgba(${rgb},0.2)`,
-                    boxShadow: `0 0 12px rgba(${rgb},0.06)`,
-                  }}
-                >
-                  <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    style={{ boxShadow: `0 0 20px rgba(${rgb},0.25), 0 0 50px rgba(${rgb},0.1)` }} />
-                  <div className="relative z-10">
-                    <span className="text-base font-black" style={{ color: `rgb(${rgb})` }}>{type}</span>
-                    <p className="text-[11px] text-white/35 mt-1 leading-snug line-clamp-2">
-                      {profile.nickname}
-                    </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {MBTI_GROUPS.map((group, gi) => (
+                <ScrollReveal key={group.key} delay={gi * 100}>
+                  <div
+                    className="rounded-2xl p-4 sm:p-5"
+                    style={{
+                      background: `rgba(${group.rgb},0.04)`,
+                      border: `1px solid rgba(${group.rgb},0.15)`,
+                    }}
+                  >
+                    {/* 그룹 라벨 */}
+                    <div className="flex items-center gap-2 mb-3 px-1">
+                      <span className="text-xs font-black tracking-wider" style={{ color: `rgb(${group.rgb})` }}>{group.key}</span>
+                      <span className="text-[11px] text-white/30 font-bold">{group.label}</span>
+                      <div className="flex-1 h-px ml-1" style={{ background: `rgba(${group.rgb},0.15)` }} />
+                    </div>
+
+                    {/* 4개 MBTI 타입 */}
+                    <div className="grid grid-cols-2 gap-2">
+                      {group.types.map((type) => {
+                        const profile = TYPE_PROFILES[type];
+                        return (
+                          <Link
+                            key={type}
+                            href={`/mbti-profiles/${type.toLowerCase()}`}
+                            className="group relative rounded-xl p-3 flex flex-col gap-1 transition-all duration-300 hover:-translate-y-0.5"
+                            style={{
+                              background: `rgba(${group.rgb},0.06)`,
+                              border: `1px solid rgba(${group.rgb},0.12)`,
+                            }}
+                          >
+                            <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              style={{ boxShadow: `0 0 18px rgba(${group.rgb},0.2), 0 0 40px rgba(${group.rgb},0.08)` }} />
+                            <div className="relative z-10">
+                              <span className="text-sm font-black" style={{ color: `rgb(${group.rgb})` }}>{type}</span>
+                              <p className="text-[10px] text-white/30 mt-0.5 leading-snug line-clamp-1">
+                                {profile.nickname}
+                              </p>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
                   </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
+                </ScrollReveal>
+              ))}
+            </div>
+          </section>
+        </ScrollReveal>
+
+        {/* 섹션 디바이더 */}
+        <div className="w-full h-px mx-auto mb-12"
+          style={{ background: "linear-gradient(90deg, transparent, rgba(236,72,153,0.15), transparent)" }}
+        />
 
         {/* ══════════════════════════════════════════════════════
-            Bottom CTA
+            Bottom CTA — 풀폭 배너 스타일
            ══════════════════════════════════════════════════════ */}
-        <section className="flex flex-col items-center gap-6 py-8">
-          <div className="relative text-center">
-            <div className="absolute inset-0 -z-10 blur-[80px] opacity-20"
-              style={{ background: "radial-gradient(ellipse, rgba(236,72,153,0.5), transparent 70%)" }} />
-            <p className="text-xl sm:text-2xl font-bold text-white/60">
-              나의 MBTI 궁합이 궁금하다면
-            </p>
-          </div>
-          <Link
-            href="/mbti-love"
-            className="px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105 hover:-translate-y-0.5"
-            style={{
-              background: "rgba(236,72,153,0.15)",
-              border: "1.5px solid rgba(236,72,153,0.55)",
-              color: "#f9a8d4",
-              boxShadow: "0 0 20px rgba(236,72,153,0.3), 0 0 50px rgba(236,72,153,0.15), 0 0 100px rgba(236,72,153,0.08)",
-            }}
-          >
-            궁합 테스트 시작하기
-          </Link>
-        </section>
+        <ScrollReveal>
+          <section className="mb-8">
+            <div
+              className="relative rounded-2xl p-10 sm:p-14 flex flex-col items-center gap-6 text-center overflow-hidden"
+              style={{
+                background: "rgba(236,72,153,0.05)",
+                border: "1.5px solid rgba(236,72,153,0.2)",
+                boxShadow: "0 0 40px rgba(236,72,153,0.08)",
+              }}
+            >
+              {/* 배경 글로우 */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full pointer-events-none"
+                style={{ background: "radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 60%)" }} />
+
+              <p className="relative z-10 text-xl sm:text-2xl font-black text-white/70">
+                나의 MBTI 궁합이 궁금하다면
+              </p>
+              <p className="relative z-10 text-sm text-white/30 -mt-2">
+                256가지 조합 중 나의 궁합을 찾아보세요
+              </p>
+              <Link
+                href="/mbti-love"
+                className="relative z-10 px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105 hover:-translate-y-0.5"
+                style={{
+                  background: "rgba(236,72,153,0.15)",
+                  border: "1.5px solid rgba(236,72,153,0.55)",
+                  color: "#f9a8d4",
+                  animation: "cta-glow 3s ease-in-out infinite 1.5s",
+                }}
+              >
+                궁합 테스트 시작하기
+              </Link>
+            </div>
+          </section>
+        </ScrollReveal>
       </div>
 
       <SiteFooter />

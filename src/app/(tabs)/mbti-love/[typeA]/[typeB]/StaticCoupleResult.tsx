@@ -66,9 +66,9 @@ export default function StaticCoupleResult({ typeA, typeB, score, tier, loveDesc
 
             {/* MBTI 타입 */}
             <div className="flex items-center gap-3 z-10">
-              <span className="text-xl sm:text-2xl font-black" style={{ color: "#c084fc" }}>{typeA}</span>
+              <span className="text-xl sm:text-2xl font-black" style={{ color: "#c084fc", textShadow: "0 0 12px rgba(168,85,247,0.6), 0 0 30px rgba(168,85,247,0.25)" }}>{typeA}</span>
               <span className="text-2xl">{COUPLE.mbtiSeparator}</span>
-              <span className="text-xl sm:text-2xl font-black" style={{ color: "#f472b6" }}>{typeB}</span>
+              <span className="text-xl sm:text-2xl font-black" style={{ color: "#f472b6", textShadow: "0 0 12px rgba(236,72,153,0.6), 0 0 30px rgba(236,72,153,0.25)" }}>{typeB}</span>
             </div>
 
             <CircularGauge score={score} gradient={["#ec4899", "#a855f7"]} textColor="#f472b6" />

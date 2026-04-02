@@ -420,9 +420,9 @@ export default function CoupleResult({
 
                   {/* 내 MBTI + 상대 MBTI */}
                   <div className="flex items-center gap-3 z-10">
-                    <span className="text-xl sm:text-2xl font-black" style={{ color: "#c084fc" }}>{myMbti}</span>
+                    <span className="text-xl sm:text-2xl font-black" style={{ color: "#c084fc", textShadow: "0 0 12px rgba(168,85,247,0.6), 0 0 30px rgba(168,85,247,0.25)" }}>{myMbti}</span>
                     <span className="text-2xl">{COUPLE.mbtiSeparator}</span>
-                    <span className="text-xl sm:text-2xl font-black" style={{ color: "#f472b6" }}>{partnerMbti}</span>
+                    <span className="text-xl sm:text-2xl font-black" style={{ color: "#f472b6", textShadow: "0 0 12px rgba(236,72,153,0.6), 0 0 30px rgba(236,72,153,0.25)" }}>{partnerMbti}</span>
                   </div>
 
                   {/* 원형 게이지 (점수 시각화 — 핑크→퍼플 그라디언트) */}

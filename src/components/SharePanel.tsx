@@ -53,17 +53,6 @@ export default function SharePanel({
     setTimeout(() => setCopied(false), 2000);
   }, [fullUrl, contentType]);
 
-  const handleNativeShare = useCallback(async () => {
-    trackEvent("share_click", { platform: "native", content_type: contentType });
-    try {
-      await navigator.share({ title, text: description, url: fullUrl });
-    } catch {
-      // 사용자가 공유 시트를 취소한 경우 (AbortError) — 무시
-    }
-  }, [title, description, fullUrl, contentType]);
-
-  const supportsNativeShare = typeof navigator !== "undefined" && !!navigator.share;
-
   const btnClass = "neon-btn flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold no-underline";
 
   return (
@@ -102,18 +91,6 @@ export default function SharePanel({
           <span>{copied ? "복사됨" : "링크"}</span>
         </button>
 
-        {/* 네이티브 공유 (모바일) */}
-        {supportsNativeShare && (
-          <button
-            onClick={handleNativeShare}
-            className={btnClass}
-            style={{ "--neon": rgb } as React.CSSProperties}
-            aria-label="더보기"
-          >
-            <span>↗</span>
-            <span>더보기</span>
-          </button>
-        )}
       </div>
     </div>
   );

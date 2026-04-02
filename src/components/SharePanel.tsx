@@ -36,8 +36,15 @@ export default function SharePanel({
 
   const handleKakao = useCallback(async () => {
     trackEvent("share_click", { platform: "kakao", content_type: contentType });
-    await shareKakao({ title, description, pageUrl: path });
-  }, [title, description, path, contentType]);
+    try {
+      await shareKakao({ title, description, pageUrl: path });
+    } catch {
+      // SDK 로드 실패 시 폴백: 링크 복사
+      await navigator.clipboard.writeText(fullUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }, [title, description, path, contentType, fullUrl]);
 
   const handleTwitter = useCallback(() => {
     trackEvent("share_click", { platform: "twitter", content_type: contentType });

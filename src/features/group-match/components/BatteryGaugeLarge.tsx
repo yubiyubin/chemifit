@@ -320,7 +320,7 @@ export default function BatteryGaugeLarge({
             borderTop: `1.5px solid ${theme.borderHex}cc`,
             borderRight: `1.5px solid ${theme.borderHex}cc`,
             borderBottom: `1.5px solid ${theme.borderHex}cc`,
-            borderLeft: "none",
+            borderLeft: "0px solid transparent",
             backdropFilter: "blur(4px)",
             boxShadow: `3px 0 18px rgba(${gr},${(0.75 * gp).toFixed(2)}), 5px 0 40px rgba(${gr},${(0.5 * gp).toFixed(2)}), 0 0 60px rgba(${gr},${(0.3 * gp).toFixed(2)})`,
             transition: "all 0.5s",

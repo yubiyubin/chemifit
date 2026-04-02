@@ -176,14 +176,13 @@ export default function LandingPage() {
             <div className="flex flex-col gap-3">
               <Link
                 href={FEATURES[0].href}
-                className="neon-action relative flex items-center gap-5 rounded-2xl px-6 py-6 sm:py-7 no-underline overflow-hidden"
+                className="neon-action flex items-center gap-5 rounded-2xl px-6 py-5 sm:py-6 no-underline"
                 style={{ "--neon": FEATURES[0].rgb } as React.CSSProperties}
               >
-                <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `rgb(${FEATURES[0].rgb})`, boxShadow: `0 0 10px rgba(${FEATURES[0].rgb},0.5)` }} />
-                <span className="text-5xl shrink-0">{FEATURES[0].emoji}</span>
+                <span className="text-4xl shrink-0">{FEATURES[0].emoji}</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-lg sm:text-xl font-black" style={{ color: `rgb(${FEATURES[0].rgb})` }}>{FEATURES[0].title}</span>
+                    <span className="text-base sm:text-lg font-black" style={{ color: `rgb(${FEATURES[0].rgb})` }}>{FEATURES[0].title}</span>
                     <span className="text-[10px] font-bold text-white/30">{FEATURES[0].stats}</span>
                   </div>
                   <p className="text-xs sm:text-sm text-white/40 mt-1 leading-relaxed">{FEATURES[0].desc}</p>
@@ -197,17 +196,16 @@ export default function LandingPage() {
                   <Link
                     key={f.href}
                     href={f.href}
-                    className="neon-action relative flex items-center gap-4 rounded-2xl px-5 py-5 no-underline overflow-hidden"
+                    className="neon-action flex items-center gap-5 rounded-2xl px-6 py-5 sm:py-6 no-underline"
                     style={{ "--neon": f.rgb } as React.CSSProperties}
                   >
-                    <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `rgb(${f.rgb})`, boxShadow: `0 0 10px rgba(${f.rgb},0.5)` }} />
-                    <span className="text-3xl shrink-0">{f.emoji}</span>
+                    <span className="text-4xl shrink-0">{f.emoji}</span>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base font-black" style={{ color: `rgb(${f.rgb})` }}>{f.title}</span>
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-base sm:text-lg font-black" style={{ color: `rgb(${f.rgb})` }}>{f.title}</span>
                         <span className="text-[10px] font-bold text-white/30">{f.stats}</span>
                       </div>
-                      <p className="text-xs text-white/40 mt-1 leading-relaxed">{f.desc}</p>
+                      <p className="text-xs sm:text-sm text-white/40 mt-1 leading-relaxed">{f.desc}</p>
                     </div>
                     <span className="text-white/20 text-sm shrink-0">→</span>
                   </Link>

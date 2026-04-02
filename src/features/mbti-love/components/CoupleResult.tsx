@@ -45,6 +45,7 @@ import CtaButton from "@/components/CtaButton";
 import { SYMBOLS } from "@/data/symbols";
 import ReceiptShareImage from "@/components/shareImage";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
+import { trackEvent } from "@/lib/analytics";
 
 
 /**
@@ -368,6 +369,7 @@ export default function CoupleResult({
     (mbti: MbtiType) => {
       onPartnerSelect(mbti);
       setDetailOpen(false);
+      trackEvent("couple_result_view", { my: myMbti, partner: mbti, score: COMPATIBILITY[myMbti][mbti] });
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           resultRef.current?.scrollIntoView({
@@ -377,7 +379,7 @@ export default function CoupleResult({
         });
       });
     },
-    [onPartnerSelect],
+    [onPartnerSelect, myMbti],
   );
 
   // 파생 데이터 계산
@@ -414,6 +416,7 @@ export default function CoupleResult({
   /** 모달을 즉시 열고(로딩 상태) 백그라운드에서 캡처 후 이미지 교체 */
   async function handleSaveImage() {
     if (!cardRef.current || !shareData || !partnerMbti) return;
+    trackEvent("share_image_save", { my: myMbti, partner: partnerMbti });
     setPreviewUrl(null);
     setPreviewOpen(true); // 로딩 상태로 모달 즉시 표시
     const { toPng } = await import("html-to-image");

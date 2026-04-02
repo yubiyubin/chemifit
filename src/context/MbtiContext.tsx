@@ -25,6 +25,7 @@ import {
 } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { MBTI_TYPES, type MbtiType } from "@/data/compatibility";
+import { trackEvent } from "@/lib/analytics";
 
 /** Context에 담기는 값의 타입 */
 type MbtiContextValue = {
@@ -64,6 +65,7 @@ export function MbtiProvider({ children }: { children: ReactNode }) {
   const selectMbti = useCallback((mbti: MbtiType) => {
     setSelectedMbti(mbti);
     setShowModal(false);
+    trackEvent("mbti_select", { type: mbti });
 
     // URL 쿼리 파라미터 업데이트 (새로고침 없이)
     const params = new URLSearchParams(window.location.search);

@@ -7,6 +7,7 @@
 "use client";
 
 import React from "react";
+import { trackEvent } from "@/lib/analytics";
 
 interface CtaButtonProps {
   /** 메인 텍스트 (항상 표시) */
@@ -32,7 +33,7 @@ export default function CtaButton({
   return (
     <button
       data-testid={testId}
-      onClick={onClick}
+      onClick={() => { trackEvent("cta_click", { title }); onClick(); }}
       className={`neon-action w-full rounded-xl text-center ${subtitle ? "py-4" : "py-2.5"} ${className}`}
       style={{ "--neon": rgb } as React.CSSProperties}
     >

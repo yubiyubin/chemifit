@@ -294,8 +294,8 @@ export default function CoupleResult({
     setPreviewOpen(true); // 로딩 상태로 모달 즉시 표시
     const { toPng } = await import("html-to-image");
     await document.fonts.ready;
-    const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, width: 1080, height: 1350 });
-    setPreviewUrl(dataUrl); // 이미지 준비되면 교체
+    const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, width: 1080, height: 1350, skipFonts: true });
+    setPreviewUrl(dataUrl);
   }
 
   function handlePreviewClose() {

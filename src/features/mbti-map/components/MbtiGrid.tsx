@@ -13,7 +13,7 @@
  */
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { MBTI_TYPES, COMPATIBILITY, MbtiType } from "@/data/compatibility";
 import { MBTI_MAP } from "@/data/ui-text";
 import { getScoreInfo } from "@/data/labels";
@@ -27,6 +27,9 @@ import { TYPE_PROFILES } from "@/data/type-profiles";
 import { TITLE1, TITLE2, titleProps } from "@/styles/titles";
 import { PURPLE_RGB } from "@/styles/card-themes";
 import SharePanel from "@/components/SharePanel";
+import MapShareImage from "@/components/MapShareImage";
+import ImagePreviewModal from "@/components/ImagePreviewModal";
+import { trackEvent } from "@/lib/analytics";
 
 /** 동일 점수를 가진 MBTI들을 하나의 그룹으로 묶기 위한 타입 */
 type GroupedPair = {
@@ -62,6 +65,20 @@ type Props = {
 export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
   const setSelectedMbti = onSelect ?? (() => {});
   const scrollRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const handleSaveImage = useCallback(async () => {
+    if (!cardRef.current) return;
+    trackEvent("share_image_save", { type: selectedMbti, content: "map" });
+    setPreviewUrl(null);
+    setPreviewOpen(true);
+    const { toPng } = await import("html-to-image");
+    await document.fonts.ready;
+    const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, width: 1080, height: 1350 });
+    setPreviewUrl(dataUrl);
+  }, [selectedMbti]);
 
   // 선택된 버튼이 보이도록 자동 스크롤 (쿼리 파라미터 초기 로드 포함)
   useEffect(() => {
@@ -293,32 +310,50 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
 
       </NeonCard>
 
-      {/* ── 공유 버튼 행 ── */}
-      <SharePanel
-        title={`${selectedMbti} MBTI 궁합 순위`}
-        description={`${selectedMbti}와 가장 잘 맞는 MBTI는? 16타입 궁합 랭킹을 확인하세요.`}
-        path={`/mbti-map?mbti=${selectedMbti}`}
-        rgb={PURPLE_RGB}
-        contentType="map"
-      />
+      {/* ── 공유 + 이미지 저장 ── */}
+      <div className="flex flex-col gap-3">
+        <SharePanel
+          title={`${selectedMbti} MBTI 궁합 순위`}
+          description={`${selectedMbti}와 가장 잘 맞는 MBTI는? 16타입 궁합 랭킹을 확인하세요.`}
+          path={`/mbti-map?mbti=${selectedMbti}`}
+          rgb={PURPLE_RGB}
+          contentType="map"
+        />
+        <button
+          data-testid="save-image-btn"
+          onClick={handleSaveImage}
+          className="neon-ghost w-full py-2.5 rounded-xl text-sm font-bold"
+        >
+          📸 {MBTI_MAP.saveImageBtn}
+        </button>
+      </div>
 
       {/* ── 상세 팝업 패널 (배지 클릭 시 활성화) ── */}
       <CompatDetailModal data={panel} onClose={() => setPanel(null)} />
 
-      {/* off-screen 캡처 영역 (일시 비활성화)
+      {/* off-screen 티어리스트 캡처 영역 */}
       <div
         aria-hidden="true"
         style={{ position: "fixed", top: 0, left: 0, zIndex: -9999, pointerEvents: "none", opacity: 0 }}
       >
-        <ReceiptShareImage data={shareData} cardRef={cardRef} />
+        <MapShareImage
+          data={{
+            myMbti: selectedMbti,
+            nickname: TYPE_PROFILES[selectedMbti].nickname,
+            scores,
+            best,
+            worst,
+          }}
+          cardRef={cardRef}
+        />
       </div>
 
       <ImagePreviewModal
+        open={previewOpen}
         imageDataUrl={previewUrl}
         fileName={`chemifit-map-${selectedMbti}.png`}
-        onClose={() => setPreviewUrl(null)}
+        onClose={() => { setPreviewOpen(false); setPreviewUrl(null); }}
       />
-      */}
     </div>
   );
 }

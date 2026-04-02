@@ -172,93 +172,26 @@ export default function LandingPage() {
               무엇을 할 수 있나요?
             </h2>
 
-            <div className="flex flex-col gap-4">
-              {/* 메인 피처: 연인 궁합 — 풀 너비 */}
-              <Link
-                href={FEATURES[0].href}
-                className="group relative rounded-2xl p-7 sm:p-9 flex flex-col sm:flex-row gap-6 sm:items-center transition-all duration-300 hover:-translate-y-1 overflow-hidden"
-                style={{
-                  background: `rgba(${FEATURES[0].rgb},0.06)`,
-                  border: `1.5px solid rgba(${FEATURES[0].rgb},0.35)`,
-                  boxShadow: `0 0 0 1px rgba(${FEATURES[0].rgb},0.08), 0 0 25px rgba(${FEATURES[0].rgb},0.12), 0 0 60px rgba(${FEATURES[0].rgb},0.06)`,
-                }}
-              >
-                {/* 상단 네온 라인 */}
-                <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `rgb(${FEATURES[0].rgb})`, boxShadow: `0 0 12px rgba(${FEATURES[0].rgb},0.6), 0 0 30px rgba(${FEATURES[0].rgb},0.3)` }} />
-                {/* 코너 글로우 */}
-                <div className="absolute top-0 left-0 w-40 h-40 pointer-events-none"
-                  style={{ background: `radial-gradient(circle at top left, rgba(${FEATURES[0].rgb},0.1) 0%, transparent 70%)` }} />
-                {/* 호버 글로우 */}
-                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ boxShadow: `0 0 35px rgba(${FEATURES[0].rgb},0.25), 0 0 80px rgba(${FEATURES[0].rgb},0.12)` }} />
-
-                <div className="relative z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shrink-0"
-                  style={{ background: `rgba(${FEATURES[0].rgb},0.1)`, border: `1px solid rgba(${FEATURES[0].rgb},0.2)`, boxShadow: `0 0 20px rgba(${FEATURES[0].rgb},0.1)` }}
+            {/* 3개 기능 — neon-action 스타일 기반 */}
+            <div className="flex flex-col gap-3">
+              {FEATURES.map((f) => (
+                <Link
+                  key={f.href}
+                  href={`/${f.href.slice(1)}`}
+                  className="neon-action flex items-center gap-5 rounded-2xl px-6 py-5 sm:py-6 no-underline"
+                  style={{ "--neon": f.rgb } as React.CSSProperties}
                 >
-                  <span className="text-4xl sm:text-5xl">{FEATURES[0].emoji}</span>
-                </div>
-                <div className="relative z-10 flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl sm:text-2xl font-black" style={{ color: `rgb(${FEATURES[0].rgb})`, textShadow: `0 0 20px rgba(${FEATURES[0].rgb},0.3)` }}>{FEATURES[0].title}</h3>
-                    <span className="px-3 py-1 rounded-full text-[10px] font-bold"
-                      style={{ background: `rgba(${FEATURES[0].rgb},0.12)`, border: `1px solid rgba(${FEATURES[0].rgb},0.2)`, color: `rgba(${FEATURES[0].rgb},0.9)` }}>
-                      {FEATURES[0].stats}
-                    </span>
-                  </div>
-                  <p className="text-sm text-white/45 leading-relaxed">{FEATURES[0].desc}</p>
-                  <div className="flex items-center gap-2 mt-3" style={{ color: `rgba(${FEATURES[0].rgb},0.6)` }}>
-                    <span className="text-xs font-bold">시작하기</span>
-                    <span className="text-xs group-hover:translate-x-1 transition-transform">→</span>
-                  </div>
-                </div>
-              </Link>
-
-              {/* 서브 피처 2개 — 반반 */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {FEATURES.slice(1).map((f) => (
-                  <Link
-                    key={f.href}
-                    href={f.href}
-                    className="group relative rounded-2xl p-6 sm:p-7 flex flex-col gap-4 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
-                    style={{
-                      background: `rgba(${f.rgb},0.06)`,
-                      border: `1.5px solid rgba(${f.rgb},0.3)`,
-                      boxShadow: `0 0 0 1px rgba(${f.rgb},0.06), 0 0 20px rgba(${f.rgb},0.1), 0 0 50px rgba(${f.rgb},0.05)`,
-                    }}
-                  >
-                    {/* 상단 네온 라인 */}
-                    <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `rgb(${f.rgb})`, boxShadow: `0 0 12px rgba(${f.rgb},0.6), 0 0 30px rgba(${f.rgb},0.3)` }} />
-                    {/* 코너 글로우 */}
-                    <div className="absolute top-0 left-0 w-32 h-32 pointer-events-none"
-                      style={{ background: `radial-gradient(circle at top left, rgba(${f.rgb},0.08) 0%, transparent 70%)` }} />
-                    {/* 호버 글로우 */}
-                    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{ boxShadow: `0 0 30px rgba(${f.rgb},0.2), 0 0 70px rgba(${f.rgb},0.1)` }} />
-
-                    <div className="relative z-10 flex flex-col gap-4">
-                      <div className="w-14 h-14 rounded-xl flex items-center justify-center"
-                        style={{ background: `rgba(${f.rgb},0.1)`, border: `1px solid rgba(${f.rgb},0.2)`, boxShadow: `0 0 15px rgba(${f.rgb},0.08)` }}
-                      >
-                        <span className="text-3xl">{f.emoji}</span>
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <h3 className="text-lg font-black" style={{ color: `rgb(${f.rgb})`, textShadow: `0 0 15px rgba(${f.rgb},0.25)` }}>{f.title}</h3>
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
-                            style={{ background: `rgba(${f.rgb},0.12)`, border: `1px solid rgba(${f.rgb},0.2)`, color: `rgba(${f.rgb},0.9)` }}>
-                            {f.stats}
-                          </span>
-                        </div>
-                        <p className="text-sm text-white/40 leading-relaxed">{f.desc}</p>
-                      </div>
-                      <div className="flex items-center gap-2" style={{ color: `rgba(${f.rgb},0.6)` }}>
-                        <span className="text-xs font-bold">시작하기</span>
-                        <span className="text-xs group-hover:translate-x-1 transition-transform">→</span>
-                      </div>
+                  <span className="text-4xl shrink-0">{f.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-base sm:text-lg font-black" style={{ color: `rgb(${f.rgb})` }}>{f.title}</span>
+                      <span className="text-[10px] font-bold text-white/30">{f.stats}</span>
                     </div>
-                  </Link>
-                ))}
-              </div>
+                    <p className="text-xs sm:text-sm text-white/40 mt-1 leading-relaxed">{f.desc}</p>
+                  </div>
+                  <span className="text-white/20 text-sm shrink-0">→</span>
+                </Link>
+              ))}
             </div>
           </section>
         </ScrollReveal>

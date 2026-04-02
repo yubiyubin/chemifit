@@ -37,143 +37,17 @@ type Props = {
 };
 
 import { TITLE1, TITLE2, TITLE3, titleProps } from "@/styles/titles";
-import { FIGHT_THEME, SOLUTION_THEME, PINK_RGB, PURPLE_RGB, CYAN_RGB, type CardTheme } from "@/styles/card-themes";
+import { FIGHT_THEME, SOLUTION_THEME, PINK_RGB, PURPLE_RGB, CYAN_RGB } from "@/styles/card-themes";
 import { getCategoryScores } from "@/features/mbti-love/consts/categories";
-import { SECTION_EMOJIS, LINE_EMOJIS, DEFAULT_BULLET_EMOJI } from "@/features/mbti-love/consts/detail-emojis";
 import { COUPLE, MBTI_SELECT, EMOJIS, CTA_TEXTS } from "@/data/ui-text";
+import { InfoCard, decorateBullets } from "./couple-shared";
 import CtaButton from "@/components/CtaButton";
 import { SYMBOLS } from "@/data/symbols";
 import ReceiptShareImage from "@/components/shareImage";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
+import SharePanel from "@/components/SharePanel";
+import { trackEvent } from "@/lib/analytics";
 
-
-/**
- * "ENFP: 텍스트" 형식의 줄을 뱃지 + 텍스트로 파싱.
- * "→ 요약" 형식은 화살표 요약 라인으로 처리.
- * myMbti/partnerMbti가 주어지면 해당 뱃지 색상을 히어로 카드와 일치시킨다.
- */
-function InfoLine({
-  line,
-  themeRgb,
-  titleColor,
-  myMbti,
-  partnerMbti,
-  mbtiSuffix,
-}: {
-  line: string;
-  themeRgb: string;
-  /** MBTI 텍스트 및 → 줄에 적용할 색상 (미지정 시 rgba(themeRgb,0.9)) */
-  titleColor?: string;
-  myMbti?: string;
-  partnerMbti?: string;
-  /** MBTI 텍스트 뒤에 붙일 접미사 (예: "에게") */
-  mbtiSuffix?: string;
-}) {
-  // MBTI 뱃지 패턴: "XXXX: ..."
-  const mbtiMatch = line.match(/^([A-Z]{4}):\s*(.+)$/);
-  if (mbtiMatch) {
-    const [, mbti, text] = mbtiMatch;
-    // myMbti → titleColor(밝음), partnerMbti → rgba 흐린 버전으로 시각적 구분
-    const isMyMbti = mbti === myMbti;
-    const mbtiColor = isMyMbti
-      ? (titleColor ?? `rgba(${themeRgb},0.95)`)
-      : mbti === partnerMbti
-        ? `color-mix(in srgb, rgb(${themeRgb}) 62%, white)`
-        : (titleColor ?? `rgba(${themeRgb},0.95)`);
-    const mbtiGlow = isMyMbti
-      ? `0 0 8px rgba(${themeRgb},0.7)`
-      : `0 0 8px rgba(${themeRgb},0.35)`;
-    return (
-      <p className="text-sm sm:text-base leading-relaxed">
-        <span className="font-black mr-2" style={{ color: mbtiColor, textShadow: mbtiGlow }}>{mbti}{mbtiSuffix}</span>
-        <span className="font-medium" style={{ color: "rgba(255,255,255,0.82)" }}>{text}</span>
-      </p>
-    );
-  }
-  // → 요약 라인 (구분선 + TITLE3 스타일)
-  if (line.startsWith("→")) {
-    const arrowColor = titleColor ?? `rgba(${themeRgb},0.9)`;
-    return (
-      <div className="flex flex-col gap-2 pt-1">
-        <div style={{ height: 1, background: `rgba(${themeRgb},0.15)` }} />
-        <p {...titleProps(TITLE3, arrowColor, themeRgb)}>
-          {line}
-        </p>
-      </div>
-    );
-  }
-  // 일반 텍스트
-  return (
-    <p
-      className="text-sm sm:text-base leading-relaxed font-medium"
-      style={{ color: "rgba(255,255,255,0.82)" }}
-    >
-      {line}
-    </p>
-  );
-}
-
-/** 싸움 패턴 / 해결 핵심용 테마 카드 */
-function InfoCard({
-  theme,
-  title,
-  body,
-  myMbti,
-  partnerMbti,
-  mbtiSuffix,
-}: {
-  theme: CardTheme;
-  title: string;
-  body: string;
-  myMbti?: string;
-  partnerMbti?: string;
-  mbtiSuffix?: string;
-}) {
-  const lines = body.split("\n").filter((l) => l.trim());
-  return (
-    <div
-      className="rounded-xl p-5 flex flex-col gap-2.5"
-      style={{
-        background: `rgba(${theme.rgb},${theme.bgAlpha})`,
-        border: `1px solid rgba(${theme.rgb},${theme.borderAlpha})`,
-        boxShadow: `0 0 20px rgba(${theme.rgb},${theme.shadowAlpha})`,
-      }}
-    >
-      <p {...titleProps(TITLE3, theme.title, theme.titleGlowRgb)}>
-        {title}
-      </p>
-      <div className="flex flex-col gap-2">
-        {lines.map((line, i) => (
-          <InfoLine
-            key={i}
-            line={line}
-            themeRgb={theme.rgb}
-            titleColor={theme.title}
-            myMbti={myMbti}
-            partnerMbti={partnerMbti}
-            mbtiSuffix={mbtiSuffix}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-
-/**
- * detail 본문의 `•` 불릿을 섹션·키워드에 맞는 이모티콘으로 치환한다.
- */
-function decorateBullets(body: string, heading: string): string {
-  const sectionEntry = SECTION_EMOJIS.find((s) => heading.includes(s.keyword));
-  const sectionEmoji = sectionEntry?.emoji ?? DEFAULT_BULLET_EMOJI;
-
-  return body.replace(/^• (.+)/gm, (_match, content: string) => {
-    const line = content.trim();
-    const lineEntry = LINE_EMOJIS.find((e) => e.pattern.test(line));
-    const emoji = lineEntry?.emoji ?? sectionEmoji;
-    return `${emoji} ${content}`;
-  });
-}
 
 /**
  * 히어로 카드 배경에 떠다니는 하트 애니메이션 컴포넌트
@@ -368,6 +242,7 @@ export default function CoupleResult({
     (mbti: MbtiType) => {
       onPartnerSelect(mbti);
       setDetailOpen(false);
+      trackEvent("couple_result_view", { my: myMbti, partner: mbti, score: COMPATIBILITY[myMbti][mbti] });
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           resultRef.current?.scrollIntoView({
@@ -377,7 +252,7 @@ export default function CoupleResult({
         });
       });
     },
-    [onPartnerSelect],
+    [onPartnerSelect, myMbti],
   );
 
   // 파생 데이터 계산
@@ -414,12 +289,13 @@ export default function CoupleResult({
   /** 모달을 즉시 열고(로딩 상태) 백그라운드에서 캡처 후 이미지 교체 */
   async function handleSaveImage() {
     if (!cardRef.current || !shareData || !partnerMbti) return;
+    trackEvent("share_image_save", { my: myMbti, partner: partnerMbti });
     setPreviewUrl(null);
     setPreviewOpen(true); // 로딩 상태로 모달 즉시 표시
     const { toPng } = await import("html-to-image");
     await document.fonts.ready;
-    const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, width: 1080, height: 1350 });
-    setPreviewUrl(dataUrl); // 이미지 준비되면 교체
+    const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, width: 1080, height: 1350, skipFonts: true });
+    setPreviewUrl(dataUrl);
   }
 
   function handlePreviewClose() {
@@ -542,29 +418,11 @@ export default function CoupleResult({
                     );
                   })()}
 
-                  {/* 내 MBTI + 상대 MBTI 뱃지 */}
-                  <div className="flex items-center gap-4 z-10">
-                    <div
-                      className="px-4 py-2 rounded-xl text-lg font-black"
-                      style={{
-                        background: "rgba(168,85,247,0.15)",
-                        border: "1px solid rgba(168,85,247,0.3)",
-                        color: "#c084fc",
-                      }}
-                    >
-                      {myMbti}
-                    </div>
-                    <span className="text-3xl">{COUPLE.mbtiSeparator}</span>
-                    <div
-                      className="px-4 py-2 rounded-xl text-lg font-black"
-                      style={{
-                        background: "rgba(236,72,153,0.15)",
-                        border: "1px solid rgba(236,72,153,0.3)",
-                        color: "#f472b6",
-                      }}
-                    >
-                      {partnerMbti}
-                    </div>
+                  {/* 내 MBTI + 상대 MBTI */}
+                  <div className="flex items-center gap-3 z-10">
+                    <span className="text-xl sm:text-2xl font-black" style={{ color: "#c084fc", textShadow: "0 0 12px rgba(168,85,247,0.6), 0 0 30px rgba(168,85,247,0.25)" }}>{myMbti}</span>
+                    <span className="text-2xl">{COUPLE.mbtiSeparator}</span>
+                    <span className="text-xl sm:text-2xl font-black" style={{ color: "#f472b6", textShadow: "0 0 12px rgba(236,72,153,0.6), 0 0 30px rgba(236,72,153,0.25)" }}>{partnerMbti}</span>
                   </div>
 
                   {/* 원형 게이지 (점수 시각화 — 핑크→퍼플 그라디언트) */}
@@ -690,16 +548,27 @@ export default function CoupleResult({
           {/* ── 섹션 6: 세부 궁합 (4개 카테고리 바 게이지) ── */}
           {categories && <DetailScoreCard categories={categories} />}
 
-          {/* ── 섹션 7: 이미지 저장 버튼 ── */}
-          {shareData && (
-            <button
-              data-testid="save-image-btn"
-              onClick={handleSaveImage}
-              className="neon-ghost w-full py-2.5 rounded-xl text-sm font-bold"
-              style={{ "--neon": PINK_RGB } as React.CSSProperties}
-            >
-              📸 {COUPLE.saveImageBtn}
-            </button>
+          {/* ── 섹션 7: 공유 + 이미지 저장 ── */}
+          {partnerMbti && score !== null && loveDesc && (
+            <div className="flex flex-col gap-3">
+              <SharePanel
+                title={`${myMbti}와 ${partnerMbti} 연애 궁합 - ${score}점`}
+                description={loveDesc.preview}
+                path={`/mbti-love/${myMbti.toLowerCase()}/${partnerMbti.toLowerCase()}`}
+                rgb={PINK_RGB}
+                contentType="couple"
+              />
+              {shareData && (
+                <button
+                  data-testid="save-image-btn"
+                  onClick={handleSaveImage}
+                  className="neon-ghost w-full py-2.5 rounded-xl text-sm font-bold"
+                  style={{ "--neon": PINK_RGB } as React.CSSProperties}
+                >
+                  📸 {COUPLE.saveImageBtn}
+                </button>
+              )}
+            </div>
           )}
         </div>
       )}

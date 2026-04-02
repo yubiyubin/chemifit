@@ -15,6 +15,7 @@
 
 import type { MbtiType } from "@/data/compatibility";
 import { MBTI_GROUPS } from "@/data/groups";
+import { PINK_RGB, PURPLE_RGB } from "@/styles/card-themes";
 import ModalOverlay from "./ModalOverlay";
 import { MBTI_SELECT } from "@/data/ui-text";
 import { SYMBOLS } from "@/data/symbols";
@@ -40,7 +41,7 @@ export default function MbtiSelectModal({
 }: Props) {
   // Theme colors
   const isPink = theme === "pink";
-  const mainColor = isPink ? "236,72,153" : "168,85,247"; // #ec4899 vs #a855f7
+  const mainColor = isPink ? PINK_RGB : PURPLE_RGB;
   
   const content = (
     <div

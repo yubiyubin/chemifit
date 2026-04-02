@@ -5,7 +5,6 @@
  * - MBTI_TYPES: 16개 MBTI 타입 상수 배열
  * - MbtiType: 유니온 타입 ("INTJ" | "INTP" | ... | "ESFP")
  * - COMPATIBILITY: 16×16 궁합 점수 매트릭스 (0~100)
- * - COMPATIBILITY_DESC: 16×16 한 줄 설명 (궁합 맵/그룹 궁합에서 사용)
  * - Member: 그룹 궁합용 멤버 타입 { name, mbti, emoji }
  *
  * 점수 기준:

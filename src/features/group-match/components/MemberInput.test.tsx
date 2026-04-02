@@ -1,8 +1,9 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import MemberInput from "./MemberInput";
-import type { Member } from "@/data/compatibility";
+import type { Member } from "../../../data/compatibility";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),

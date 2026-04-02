@@ -319,6 +319,12 @@ export function getCoupleTier(score: number) {
   return pickFromTier(COUPLE_TIERS, score);
 }
 
+/** 점수에 해당하는 커플 등급의 이모지만 반환 (정적 페이지/OG 이미지용 — 랜덤 라벨 불필요 시) */
+export function getTierEmoji(score: number): string {
+  const tier = COUPLE_TIERS.find((t) => score >= t.min) ?? COUPLE_TIERS[COUPLE_TIERS.length - 1];
+  return tier.emoji;
+}
+
 // ─────────────────────────────────────────────
 // 연애 vs 친구 한줄 요약
 // ─────────────────────────────────────────────

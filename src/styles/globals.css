@@ -165,6 +165,46 @@ button, select, [role="button"] {
   box-shadow: 0 6px 16px var(--badge-glow);
 }
 
+/* ===== 랜딩 페이지 ===== */
+
+/* 스크롤 진입 애니메이션 — ScrollReveal 컴포넌트에서 사용 */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 배경 글로우 오브 — 천천히 떠다니는 효과 */
+@keyframes float-orb {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(30px, -20px); }
+  50% { transform: translate(-20px, 15px); }
+  75% { transform: translate(15px, 25px); }
+}
+
+/* CTA 버튼 네온 맥동 */
+@keyframes cta-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(236,72,153,0.3), 0 0 50px rgba(236,72,153,0.15); }
+  50% { box-shadow: 0 0 30px rgba(236,72,153,0.45), 0 0 70px rgba(236,72,153,0.2); }
+}
+
+/* 점수 바 게이지 (랜딩 전용 — 스크롤 진입 시 트리거) */
+.landing-gauge {
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-reveal.revealed .landing-gauge {
+  transform: scaleX(1);
+}
+
 /* ===== 유틸리티 ===== */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

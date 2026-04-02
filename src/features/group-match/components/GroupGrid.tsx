@@ -15,7 +15,7 @@
 "use client";
 
 import { useState, useCallback, useMemo, useRef } from "react";
-import { useCopyLink } from "@/hooks/useCopyLink";
+
 import { useRouter } from "next/navigation";
 import {
   Member,
@@ -47,6 +47,7 @@ import { GROUP, EMOJIS, CTA_TEXTS, MBTI_MAP } from "@/data/ui-text";
 import CtaButton from "@/components/CtaButton";
 import { SYMBOLS } from "@/data/symbols";
 import { VARIANT_CONFIG, CYAN_RGB, PURPLE_RGB } from "@/styles/card-themes";
+import SharePanel from "@/components/SharePanel";
 import MbtiProfileModal from "@/components/MbtiProfileModal";
 import NeonCard from "@/components/NeonCard";
 
@@ -76,7 +77,7 @@ export default function GroupGrid({ members }: Props) {
   const hintShownRef = useRef(false); // 힌트는 최초 1회만 표시
   const [roleOpen, setRoleOpen] = useState(false);
   const [allPairsOpen, setAllPairsOpen] = useState(false);
-  const { copied, copy: handleCopy } = useCopyLink();
+
   const [summary, setSummary] = useState<{
     avg: number;
     best: { mA: Member; mB: Member; score: number };
@@ -982,20 +983,15 @@ export default function GroupGrid({ members }: Props) {
             </div>
           )}
 
-          {/* 링크 복사 + CTA 버튼 */}
+          {/* 공유 + CTA 버튼 */}
           <div className="mx-6 mb-6 flex flex-col gap-3">
-            <button
-              onClick={handleCopy}
-              className="neon-action py-3 rounded-xl text-center"
-              style={{ "--neon": CYAN_RGB } as React.CSSProperties}
-            >
-              <p
-                className="text-sm font-bold"
-                style={{ color: "rgba(0,203,255,0.85)" }}
-              >
-                {copied ? GROUP.copiedMessage : `🔗 ${GROUP.shareButton}`}
-              </p>
-            </button>
+            <SharePanel
+              title={`${members.length}명 그룹 MBTI 궁합 분석`}
+              description={`${members.map((m) => m.mbti).join(", ")} 그룹 케미를 확인하세요.`}
+              path="/group-match"
+              rgb={CYAN_RGB}
+              contentType="group"
+            />
             <CtaButton
               title={CTA_TEXTS.group.toLove.title}
               subtitle={CTA_TEXTS.group.toLove.subtitle}

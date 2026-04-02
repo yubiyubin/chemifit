@@ -61,7 +61,7 @@ export default function ProfileDetail({ profile }: Props) {
       height: 1350,
       skipFonts: true,
     });
-    setPreviewUrl(dataUrl);
+    setPreviewUrl(dataUrl); // 이미지 준비되면 교체
   };
 
   function handlePreviewClose() {
@@ -324,6 +324,7 @@ export default function ProfileDetail({ profile }: Props) {
       >
         <ProfileShareImage profile={profile} cardRef={cardRef} />
       </div>
+
 
       {/* ── 이미지 미리보기 모달 ── */}
       <ImagePreviewModal

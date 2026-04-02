@@ -77,7 +77,7 @@ export default function MapShareImage({ data, cardRef }: Props) {
         .ms-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(168,85,247,0.08) 0%,transparent 55%)}
         .ms-orb{position:absolute;border-radius:50%;filter:blur(70px);width:400px;height:400px;background:rgba(168,85,247,0.1);top:300px;left:50%;transform:translateX(-50%)}
         .ms-noise{position:absolute;inset:0;opacity:0.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-        .ms-receipt{position:relative;z-index:2;margin:40px auto;width:820px;background:linear-gradient(145deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%);backdrop-filter:blur(40px) saturate(1.4);-webkit-backdrop-filter:blur(40px) saturate(1.4);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:40px 48px;display:flex;flex-direction:column;box-shadow:0 12px 60px rgba(0,0,0,0.4),0 1px 0 rgba(255,255,255,0.07) inset;height:calc(100% - 80px)}
+        .ms-receipt{position:relative;z-index:2;width:100%;height:100%;background:linear-gradient(145deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%);padding:48px 56px;display:flex;flex-direction:column}
         .ms-mono{font-family:'JetBrains Mono',monospace}
         .ms-sep{border:none;margin:14px 0}
         .ms-sep-d{border-top:2px dashed rgba(255,255,255,0.08)}

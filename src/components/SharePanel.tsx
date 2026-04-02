@@ -46,13 +46,6 @@ export default function SharePanel({
     }
   }, [title, description, path, contentType, fullUrl]);
 
-  const handleTwitter = useCallback(() => {
-    trackEvent("share_click", { platform: "twitter", content_type: contentType });
-    const text = `${title} - ${description}`;
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(fullUrl)}`;
-    window.open(twitterUrl, "_blank", "noopener,noreferrer,width=550,height=420");
-  }, [title, description, fullUrl, contentType]);
-
   const handleCopy = useCallback(async () => {
     trackEvent("share_click", { platform: "copy", content_type: contentType });
     await navigator.clipboard.writeText(fullUrl);
@@ -93,19 +86,6 @@ export default function SharePanel({
             <path d="M12 3C6.48 3 2 6.58 2 10.94c0 2.8 1.86 5.27 4.66 6.67-.15.53-.96 3.4-.99 3.62 0 0-.02.17.09.23.11.07.24.02.24.02.32-.04 3.7-2.42 4.28-2.83.56.08 1.14.12 1.72.12 5.52 0 10-3.58 10-7.94S17.52 3 12 3z"/>
           </svg>
           <span>카카오톡</span>
-        </button>
-
-        {/* 트위터(X) */}
-        <button
-          onClick={handleTwitter}
-          className={btnClass}
-          style={{ "--neon": rgb } as React.CSSProperties}
-          aria-label="트위터로 공유"
-        >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-          </svg>
-          <span>X</span>
         </button>
 
         {/* 링크 복사 */}

@@ -47,6 +47,7 @@ import { GROUP, EMOJIS, CTA_TEXTS, MBTI_MAP } from "@/data/ui-text";
 import CtaButton from "@/components/CtaButton";
 import { SYMBOLS } from "@/data/symbols";
 import { VARIANT_CONFIG, CYAN_RGB, PURPLE_RGB } from "@/styles/card-themes";
+import SharePanel from "@/components/SharePanel";
 import MbtiProfileModal from "@/components/MbtiProfileModal";
 import NeonCard from "@/components/NeonCard";
 
@@ -982,8 +983,15 @@ export default function GroupGrid({ members }: Props) {
             </div>
           )}
 
-          {/* 링크 복사 + CTA 버튼 */}
+          {/* 공유 + CTA 버튼 */}
           <div className="mx-6 mb-6 flex flex-col gap-3">
+            <SharePanel
+              title={`${members.length}명 그룹 MBTI 궁합 분석`}
+              description={`${members.map((m) => m.mbti).join(", ")} 그룹 케미를 확인하세요.`}
+              path="/group-match"
+              rgb={CYAN_RGB}
+              contentType="group"
+            />
             <button
               onClick={handleCopy}
               className="neon-action py-3 rounded-xl text-center"

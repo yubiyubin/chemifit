@@ -27,6 +27,7 @@ import NeonCard from "@/components/NeonCard";
 import { TYPE_PROFILES } from "@/data/type-profiles";
 import { TITLE1, TITLE2, titleProps } from "@/styles/titles";
 import { PURPLE_RGB } from "@/styles/card-themes";
+import SharePanel from "@/components/SharePanel";
 
 /** 동일 점수를 가진 MBTI들을 하나의 그룹으로 묶기 위한 타입 */
 type GroupedPair = {
@@ -295,7 +296,14 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
       </NeonCard>
 
       {/* ── 공유 버튼 행 ── */}
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3">
+        <SharePanel
+          title={`${selectedMbti} MBTI 궁합 순위`}
+          description={`${selectedMbti}와 가장 잘 맞는 MBTI는? 16타입 궁합 랭킹을 확인하세요.`}
+          path={`/mbti-map?mbti=${selectedMbti}`}
+          rgb={PURPLE_RGB}
+          contentType="map"
+        />
         <button
           data-testid="copy-link-btn"
           onClick={handleCopyLink}
@@ -303,15 +311,6 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
         >
           {copied ? MBTI_MAP.copiedMessage : MBTI_MAP.copyLinkBtn}
         </button>
-        {/* 이미지 저장 버튼 (일시 비활성화)
-        <button
-          data-testid="save-image-btn"
-          onClick={handleSaveImage}
-          className="neon-ghost w-full py-2.5 rounded-xl text-sm font-bold"
-        >
-          📸 {MBTI_MAP.saveImageBtn}
-        </button>
-        */}
       </div>
 
       {/* ── 상세 팝업 패널 (배지 클릭 시 활성화) ── */}

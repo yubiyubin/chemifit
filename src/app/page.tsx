@@ -7,32 +7,11 @@
  */
 import Link from "next/link";
 import Image from "next/image";
-import { MBTI_TYPES, COMPATIBILITY } from "@/data/compatibility";
-import type { MbtiType } from "@/data/compatibility";
 import { TYPE_PROFILES } from "@/data/type-profiles";
-import { getTierEmoji } from "@/data/labels";
 import { MBTI_GROUPS } from "@/data/groups";
 import { SITE } from "@/data/ui-text";
 import SiteFooter from "@/components/SiteFooter";
 import ScrollReveal from "@/components/ScrollReveal";
-
-/** 상위 5개 궁합 조합을 추출 (중복 없이) */
-function getTopCouples(count: number) {
-  const seen = new Set<string>();
-  const pairs: { a: MbtiType; b: MbtiType; score: number }[] = [];
-
-  for (const a of MBTI_TYPES) {
-    for (const b of MBTI_TYPES) {
-      if (a === b) continue;
-      const key = [a, b].sort().join("-");
-      if (seen.has(key)) continue;
-      seen.add(key);
-      pairs.push({ a, b, score: COMPATIBILITY[a][b] });
-    }
-  }
-
-  return pairs.sort((x, y) => y.score - x.score).slice(0, count);
-}
 
 const FEATURES = [
   {
@@ -62,9 +41,6 @@ const FEATURES = [
 ] as const;
 
 export default function LandingPage() {
-  const topCouples = getTopCouples(5);
-  const maxScore = topCouples[0]?.score ?? 100;
-
   return (
     <main className="min-h-screen bg-[#0f0f1a] text-white overflow-hidden">
 
@@ -199,98 +175,6 @@ export default function LandingPage() {
                   </Link>
                 ))}
               </div>
-            </div>
-          </section>
-        </ScrollReveal>
-
-        {/* 섹션 디바이더 */}
-        <div className="w-full h-px mx-auto mb-16"
-          style={{ background: "linear-gradient(90deg, transparent, rgba(236,72,153,0.2), rgba(168,85,247,0.2), transparent)" }}
-        />
-
-        {/* ══════════════════════════════════════════════════════
-            Best Couples — 바 게이지 포함
-           ══════════════════════════════════════════════════════ */}
-        <ScrollReveal>
-          <section className="flex flex-col gap-6 mb-20">
-            <div className="text-center">
-              <h2 className="text-2xl sm:text-3xl font-black text-white/90">베스트 궁합 TOP 5</h2>
-              <p className="text-sm text-white/30 mt-2">가장 높은 점수를 받은 MBTI 조합</p>
-            </div>
-
-            <div
-              className="rounded-2xl overflow-hidden"
-              style={{
-                background: "rgba(236,72,153,0.04)",
-                border: "1.5px solid rgba(236,72,153,0.2)",
-                boxShadow: "0 0 25px rgba(236,72,153,0.08)",
-              }}
-            >
-              {topCouples.map(({ a, b, score }, i) => (
-                <ScrollReveal key={`${a}-${b}`} delay={i * 100}>
-                  <Link
-                    href={`/mbti-love/${a.toLowerCase()}/${b.toLowerCase()}`}
-                    className="relative flex items-center gap-4 px-5 sm:px-6 py-4 sm:py-5 transition-all duration-200 hover:bg-white/[0.03] overflow-hidden"
-                    style={{
-                      borderBottom: i < 4 ? "1px solid rgba(236,72,153,0.08)" : "none",
-                      ...(i === 0 ? { background: "rgba(236,72,153,0.06)" } : {}),
-                    }}
-                  >
-                    {/* 배경 바 게이지 */}
-                    <div
-                      className="landing-gauge absolute inset-y-0 left-0 rounded-r-lg"
-                      style={{
-                        width: `${(score / maxScore) * 100}%`,
-                        background: `linear-gradient(90deg, rgba(236,72,153,${i === 0 ? 0.08 : 0.04}), transparent)`,
-                        transitionDelay: `${i * 150}ms`,
-                      }}
-                    />
-
-                    {/* 순위 뱃지 */}
-                    <div className="relative z-10 shrink-0">
-                      <span
-                        className="flex items-center justify-center w-8 h-8 rounded-full text-sm font-black"
-                        style={{
-                          background: i === 0 ? "rgba(251,191,36,0.15)" : i === 1 ? "rgba(148,163,184,0.12)" : i === 2 ? "rgba(205,127,50,0.12)" : "rgba(255,255,255,0.05)",
-                          border: `1px solid ${i === 0 ? "rgba(251,191,36,0.4)" : i === 1 ? "rgba(148,163,184,0.3)" : i === 2 ? "rgba(205,127,50,0.3)" : "rgba(255,255,255,0.1)"}`,
-                          color: i === 0 ? "#fbbf24" : i === 1 ? "#94a3b8" : i === 2 ? "#cd7f32" : "rgba(255,255,255,0.3)",
-                          boxShadow: i < 3 ? `0 0 10px rgba(${i === 0 ? "251,191,36" : i === 1 ? "148,163,184" : "205,127,50"},0.25)` : "none",
-                        }}
-                      >
-                        {i + 1}
-                      </span>
-                    </div>
-
-                    {/* MBTI 뱃지 쌍 */}
-                    <div className="relative z-10 flex items-center gap-2 flex-1 min-w-0">
-                      <span
-                        className="px-3 py-1 rounded-lg text-sm font-black shrink-0"
-                        style={{ background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: "#c084fc" }}
-                      >
-                        {a}
-                      </span>
-                      <span className="text-white/20 text-xs">×</span>
-                      <span
-                        className="px-3 py-1 rounded-lg text-sm font-black shrink-0"
-                        style={{ background: "rgba(236,72,153,0.15)", border: "1px solid rgba(236,72,153,0.3)", color: "#f472b6" }}
-                      >
-                        {b}
-                      </span>
-                    </div>
-
-                    {/* 점수 + 티어 */}
-                    <div className="relative z-10 flex items-center gap-2 shrink-0">
-                      <span className="text-lg">{getTierEmoji(score)}</span>
-                      <span
-                        className="text-xl font-black tabular-nums"
-                        style={{ color: "#f472b6", textShadow: "0 0 10px rgba(236,72,153,0.4)" }}
-                      >
-                        {score}
-                      </span>
-                    </div>
-                  </Link>
-                </ScrollReveal>
-              ))}
             </div>
           </section>
         </ScrollReveal>

@@ -88,7 +88,7 @@ export default function SharePanel({
           aria-label="링크 복사"
         >
           <span>{copied ? "✓" : "🔗"}</span>
-          <span>{copied ? "복사됨" : "링크"}</span>
+          <span>{copied ? "복사됨" : "링크 복사"}</span>
         </button>
 
       </div>

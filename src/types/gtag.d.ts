@@ -3,7 +3,7 @@
  */
 
 interface Window {
-  gtag: (
+  gtag?: (
     command: "config" | "event" | "js" | "set",
     targetIdOrAction: string | Date,
     params?: Record<string, string | number | boolean>,

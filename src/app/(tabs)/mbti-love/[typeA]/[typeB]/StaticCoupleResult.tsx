@@ -17,7 +17,7 @@ import { TITLE1, TITLE2, TITLE3, titleProps } from "@/styles/titles";
 import { FIGHT_THEME, SOLUTION_THEME, PINK_RGB } from "@/styles/card-themes";
 import { COUPLE } from "@/data/ui-text";
 import { SYMBOLS } from "@/data/symbols";
-import { SECTION_EMOJIS, LINE_EMOJIS, DEFAULT_BULLET_EMOJI } from "@/features/mbti-love/consts/detail-emojis";
+import { InfoCard, decorateBullets } from "@/features/mbti-love/components/couple-shared";
 import type { CategoryItem } from "@/components/DetailScoreCard";
 
 type Props = {
@@ -28,101 +28,6 @@ type Props = {
   loveDesc: LoveDescription | undefined;
   categories: CategoryItem[];
 };
-
-/** InfoLine — MBTI 뱃지 + 텍스트 줄 */
-function InfoLine({
-  line,
-  themeRgb,
-  titleColor,
-  typeA,
-  typeB,
-}: {
-  line: string;
-  themeRgb: string;
-  titleColor?: string;
-  typeA?: string;
-  typeB?: string;
-}) {
-  const mbtiMatch = line.match(/^([A-Z]{4}):\s*(.+)$/);
-  if (mbtiMatch) {
-    const [, mbti, text] = mbtiMatch;
-    const isTypeA = mbti === typeA;
-    const mbtiColor = isTypeA
-      ? (titleColor ?? `rgba(${themeRgb},0.95)`)
-      : mbti === typeB
-        ? `color-mix(in srgb, rgb(${themeRgb}) 62%, white)`
-        : (titleColor ?? `rgba(${themeRgb},0.95)`);
-    return (
-      <p className="text-sm sm:text-base leading-relaxed">
-        <span className="font-black mr-2" style={{ color: mbtiColor }}>{mbti}</span>
-        <span className="font-medium" style={{ color: "rgba(255,255,255,0.82)" }}>{text}</span>
-      </p>
-    );
-  }
-  if (line.startsWith("→")) {
-    return (
-      <div className="flex flex-col gap-2 pt-1">
-        <div style={{ height: 1, background: `rgba(${themeRgb},0.15)` }} />
-        <p {...titleProps(TITLE3, titleColor ?? `rgba(${themeRgb},0.9)`, themeRgb)}>{line}</p>
-      </div>
-    );
-  }
-  return (
-    <p className="text-sm sm:text-base leading-relaxed font-medium" style={{ color: "rgba(255,255,255,0.82)" }}>
-      {line}
-    </p>
-  );
-}
-
-/** 테마 정보 카드 */
-function InfoCard({
-  theme,
-  title,
-  body,
-  typeA,
-  typeB,
-  mbtiSuffix,
-}: {
-  theme: { rgb: string; title: string; titleGlowRgb: string; bgAlpha: number; borderAlpha: number; shadowAlpha: number };
-  title: string;
-  body: string;
-  typeA?: string;
-  typeB?: string;
-  mbtiSuffix?: string;
-}) {
-  const lines = body.split("\n").filter((l) => l.trim());
-  // mbtiSuffix가 있을 때 MBTI: 형태의 라인에서 MBTI 뒤에 suffix를 붙이기 위한 처리
-  void mbtiSuffix;
-  return (
-    <div
-      className="rounded-xl p-5 flex flex-col gap-2.5"
-      style={{
-        background: `rgba(${theme.rgb},${theme.bgAlpha})`,
-        border: `1px solid rgba(${theme.rgb},${theme.borderAlpha})`,
-        boxShadow: `0 0 20px rgba(${theme.rgb},${theme.shadowAlpha})`,
-      }}
-    >
-      <p {...titleProps(TITLE3, theme.title, theme.titleGlowRgb)}>{title}</p>
-      <div className="flex flex-col gap-2">
-        {lines.map((line, i) => (
-          <InfoLine key={i} line={line} themeRgb={theme.rgb} titleColor={theme.title} typeA={typeA} typeB={typeB} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/** 불릿 이모지 치환 */
-function decorateBullets(body: string, heading: string): string {
-  const sectionEntry = SECTION_EMOJIS.find((s) => heading.includes(s.keyword));
-  const sectionEmoji = sectionEntry?.emoji ?? DEFAULT_BULLET_EMOJI;
-  return body.replace(/^• (.+)/gm, (_match, content: string) => {
-    const line = content.trim();
-    const lineEntry = LINE_EMOJIS.find((e) => e.pattern.test(line));
-    const emoji = lineEntry?.emoji ?? sectionEmoji;
-    return `${emoji} ${content}`;
-  });
-}
 
 export default function StaticCoupleResult({ typeA, typeB, score, tier, loveDesc, categories }: Props) {
   const [detailOpen, setDetailOpen] = useState(false);
@@ -188,8 +93,8 @@ export default function StaticCoupleResult({ typeA, typeB, score, tier, loveDesc
 
           {/* 싸움 패턴 + 해결 핵심 */}
           <div className="w-full flex flex-col gap-4 mt-3">
-            <InfoCard theme={FIGHT_THEME} title={COUPLE.fightTitle} body={loveDesc.fightStyle} typeA={typeA} typeB={typeB} />
-            <InfoCard theme={SOLUTION_THEME} title={COUPLE.solutionTitle} body={loveDesc.solution} typeA={typeA} typeB={typeB} mbtiSuffix="에게" />
+            <InfoCard theme={FIGHT_THEME} title={COUPLE.fightTitle} body={loveDesc.fightStyle} myMbti={typeA} partnerMbti={typeB} />
+            <InfoCard theme={SOLUTION_THEME} title={COUPLE.solutionTitle} body={loveDesc.solution} myMbti={typeA} partnerMbti={typeB} mbtiSuffix="에게" />
           </div>
         </div>
 

@@ -7,7 +7,7 @@
 import { ImageResponse } from "next/og";
 import { MBTI_TYPES, COMPATIBILITY } from "@/data/compatibility";
 import type { MbtiType } from "@/data/compatibility";
-import { COUPLE_TIERS } from "@/data/labels";
+import { getTierEmoji } from "@/data/labels";
 import { LOVE_DESC } from "@/features/mbti-love/consts/love-descriptions";
 
 export const alt = "ChemiFit MBTI 연애 궁합";
@@ -21,11 +21,6 @@ export function generateStaticParams() {
       typeB: b.toLowerCase(),
     })),
   );
-}
-
-function getTierEmoji(score: number): string {
-  const tier = COUPLE_TIERS.find((t) => score >= t.min) ?? COUPLE_TIERS[COUPLE_TIERS.length - 1];
-  return tier.emoji;
 }
 
 export default async function OGImage({

@@ -10,7 +10,7 @@ import Image from "next/image";
 import { MBTI_TYPES, COMPATIBILITY } from "@/data/compatibility";
 import type { MbtiType } from "@/data/compatibility";
 import { TYPE_PROFILES } from "@/data/type-profiles";
-import { COUPLE_TIERS } from "@/data/labels";
+import { getTierEmoji } from "@/data/labels";
 import { SITE } from "@/data/ui-text";
 import SiteFooter from "@/components/SiteFooter";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -31,11 +31,6 @@ function getTopCouples(count: number) {
   }
 
   return pairs.sort((x, y) => y.score - x.score).slice(0, count);
-}
-
-function getTierEmoji(score: number): string {
-  const tier = COUPLE_TIERS.find((t) => score >= t.min) ?? COUPLE_TIERS[COUPLE_TIERS.length - 1];
-  return tier.emoji;
 }
 
 /** MBTI 그룹 정의 */

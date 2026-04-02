@@ -418,29 +418,11 @@ export default function CoupleResult({
                     );
                   })()}
 
-                  {/* 내 MBTI + 상대 MBTI 뱃지 */}
-                  <div className="flex items-center gap-4 z-10">
-                    <div
-                      className="px-4 py-2 rounded-xl text-lg font-black"
-                      style={{
-                        background: "rgba(168,85,247,0.15)",
-                        border: "1px solid rgba(168,85,247,0.3)",
-                        color: "#c084fc",
-                      }}
-                    >
-                      {myMbti}
-                    </div>
-                    <span className="text-3xl">{COUPLE.mbtiSeparator}</span>
-                    <div
-                      className="px-4 py-2 rounded-xl text-lg font-black"
-                      style={{
-                        background: "rgba(236,72,153,0.15)",
-                        border: "1px solid rgba(236,72,153,0.3)",
-                        color: "#f472b6",
-                      }}
-                    >
-                      {partnerMbti}
-                    </div>
+                  {/* 내 MBTI + 상대 MBTI */}
+                  <div className="flex items-center gap-3 z-10">
+                    <span className="text-xl sm:text-2xl font-black" style={{ color: "#c084fc" }}>{myMbti}</span>
+                    <span className="text-2xl">{COUPLE.mbtiSeparator}</span>
+                    <span className="text-xl sm:text-2xl font-black" style={{ color: "#f472b6" }}>{partnerMbti}</span>
                   </div>
 
                   {/* 원형 게이지 (점수 시각화 — 핑크→퍼플 그라디언트) */}

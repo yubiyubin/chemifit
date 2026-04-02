@@ -14,7 +14,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useCopyLink } from "@/hooks/useCopyLink";
 import { MBTI_TYPES, COMPATIBILITY, MbtiType } from "@/data/compatibility";
 import { MBTI_MAP } from "@/data/ui-text";
 import { getScoreInfo } from "@/data/labels";
@@ -63,7 +62,6 @@ type Props = {
 export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
   const setSelectedMbti = onSelect ?? (() => {});
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { copied, copy: handleCopyLink } = useCopyLink();
 
   // 선택된 버튼이 보이도록 자동 스크롤 (쿼리 파라미터 초기 로드 포함)
   useEffect(() => {
@@ -296,22 +294,13 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
       </NeonCard>
 
       {/* ── 공유 버튼 행 ── */}
-      <div className="flex flex-col gap-3">
-        <SharePanel
-          title={`${selectedMbti} MBTI 궁합 순위`}
-          description={`${selectedMbti}와 가장 잘 맞는 MBTI는? 16타입 궁합 랭킹을 확인하세요.`}
-          path={`/mbti-map?mbti=${selectedMbti}`}
-          rgb={PURPLE_RGB}
-          contentType="map"
-        />
-        <button
-          data-testid="copy-link-btn"
-          onClick={handleCopyLink}
-          className="neon-ghost w-full py-2.5 rounded-xl text-sm font-bold"
-        >
-          {copied ? MBTI_MAP.copiedMessage : MBTI_MAP.copyLinkBtn}
-        </button>
-      </div>
+      <SharePanel
+        title={`${selectedMbti} MBTI 궁합 순위`}
+        description={`${selectedMbti}와 가장 잘 맞는 MBTI는? 16타입 궁합 랭킹을 확인하세요.`}
+        path={`/mbti-map?mbti=${selectedMbti}`}
+        rgb={PURPLE_RGB}
+        contentType="map"
+      />
 
       {/* ── 상세 팝업 패널 (배지 클릭 시 활성화) ── */}
       <CompatDetailModal data={panel} onClose={() => setPanel(null)} />

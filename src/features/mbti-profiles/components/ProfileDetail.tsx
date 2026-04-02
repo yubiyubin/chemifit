@@ -22,7 +22,7 @@ import type { MbtiType } from "@/data/compatibility";
 import NeonCard from "@/components/NeonCard";
 import CtaButton from "@/components/CtaButton";
 import MbtiBadge from "@/features/mbti-map/components/MbtiBadge";
-import { useCopyLink } from "@/hooks/useCopyLink";
+import SharePanel from "@/components/SharePanel";
 import { PROFILES } from "@/data/ui-text";
 import { MINT_RGB, PINK_RGB, PURPLE_RGB, CYAN_RGB } from "@/styles/card-themes";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
@@ -34,7 +34,6 @@ type Props = {
 export default function ProfileDetail({ profile }: Props) {
   const router = useRouter();
   const detailRef = useRef<HTMLDivElement>(null);
-  const { copied, copy } = useCopyLink();
   const [previewOpen, setPreviewOpen] = useState(false); // 이미지 미리보기 모달 열림 여부
   const [previewUrl, setPreviewUrl] = useState<string | null>(null); // 이미지 미리보기 URL
   const [expandedCelebs, setExpandedCelebs] = useState<Set<string>>(new Set());
@@ -306,19 +305,14 @@ export default function ProfileDetail({ profile }: Props) {
         >
           📸 {PROFILES.saveImageBtn}
         </button>
-        <button
-          data-testid="copy-link-btn"
-          onClick={copy}
-          className="flex-1 py-3 rounded-xl text-xs font-bold transition-all hover:opacity-80"
-          style={{
-            color: `rgba(${MINT_RGB},0.9)`,
-            background: `rgba(${MINT_RGB},0.08)`,
-            border: `1px solid rgba(${MINT_RGB},0.25)`,
-          }}
-        >
-          {copied ? `✅ ${PROFILES.copiedMessage}` : `🔗 ${PROFILES.shareButton}`}
-        </button>
       </div>
+      <SharePanel
+        title={`${profile.type} 성격 - ${profile.nickname}`}
+        description={`${profile.type} 유형의 성격 특징, 장단점, 연애 스타일을 확인하세요.`}
+        path={`/mbti-profiles/${profile.type.toLowerCase()}`}
+        rgb={MINT_RGB}
+        contentType="profile"
+      />
       </NeonCard>
 
       {/* ── 이미지 미리보기 모달 ── */}

@@ -15,7 +15,6 @@
 "use client";
 
 import { useState, useCallback, useMemo, useRef } from "react";
-import { useCopyLink } from "@/hooks/useCopyLink";
 import { useRouter } from "next/navigation";
 import {
   Member,
@@ -77,7 +76,7 @@ export default function GroupGrid({ members }: Props) {
   const hintShownRef = useRef(false); // 힌트는 최초 1회만 표시
   const [roleOpen, setRoleOpen] = useState(false);
   const [allPairsOpen, setAllPairsOpen] = useState(false);
-  const { copied, copy: handleCopy } = useCopyLink();
+
   const [summary, setSummary] = useState<{
     avg: number;
     best: { mA: Member; mB: Member; score: number };
@@ -992,18 +991,6 @@ export default function GroupGrid({ members }: Props) {
               rgb={CYAN_RGB}
               contentType="group"
             />
-            <button
-              onClick={handleCopy}
-              className="neon-action py-3 rounded-xl text-center"
-              style={{ "--neon": CYAN_RGB } as React.CSSProperties}
-            >
-              <p
-                className="text-sm font-bold"
-                style={{ color: "rgba(0,203,255,0.85)" }}
-              >
-                {copied ? GROUP.copiedMessage : `🔗 ${GROUP.shareButton}`}
-              </p>
-            </button>
             <CtaButton
               title={CTA_TEXTS.group.toLove.title}
               subtitle={CTA_TEXTS.group.toLove.subtitle}

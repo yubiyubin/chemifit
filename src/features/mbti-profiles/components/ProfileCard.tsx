@@ -8,6 +8,7 @@
 
 import type { MbtiProfile } from "@/data/type-profiles";
 import { MINT_RGB } from "@/styles/card-themes";
+import { PROFILES } from "@/data/ui-text";
 
 type Props = {
   profile: MbtiProfile;
@@ -76,7 +77,7 @@ export default function ProfileCard({ profile, isSelected, onClick }: Props) {
             border: `0.5px solid rgba(${rgb},0.4)`,
           }}
         >
-          내 유형
+          {PROFILES.myTypeBadge}
         </span>
       )}
     </button>

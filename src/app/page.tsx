@@ -11,6 +11,7 @@ import { MBTI_TYPES, COMPATIBILITY } from "@/data/compatibility";
 import type { MbtiType } from "@/data/compatibility";
 import { TYPE_PROFILES } from "@/data/type-profiles";
 import { getTierEmoji } from "@/data/labels";
+import { MBTI_GROUPS } from "@/data/groups";
 import { SITE } from "@/data/ui-text";
 import SiteFooter from "@/components/SiteFooter";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -32,14 +33,6 @@ function getTopCouples(count: number) {
 
   return pairs.sort((x, y) => y.score - x.score).slice(0, count);
 }
-
-/** MBTI 그룹 정의 */
-const MBTI_GROUPS = [
-  { key: "NT", label: "분석가", rgb: "168,85,247", types: ["INTJ", "INTP", "ENTJ", "ENTP"] as MbtiType[] },
-  { key: "NF", label: "외교관", rgb: "236,72,153", types: ["INFJ", "INFP", "ENFJ", "ENFP"] as MbtiType[] },
-  { key: "SJ", label: "관리자", rgb: "0,203,255", types: ["ISTJ", "ISFJ", "ESTJ", "ESFJ"] as MbtiType[] },
-  { key: "SP", label: "탐험가", rgb: "102,237,195", types: ["ISTP", "ISFP", "ESTP", "ESFP"] as MbtiType[] },
-] as const;
 
 const FEATURES = [
   {

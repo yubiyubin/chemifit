@@ -121,6 +121,8 @@ export const COMPAT_DETAIL = {
 export const MEMBER_INPUT = {
   maxMembers: 8,
   minMembers: 2,
+  defaultMyName: "나",
+  defaultMyEmoji: "⭐",
   namePlaceholder: "이름 (비우면 랜덤)",
   countSuffix: "명 입력됨",
   minWarning: "최소 2명이 필요해요",
@@ -202,6 +204,7 @@ export const PROFILES = {
   saveImageBtn: "이미지 저장",
   copiedMessage: "복사 완료!",
   backToGrid: "← 전체 유형 보기",
+  myTypeBadge: "내 유형",
 } as const;
 
 // ─────────────────────────────────────────────

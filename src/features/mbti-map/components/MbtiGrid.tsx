@@ -27,8 +27,6 @@ import NeonCard from "@/components/NeonCard";
 import { TYPE_PROFILES } from "@/data/type-profiles";
 import { TITLE1, TITLE2, titleProps } from "@/styles/titles";
 import { PURPLE_RGB } from "@/styles/card-themes";
-// import ReceiptShareImage from "@/components/shareImage";
-// import ImagePreviewModal from "@/components/ImagePreviewModal";
 
 /** 동일 점수를 가진 MBTI들을 하나의 그룹으로 묶기 위한 타입 */
 type GroupedPair = {
@@ -64,8 +62,6 @@ type Props = {
 export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
   const setSelectedMbti = onSelect ?? (() => {});
   const scrollRef = useRef<HTMLDivElement>(null);
-  // const cardRef = useRef<HTMLDivElement>(null); // ReceiptShareImage .rc-card 직접 참조
-  // const [previewUrl, setPreviewUrl] = useState<string | null>(null); // 이미지 미리보기 URL
   const { copied, copy: handleCopyLink } = useCopyLink();
 
   // 선택된 버튼이 보이도록 자동 스크롤 (쿼리 파라미터 초기 로드 포함)

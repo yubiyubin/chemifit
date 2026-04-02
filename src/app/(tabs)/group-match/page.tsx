@@ -16,12 +16,12 @@ import { useAutoScroll } from "@/hooks/useAutoScroll";
 import MemberInput from "@/features/group-match/components/MemberInput";
 import GroupGrid from "@/features/group-match/components/GroupGrid";
 import type { Member } from "@/data/compatibility";
-import { PAGE_HEADINGS } from "@/data/ui-text";
+import { PAGE_HEADINGS, MEMBER_INPUT } from "@/data/ui-text";
 
 export default function GroupMatchPage() {
   const { selectedMbti } = useMbti();
   const [members, setMembers] = useState<Member[]>(() =>
-    selectedMbti ? [{ name: "나", mbti: selectedMbti, emoji: "⭐" }] : [],
+    selectedMbti ? [{ name: MEMBER_INPUT.defaultMyName, mbti: selectedMbti, emoji: MEMBER_INPUT.defaultMyEmoji }] : [],
   );
 
   const router = useRouter();

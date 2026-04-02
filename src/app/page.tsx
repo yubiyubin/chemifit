@@ -17,7 +17,7 @@ const FEATURES = [
   {
     emoji: "💕",
     title: "연인 궁합",
-    desc: "나와 상대의 MBTI로 연애 궁합 점수, 싸움 패턴, 해결법까지 상세 분석",
+    desc: "이 사람이랑 사귀면 어떻게 될까? 점수부터 싸움 패턴까지",
     href: "/mbti-love",
     rgb: "236,72,153",
     stats: "256가지 조합",
@@ -25,7 +25,7 @@ const FEATURES = [
   {
     emoji: "🌐",
     title: "궁합 맵",
-    desc: "16타입 궁합 순위를 네트워크 그래프로 시각화",
+    desc: "16타입 중 나랑 제일 잘 맞는 MBTI는? 전체 순위 공개",
     href: "/mbti-map",
     rgb: "168,85,247",
     stats: "16타입 순위",
@@ -33,7 +33,7 @@ const FEATURES = [
   {
     emoji: "👥",
     title: "그룹 궁합",
-    desc: "2~8명의 MBTI로 그룹 케미와 팀 역할까지 분석",
+    desc: "친구들이랑 모이면 누가 텐션 담당? 그룹 케미 분석",
     href: "/group-match",
     rgb: "0,203,255",
     stats: "팀 역할 분석",
@@ -41,7 +41,7 @@ const FEATURES = [
   {
     emoji: "📖",
     title: "유형 설명",
-    desc: "16가지 MBTI 유형별 성격, 장단점, 연애 스타일, RPG 스탯까지",
+    desc: "내 MBTI는 어떤 캐릭터? RPG 스탯표로 확인",
     href: "/mbti-profiles",
     rgb: "102,237,195",
     stats: "16타입 프로필",

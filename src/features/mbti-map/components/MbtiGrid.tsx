@@ -76,7 +76,12 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
     setPreviewOpen(true);
     const { toPng } = await import("html-to-image");
     await document.fonts.ready;
-    const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, width: 1080, height: 1350 });
+    const dataUrl = await toPng(cardRef.current, {
+      pixelRatio: 2,
+      width: 1080,
+      height: 1350,
+      skipFonts: true,
+    });
     setPreviewUrl(dataUrl);
   }, [selectedMbti]);
 

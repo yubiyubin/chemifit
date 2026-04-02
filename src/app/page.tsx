@@ -133,17 +133,15 @@ export default function LandingPage() {
           {/* CTA */}
           <Link
             href="/mbti-love"
-            className="group relative px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105"
+            className="px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105 hover:-translate-y-0.5"
             style={{
-              background: "linear-gradient(135deg, rgba(236,72,153,0.2) 0%, rgba(168,85,247,0.15) 100%)",
-              border: "1.5px solid rgba(236,72,153,0.5)",
+              background: "rgba(236,72,153,0.15)",
+              border: "1.5px solid rgba(236,72,153,0.55)",
               color: "#f9a8d4",
-              boxShadow: "0 0 30px rgba(236,72,153,0.2), 0 0 60px rgba(236,72,153,0.1), inset 0 1px 0 rgba(255,255,255,0.1)",
+              boxShadow: "0 0 20px rgba(236,72,153,0.3), 0 0 50px rgba(236,72,153,0.15), 0 0 100px rgba(236,72,153,0.08)",
             }}
           >
-            <span className="relative z-10">지금 궁합 확인하기</span>
-            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              style={{ boxShadow: "0 0 40px rgba(236,72,153,0.4), 0 0 80px rgba(236,72,153,0.2)" }} />
+            지금 궁합 확인하기
           </Link>
 
           <p className="text-xs text-white/25">{SITE.subtitle}</p>
@@ -166,14 +164,14 @@ export default function LandingPage() {
                 href={f.href}
                 className="group relative rounded-2xl p-6 sm:p-7 flex flex-col gap-4 transition-all duration-300 hover:-translate-y-1"
                 style={{
-                  background: `linear-gradient(145deg, rgba(${f.rgb},0.08) 0%, rgba(${f.rgb},0.03) 100%)`,
+                  background: `rgba(${f.rgb},0.06)`,
                   border: `1.5px solid rgba(${f.rgb},0.25)`,
-                  boxShadow: `0 0 20px rgba(${f.rgb},0.08)`,
+                  boxShadow: `0 0 15px rgba(${f.rgb},0.1), 0 0 40px rgba(${f.rgb},0.05)`,
                 }}
               >
                 {/* 호버 글로우 */}
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ boxShadow: `0 0 30px rgba(${f.rgb},0.2), 0 0 60px rgba(${f.rgb},0.1)` }} />
+                  style={{ boxShadow: `0 0 25px rgba(${f.rgb},0.25), 0 0 60px rgba(${f.rgb},0.12)` }} />
 
                 <div className="relative z-10 flex flex-col gap-3">
                   <span className="text-4xl">{f.emoji}</span>
@@ -205,9 +203,9 @@ export default function LandingPage() {
           <div
             className="rounded-2xl overflow-hidden"
             style={{
-              background: "linear-gradient(145deg, rgba(236,72,153,0.06) 0%, rgba(168,85,247,0.04) 100%)",
+              background: "rgba(236,72,153,0.05)",
               border: "1.5px solid rgba(236,72,153,0.2)",
-              boxShadow: "0 0 30px rgba(236,72,153,0.08)",
+              boxShadow: "0 0 20px rgba(236,72,153,0.1), 0 0 50px rgba(236,72,153,0.05)",
             }}
           >
             {topCouples.map(({ a, b, score }, i) => (
@@ -280,12 +278,13 @@ export default function LandingPage() {
                   href={`/mbti-profiles/${type.toLowerCase()}`}
                   className="group relative rounded-xl p-4 flex flex-col gap-2 transition-all duration-300 hover:-translate-y-1"
                   style={{
-                    background: `linear-gradient(145deg, rgba(${rgb},0.08) 0%, rgba(${rgb},0.03) 100%)`,
+                    background: `rgba(${rgb},0.06)`,
                     border: `1px solid rgba(${rgb},0.2)`,
+                    boxShadow: `0 0 12px rgba(${rgb},0.06)`,
                   }}
                 >
                   <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    style={{ boxShadow: `0 0 20px rgba(${rgb},0.2)` }} />
+                    style={{ boxShadow: `0 0 20px rgba(${rgb},0.25), 0 0 50px rgba(${rgb},0.1)` }} />
                   <div className="relative z-10">
                     <span className="text-base font-black" style={{ color: `rgb(${rgb})` }}>{type}</span>
                     <p className="text-[11px] text-white/35 mt-1 leading-snug line-clamp-2">
@@ -311,12 +310,12 @@ export default function LandingPage() {
           </div>
           <Link
             href="/mbti-love"
-            className="group relative px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105"
+            className="px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105 hover:-translate-y-0.5"
             style={{
-              background: "linear-gradient(135deg, rgba(236,72,153,0.2) 0%, rgba(168,85,247,0.15) 100%)",
-              border: "1.5px solid rgba(236,72,153,0.5)",
+              background: "rgba(236,72,153,0.15)",
+              border: "1.5px solid rgba(236,72,153,0.55)",
               color: "#f9a8d4",
-              boxShadow: "0 0 30px rgba(236,72,153,0.2), 0 0 60px rgba(236,72,153,0.1), inset 0 1px 0 rgba(255,255,255,0.1)",
+              boxShadow: "0 0 20px rgba(236,72,153,0.3), 0 0 50px rgba(236,72,153,0.15), 0 0 100px rgba(236,72,153,0.08)",
             }}
           >
             궁합 테스트 시작하기

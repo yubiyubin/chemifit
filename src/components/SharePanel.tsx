@@ -1,8 +1,9 @@
 /**
  * SharePanel — 통합 공유 버튼 패널
  *
- * 카카오톡, 트위터(X), 링크 복사 버튼을 한 줄로 표시.
+ * 카카오톡, 트위터(X), 링크 복사 버튼을 균등 배치.
  * 모바일에서 Web Share API 가용 시 네이티브 공유 시트도 지원.
+ * 사이트의 neon-btn 스타일 기반으로 통일된 디자인.
  */
 "use client";
 
@@ -39,7 +40,6 @@ export default function SharePanel({
     try {
       await shareKakao({ title, description, pageUrl: path });
     } catch {
-      // SDK 로드 실패 시 폴백: 링크 복사
       await navigator.clipboard.writeText(fullUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -67,71 +67,70 @@ export default function SharePanel({
 
   const supportsNativeShare = typeof navigator !== "undefined" && !!navigator.share;
 
+  const btnClass = "neon-btn flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold no-underline";
+
   return (
-    <div className="flex items-center gap-2">
-      {/* 카카오톡 */}
-      <button
-        onClick={handleKakao}
-        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 hover:-translate-y-0.5"
-        style={{
-          background: "rgba(254,229,0,0.12)",
-          border: "1px solid rgba(254,229,0,0.3)",
-          color: "#FEE500",
-        }}
-        aria-label="카카오톡으로 공유"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="#FEE500">
-          <path d="M12 3C6.48 3 2 6.58 2 10.94c0 2.8 1.86 5.27 4.66 6.67-.15.53-.96 3.4-.99 3.62 0 0-.02.17.09.23.11.07.24.02.24.02.32-.04 3.7-2.42 4.28-2.83.56.08 1.14.12 1.72.12 5.52 0 10-3.58 10-7.94S17.52 3 12 3z"/>
-        </svg>
-        카카오톡
-      </button>
-
-      {/* 트위터(X) */}
-      <button
-        onClick={handleTwitter}
-        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 hover:-translate-y-0.5"
-        style={{
-          background: "rgba(29,155,240,0.12)",
-          border: "1px solid rgba(29,155,240,0.3)",
-          color: "#1D9BF0",
-        }}
-        aria-label="트위터로 공유"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="#1D9BF0">
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-        </svg>
-        X
-      </button>
-
-      {/* 링크 복사 */}
-      <button
-        onClick={handleCopy}
-        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 hover:-translate-y-0.5"
-        style={{
-          background: `rgba(${rgb},0.1)`,
-          border: `1px solid rgba(${rgb},0.25)`,
-          color: copied ? "#4ade80" : `rgba(${rgb},0.8)`,
-        }}
-        aria-label="링크 복사"
-      >
-        {copied ? "✓ 복사됨" : "🔗 링크"}
-      </button>
-
-      {/* 네이티브 공유 (모바일) */}
-      {supportsNativeShare && (
+    <div
+      className="rounded-2xl p-3"
+      style={{
+        background: `rgba(${rgb},0.04)`,
+        border: `1px solid rgba(${rgb},0.12)`,
+      }}
+    >
+      <div className="flex gap-2">
+        {/* 카카오톡 */}
         <button
-          onClick={handleNativeShare}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 hover:-translate-y-0.5"
-          style={{
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            color: "rgba(255,255,255,0.6)",
-          }}
-          aria-label="공유"
+          onClick={handleKakao}
+          className={btnClass}
+          style={{ "--neon": rgb } as React.CSSProperties}
+          aria-label="카카오톡으로 공유"
         >
-          ↗ 더보기
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#FEE500">
+            <path d="M12 3C6.48 3 2 6.58 2 10.94c0 2.8 1.86 5.27 4.66 6.67-.15.53-.96 3.4-.99 3.62 0 0-.02.17.09.23.11.07.24.02.24.02.32-.04 3.7-2.42 4.28-2.83.56.08 1.14.12 1.72.12 5.52 0 10-3.58 10-7.94S17.52 3 12 3z"/>
+          </svg>
+          <span>카카오톡</span>
         </button>
-      )}
+
+        {/* 트위터(X) */}
+        <button
+          onClick={handleTwitter}
+          className={btnClass}
+          style={{ "--neon": rgb } as React.CSSProperties}
+          aria-label="트위터로 공유"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          <span>X</span>
+        </button>
+
+        {/* 링크 복사 */}
+        <button
+          onClick={handleCopy}
+          className={btnClass}
+          style={{
+            "--neon": rgb,
+            ...(copied ? { background: `rgba(${rgb},0.2)`, color: "#fff" } : {}),
+          } as React.CSSProperties}
+          aria-label="링크 복사"
+        >
+          <span>{copied ? "✓" : "🔗"}</span>
+          <span>{copied ? "복사됨" : "링크"}</span>
+        </button>
+
+        {/* 네이티브 공유 (모바일) */}
+        {supportsNativeShare && (
+          <button
+            onClick={handleNativeShare}
+            className={btnClass}
+            style={{ "--neon": rgb } as React.CSSProperties}
+            aria-label="더보기"
+          >
+            <span>↗</span>
+            <span>더보기</span>
+          </button>
+        )}
+      </div>
     </div>
   );
 }

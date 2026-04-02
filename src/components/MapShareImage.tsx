@@ -72,8 +72,6 @@ export default function MapShareImage({ data, cardRef }: Props) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap');
         .ms-wrap{width:1080px;height:1350px;transform-origin:center center}
         .ms-card{width:1080px;height:1350px;position:relative;overflow:hidden;background:#08000e}
         .ms-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(168,85,247,0.08) 0%,transparent 55%)}

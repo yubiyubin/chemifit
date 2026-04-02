@@ -38,6 +38,14 @@ const FEATURES = [
     rgb: "0,203,255",
     stats: "팀 역할 분석",
   },
+  {
+    emoji: "📖",
+    title: "유형 설명",
+    desc: "16가지 MBTI 유형별 성격, 장단점, 연애 스타일, RPG 스탯까지",
+    href: "/mbti-profiles",
+    rgb: "102,237,195",
+    stats: "16타입 프로필",
+  },
 ] as const;
 
 export default function LandingPage() {
@@ -154,8 +162,8 @@ export default function LandingPage() {
                 <span className="text-white/20 text-sm shrink-0">→</span>
               </Link>
 
-              {/* 서브: 궁합맵 + 그룹궁합 — 반반 */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* 서브: 궁합맵 + 그룹궁합 + 유형설명 */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {FEATURES.slice(1).map((f) => (
                   <Link
                     key={f.href}

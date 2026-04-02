@@ -10,16 +10,24 @@ import type { MbtiProfile } from "@/data/type-profiles";
 
 const BARCODE_HEIGHTS = [28, 36, 20, 40, 24, 36, 16, 32, 40, 20, 36, 28, 40, 16, 32, 24, 40, 20, 36, 28];
 
-/** 능력치 정의: MBTI 차원별 가중치로 점수 산출 */
+/** 능력치 정의: MBTI 차원별 가중치로 점수 산출 + 점수 구간별 한 줄 설명 */
 const STAT_DEFS = [
-  { name: "리더십", emoji: "⚔️", weights: { E: 30, I: 5, N: 5, S: 5, T: 10, F: 5, J: 15, P: 5 } },
-  { name: "추진력", emoji: "🎯", weights: { E: 15, I: 5, N: 10, S: 5, T: 15, F: 5, J: 25, P: 5 } },
-  { name: "논리력", emoji: "🧠", weights: { E: 5, I: 10, N: 20, S: 5, T: 30, F: 0, J: 5, P: 5 } },
-  { name: "효율성", emoji: "⚡", weights: { E: 5, I: 5, N: 5, S: 10, T: 20, F: 5, J: 25, P: 5 } },
-  { name: "창의력", emoji: "🎨", weights: { E: 5, I: 10, N: 30, S: 0, T: 5, F: 10, J: 0, P: 20 } },
-  { name: "감수성", emoji: "💗", weights: { E: 5, I: 10, N: 10, S: 5, T: 0, F: 30, J: 5, P: 10 } },
-  { name: "사교성", emoji: "🤝", weights: { E: 35, I: 0, N: 5, S: 5, T: 0, F: 10, J: 5, P: 10 } },
-  { name: "인내심", emoji: "🕊️", weights: { E: 0, I: 15, N: 5, S: 15, T: 5, F: 5, J: 10, P: 5 } },
+  { name: "리더십", emoji: "⚔️", weights: { E: 30, I: 5, N: 5, S: 5, T: 10, F: 5, J: 15, P: 5 },
+    descs: { high: "팀 동기부여의 신", mid: "필요할 때 나서는 편", low: "뒤에서 서포트 선호" } },
+  { name: "추진력", emoji: "🎯", weights: { E: 15, I: 5, N: 10, S: 5, T: 15, F: 5, J: 25, P: 5 },
+    descs: { high: "그림 그리고 바로 실행", mid: "동기 있으면 밀어붙임", low: "흐름에 맡기는 스타일" } },
+  { name: "논리력", emoji: "🧠", weights: { E: 5, I: 10, N: 20, S: 5, T: 30, F: 0, J: 5, P: 5 },
+    descs: { high: "복잡할수록 빠른 판단", mid: "논리+감각 밸런스형", low: "직감으로 먼저 느끼는 편" } },
+  { name: "효율성", emoji: "⚡", weights: { E: 5, I: 5, N: 5, S: 10, T: 20, F: 5, J: 25, P: 5 },
+    descs: { high: "'개선안 세 가지' 자동생성", mid: "나름 체계적으로 처리", low: "과정도 즐기는 타입 🌿" } },
+  { name: "창의력", emoji: "🎨", weights: { E: 5, I: 10, N: 30, S: 0, T: 5, F: 10, J: 0, P: 20 },
+    descs: { high: "상상력 멈출 수 없음", mid: "전략적 창의성은 높음", low: "검증된 방법이 편함 📋" } },
+  { name: "감수성", emoji: "💗", weights: { E: 5, I: 10, N: 10, S: 5, T: 0, F: 30, J: 5, P: 10 },
+    descs: { high: "감정 안테나 항상 ON", mid: "공감은 하는데 표현은 적음", low: "차갑게 보일 때 있음 ❄️" } },
+  { name: "사교성", emoji: "🤝", weights: { E: 35, I: 0, N: 5, S: 5, T: 0, F: 10, J: 5, P: 10 },
+    descs: { high: "어디서든 분위기 메이커", mid: "목적 있는 네트워킹 장인", low: "소수 정예 인간관계 🔒" } },
+  { name: "인내심", emoji: "🕊️", weights: { E: 0, I: 15, N: 5, S: 15, T: 5, F: 5, J: 10, P: 5 },
+    descs: { high: "기다림의 달인 🧘", mid: "참을 건 참는 편", low: "느린 사람 보면 답답 💢" } },
 ] as const;
 
 type MbtiDim = "E" | "I" | "S" | "N" | "T" | "F" | "J" | "P";
@@ -30,7 +38,8 @@ function computeStats(mbti: string) {
     const base = 20;
     const bonus = dims.reduce((sum, d) => sum + (def.weights[d] ?? 0), 0);
     const score = Math.min(99, Math.max(10, base + bonus));
-    return { ...def, score };
+    const desc = score >= 75 ? def.descs.high : score >= 45 ? def.descs.mid : def.descs.low;
+    return { ...def, score, desc };
   });
 }
 
@@ -119,6 +128,7 @@ export default function ProfileShareImage({ profile, cardRef }: Props) {
         .psf-vlow{background:linear-gradient(90deg,rgba(248,113,113,0.6),rgba(252,165,165,0.6));box-shadow:0 0 10px rgba(248,113,113,0.25)}
         .ps-sv{font-size:16px;font-weight:700;color:rgba(255,255,255,0.5);width:48px;text-align:right;flex-shrink:0}
         .ps-sg{font-size:13px;font-weight:700;padding:3px 10px;border-radius:4px;width:36px;text-align:center;margin-left:8px}
+        .ps-desc{font-size:12px;color:rgba(255,255,255,0.25);margin-left:10px;flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .g-s{color:#fbbf24;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.12)}
         .g-a{color:#34d399;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.12)}
         .g-b{color:#60a5fa;background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.12)}
@@ -179,6 +189,7 @@ export default function ProfileShareImage({ profile, cardRef }: Props) {
                     </div>
                     <div className="ps-sv">{stat.score}%</div>
                     <div className={`ps-sg ${grade.cls}`}>{grade.label}</div>
+                    <div className="ps-desc">{stat.desc}</div>
                   </div>
                 );
               })}

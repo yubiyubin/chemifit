@@ -141,7 +141,7 @@ export default function LandingPage() {
         <ScrollReveal>
           <section className="flex flex-col gap-6 mb-20">
             <h2 className="text-2xl sm:text-3xl font-black text-center text-white/90">
-              무엇을 할 수 있나요?
+              어떤 케미가 궁금해?
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

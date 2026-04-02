@@ -10,7 +10,7 @@ export const SITE_NAME = "ChemiFit";
 export const GA_ID = "G-3V9R7C99QG";
 
 /** 카카오 JavaScript 앱 키 (공개 키 — https://developers.kakao.com 에서 발급) */
-export const KAKAO_JS_KEY = "YOUR_KAKAO_JS_KEY";
+export const KAKAO_JS_KEY = "b564158e91a08e0a56f340f7df559146";
 
 /** 모든 페이지에서 공유하는 OG 이미지 설정 */
 export const OG_IMAGE = {

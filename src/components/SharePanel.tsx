@@ -62,7 +62,11 @@ export default function SharePanel({
 
   const handleNativeShare = useCallback(async () => {
     trackEvent("share_click", { platform: "native", content_type: contentType });
-    await navigator.share({ title, text: description, url: fullUrl });
+    try {
+      await navigator.share({ title, text: description, url: fullUrl });
+    } catch {
+      // 사용자가 공유 시트를 취소한 경우 (AbortError) — 무시
+    }
   }, [title, description, fullUrl, contentType]);
 
   const supportsNativeShare = typeof navigator !== "undefined" && !!navigator.share;

@@ -7,7 +7,7 @@
 import { useEffect, useRef } from "react";
 import type React from "react";
 import type { Member } from "@/data/compatibility";
-import type { PairScore, GroupAnalysis } from "@/features/group-match/utils/group-roles";
+import type { GroupAnalysis } from "@/features/group-match/utils/group-roles";
 import { getScoreInfo } from "@/data/labels";
 
 const BARCODE_HEIGHTS = [28, 36, 20, 40, 24, 36, 16, 32, 40, 20, 36, 28, 40, 16, 32, 24, 40, 20, 36, 28];

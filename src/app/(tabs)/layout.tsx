@@ -51,7 +51,7 @@ function TabsLayoutInner({ children }: { children: React.ReactNode }) {
         <nav aria-label="메인 탭" className="mt-10 mb-3">
           <TabSwitcher tabs={TABS} activeNeon={activeNeon} />
         </nav>
-        <section>{children}</section>
+        <section aria-label="페이지 콘텐츠">{children}</section>
       </div>
       <SiteFooter />
     </main>

@@ -12,7 +12,7 @@
 export const COMMON = {
   saveBtn: "저장",
   previewTitle: "이미지 미리보기",
-  loadingText: "이미지 생성 중...",
+  loadingText: "궁합 카드 만드는 중...",
 } as const;
 
 // ─────────────────────────────────────────────
@@ -45,7 +45,7 @@ export const MBTI_SELECT = {
   defaultSubtitle: "선택하면 바로 궁합을 볼 수 있어요",
   defaultEmoji: "🧬",
   partnerTitle: "상대방의 MBTI는?",
-  partnerSubtitle: "궁금한 그 사람의 유형을 선택해주세요 💕",
+  partnerSubtitle: "상대방 MBTI를 선택하세요 💕",
   partnerEmoji: "💘",
   otherMbtiLabel: "다른 MBTI와 궁합 보기",
 } as const;
@@ -77,8 +77,8 @@ export const MBTI_MAP = {
   rankTitle: "📊 궁합 순위",
   copyLinkBtn: "링크 복사",
   copiedMessage: "복사 완료!",
-  badgeClickHint: "원을 클릭하면 상세 궁합을 볼 수 있어요",
-  graphTapHint: "원들을 탭해보세요",
+  /** 클릭/탭 모두 커버하는 디바이스 중립 힌트 */
+  nodeHint: "원을 눌러 상세 궁합을 확인하세요",
   saveImageBtn: "이미지 저장",
 } as const;
 
@@ -87,11 +87,10 @@ export const MBTI_MAP = {
 // ─────────────────────────────────────────────
 
 export const GROUP = {
-  emptyTitle: "최소 2명이 필요해요",
-  emptySubtitle: "멤버를 추가하면 그룹 궁합을 분석해드려요",
+  emptyTitle: "멤버를 추가해보세요",
+  emptySubtitle: "2명 이상이면 그룹 케미 분석이 시작돼요",
   emptyEmoji: "👥",
   previewGuide: "멤버를 추가하면 궁합 맵이 나타나요",
-  graphHint: "원을 클릭하면 상세 궁합을 볼 수 있어요",
   pairSectionTitle: "쌍별 궁합",
   roleAccordionOpen: "🎭 그룹 역할 분석 보기",
   roleAccordionClose: "접기",
@@ -213,11 +212,11 @@ export const LANDING = {
   heroHeadline1: "MBTI 궁합,",
   heroHeadline2: "한눈에",
   heroParagraph1: "연인 궁합부터 그룹 케미까지",
-  heroParagraph2: "256가지 MBTI 조합을 점수 · 그래프 · 상세 분석으로",
+  heroParagraph2: "256가지 MBTI 조합을 점수·그래프로 한눈에 확인하세요",
   heroCta: "지금 궁합 확인하기",
   featuresSectionTitle: "어떤 케미가 궁금해?",
   typesSectionTitle: "16가지 MBTI 유형",
-  typesSectionSubtitle: "클릭하면 성격 특징, 장단점, 궁합을 확인할 수 있어요",
+  typesSectionSubtitle: "눌러서 성격·장단점·궁합 상세 확인",
   bottomCtaHeadline: "나의 MBTI 궁합이 궁금하다면",
   bottomCtaSubtitle: "256가지 조합 중 나의 궁합을 찾아보세요",
   bottomCtaButton: "궁합 테스트 시작하기",

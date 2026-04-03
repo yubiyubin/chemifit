@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   description: META.root.description,
   keywords: META.root.keywords,
   alternates: { canonical: META.root.canonical },
+  robots: { index: true, follow: true },
   icons: {
     icon: "/persona-lab.svg",
   },

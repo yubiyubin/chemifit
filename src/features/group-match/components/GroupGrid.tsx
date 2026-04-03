@@ -768,7 +768,7 @@ export default function GroupGrid({ members }: Props) {
                       animation: "hint-glow-cyan 2.5s ease-in-out infinite",
                     }}
                   >
-                    {MBTI_MAP.graphTapHint}
+                    {MBTI_MAP.nodeHint}
                   </span>
                 </div>
               )}

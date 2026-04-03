@@ -266,7 +266,7 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
           className="text-center text-[11px] font-medium -mb-3"
           style={{ color: "rgba(255,255,255,0.25)" }}
         >
-          {MBTI_MAP.badgeClickHint}
+          {MBTI_MAP.nodeHint}
         </p>
         <DetailScoreCard title={MBTI_MAP.rankTitle} themeRgb="168,85,247">
           {(() => {

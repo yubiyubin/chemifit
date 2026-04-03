@@ -4,13 +4,23 @@
  * 1080x1350 레시피 스타일. 멤버 목록, 베스트/워스트 쌍,
  * 조합별 궁합 바 게이지, 그룹 역할을 표시.
  */
-import { useEffect, useRef } from "react";
 import type React from "react";
 import type { Member } from "@/data/compatibility";
 import type { GroupAnalysis } from "@/features/group-match/utils/group-roles";
 import { getScoreInfo } from "@/data/labels";
-
-const BARCODE_HEIGHTS = [28, 36, 20, 40, 24, 36, 16, 32, 40, 20, 36, 28, 40, 16, 32, 24, 40, 20, 36, 28];
+import { useShareImageSetup } from "./useShareImageSetup";
+import {
+  BARCODE_HEIGHTS,
+  SI_LOGO,
+  SI_SUB,
+  SI_HERO_PADDING,
+  SI_HERO_TYPE_BASE,
+  SI_SEP_D,
+  SI_SEP_DB,
+  SI_CARD_BG,
+  SI_NOISE_URL,
+  SI_RECEIPT_BG,
+} from "./shareImageTokens";
 
 export type GroupShareData = {
   members: Member[];
@@ -35,31 +45,9 @@ function barClass(score: number): string {
 
 export default function GroupShareImage({ data, cardRef }: Props) {
   const { members, avg, best, worst, pairs, analysis } = data;
-  const wrapRef = useRef(null);
+  const wrapRef = useShareImageSetup();
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
   const avgInfo = getScoreInfo(avg);
-
-  useEffect(() => {
-    const FONT_ID = "chemifit-share-fonts";
-    if (!document.getElementById(FONT_ID)) {
-      const link = document.createElement("link");
-      link.id = FONT_ID;
-      link.rel = "stylesheet";
-      link.href = "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap";
-      document.head.appendChild(link);
-    }
-  }, []);
-
-  useEffect(() => {
-    function fit() {
-      if (!wrapRef.current) return;
-      const s = Math.min(window.innerWidth / 1080, window.innerHeight / 1350, 1);
-      (wrapRef.current as HTMLElement).style.transform = `scale(${s})`;
-    }
-    fit();
-    window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
-  }, []);
 
   const sortedPairs = [...pairs].sort((a, b) => b.score - a.score);
   const activeRoles = analysis.roles.filter((r) => r.count > 0);
@@ -68,22 +56,22 @@ export default function GroupShareImage({ data, cardRef }: Props) {
     <>
       <style>{`
         .gs-wrap{width:1080px;height:1350px;transform-origin:center center}
-        .gs-card{width:1080px;height:1350px;position:relative;overflow:hidden;background:#08000e}
+        .gs-card{width:1080px;height:1350px;position:relative;overflow:hidden;${SI_CARD_BG}}
         .gs-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 35%,rgba(0,203,255,0.08) 0%,transparent 55%)}
         .gs-orb{position:absolute;border-radius:50%;filter:blur(70px);width:400px;height:400px;background:rgba(0,203,255,0.1);top:250px;left:50%;transform:translateX(-50%)}
-        .gs-noise{position:absolute;inset:0;opacity:0.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-        .gs-receipt{position:relative;z-index:2;width:100%;height:100%;background:linear-gradient(145deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%);padding:36px 56px;display:flex;flex-direction:column}
+        .gs-noise{position:absolute;inset:0;opacity:0.04;background-image:${SI_NOISE_URL}}
+        .gs-receipt{position:relative;z-index:2;width:100%;height:100%;${SI_RECEIPT_BG};padding:36px 56px;display:flex;flex-direction:column}
         .gs-mono{font-family:'JetBrains Mono',monospace}
         .gs-sep{border:none;margin:10px 0}
-        .gs-sep-d{border-top:2px dashed rgba(255,255,255,0.08)}
-        .gs-sep-db{border-top:3px double rgba(255,255,255,0.1)}
+        .gs-sep-d{${SI_SEP_D}}
+        .gs-sep-db{${SI_SEP_DB}}
         .gs-header{text-align:center;margin-bottom:2px}
-        .gs-logo{font-size:32px;font-weight:800;color:rgba(255,255,255,0.25);letter-spacing:4px}
-        .gs-sub{font-size:12px;color:rgba(255,255,255,0.2);letter-spacing:4px;margin-top:4px}
+        .gs-logo{${SI_LOGO}}
+        .gs-sub{${SI_SUB}}
         .gs-row{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;color:rgba(255,255,255,0.28)}
         .gs-row .gs-v{font-weight:700;color:rgba(255,255,255,0.5)}
-        .gs-hero{text-align:center;padding:20px 0}
-        .gs-hero-score{font-size:76px;font-weight:800;color:#fff;letter-spacing:8px;text-shadow:0 0 32px rgba(0,203,255,0.65),0 0 64px rgba(0,203,255,0.25);line-height:1}
+        .gs-hero{text-align:center;${SI_HERO_PADDING}}
+        .gs-hero-score{${SI_HERO_TYPE_BASE};text-shadow:0 0 32px rgba(0,203,255,0.65),0 0 64px rgba(0,203,255,0.25)}
         .gs-hero-score span{font-size:28px;color:rgba(255,255,255,0.3)}
         .gs-hero-copy{font-size:22px;font-weight:700;color:rgba(255,255,255,0.5);margin-top:12px}
         .gs-hero-copy em{font-style:normal;background:linear-gradient(90deg,#22d3ee,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}

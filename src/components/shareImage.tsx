@@ -1,5 +1,13 @@
-import { useEffect, useRef } from "react";
 import type React from "react";
+import { useShareImageSetup } from "./useShareImageSetup";
+import {
+  BARCODE_HEIGHTS,
+  SI_LOGO,
+  SI_SUB,
+  SI_CARD_BG,
+  SI_NOISE_URL,
+  SI_RECEIPT_BG,
+} from "./shareImageTokens";
 
 const STAT_COLORS = [
   {
@@ -28,10 +36,6 @@ const STAT_COLORS = [
   },
 ];
 
-const BARCODE_HEIGHTS = [
-  28, 36, 20, 40, 24, 36, 16, 32, 40, 20, 36, 28, 40, 16, 32, 24, 40, 20, 36,
-  28,
-];
 
 const defaultData = {
   typeA: "INTP",
@@ -84,48 +88,21 @@ export default function ReceiptShareImage({ data = defaultData, cardRef }: Recei
   const { typeA, typeB, score, category, copy, tagline, matchType, stats } =
     data;
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
-  const wrapRef = useRef(null);
-
-  // Google Fonts를 <link> 태그로 동적 삽입 (html-to-image 캡처 전 폰트 로딩 보장)
-  useEffect(() => {
-    const FONT_ID = "chemifit-share-fonts";
-    if (!document.getElementById(FONT_ID)) {
-      const link = document.createElement("link");
-      link.id = FONT_ID;
-      link.rel = "stylesheet";
-      link.href =
-        "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap";
-      document.head.appendChild(link);
-    }
-  }, []);
-
-  useEffect(() => {
-    function fit() {
-      if (!wrapRef.current) return;
-      const s = Math.min(
-        window.innerWidth / 1080,
-        window.innerHeight / 1350,
-        1,
-      );
-      (wrapRef.current as HTMLElement).style.transform = `scale(${s})`;
-    }
-    fit();
-    window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
-  }, []);
+  // 폰트 로딩 + scale-to-fit을 공통 훅으로 처리
+  const wrapRef = useShareImageSetup();
 
   return (
     <>
       <style>{`
         .rc-wrap { width:1080px; height:1350px; transform-origin:center center; }
-        .rc-card { width:1080px; height:1350px; position:relative; overflow:hidden; background:#08000e; }
+        .rc-card { width:1080px; height:1350px; position:relative; overflow:hidden; ${SI_CARD_BG}; }
         .rc-bg { position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(255,0,128,0.1) 0%,transparent 55%); }
         .rc-orb { position:absolute; width:400px; height:400px; border-radius:50%; background:rgba(255,0,128,0.12); filter:blur(70px); top:300px; left:50%; transform:translateX(-50%); }
-        .rc-noise { position:absolute; inset:0; opacity:0.04; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-        .rc-receipt { position:relative; z-index:2; width:100%; height:100%; background:linear-gradient(145deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%); padding:48px 56px; display:flex; flex-direction:column; }
+        .rc-noise { position:absolute; inset:0; opacity:0.04; background-image:${SI_NOISE_URL}; }
+        .rc-receipt { position:relative; z-index:2; width:100%; height:100%; ${SI_RECEIPT_BG}; padding:48px 56px; display:flex; flex-direction:column; }
         .rc-header { text-align:center; margin-bottom:24px; }
-        .rc-logo { font-family:'JetBrains Mono',monospace; font-size:32px; font-weight:800; color:rgba(255,255,255,0.25); letter-spacing:4px; }
-        .rc-sub { font-family:'JetBrains Mono',monospace; font-size:12px; color:rgba(255,255,255,0.2); letter-spacing:4px; margin-top:4px; }
+        .rc-logo { font-family:'JetBrains Mono',monospace; ${SI_LOGO}; }
+        .rc-sub { font-family:'JetBrains Mono',monospace; ${SI_SUB}; }
         .rc-dotline { border:none; border-top:2px dashed rgba(255,255,255,0.08); margin:20px 0; }
         .rc-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; }
         .rc-rlabel { font-family:'JetBrains Mono',monospace; font-size:16px; color:rgba(255,255,255,0.35); letter-spacing:1px; }

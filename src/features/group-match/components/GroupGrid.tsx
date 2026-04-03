@@ -48,8 +48,11 @@ import CtaButton from "@/components/CtaButton";
 import { SYMBOLS } from "@/data/symbols";
 import { VARIANT_CONFIG, CYAN_RGB, PURPLE_RGB } from "@/styles/card-themes";
 import SharePanel from "@/components/SharePanel";
+import GroupShareImage from "@/components/GroupShareImage";
+import ImagePreviewModal from "@/components/ImagePreviewModal";
 import MbtiProfileModal from "@/components/MbtiProfileModal";
 import NeonCard from "@/components/NeonCard";
+import { trackEvent } from "@/lib/analytics";
 
 /** 컴포넌트 Props: 그룹에 포함된 멤버 배열 (첫 번째 멤버가 '나') */
 type Props = { members: Member[] };
@@ -77,6 +80,9 @@ export default function GroupGrid({ members }: Props) {
   const hintShownRef = useRef(false); // 힌트는 최초 1회만 표시
   const [roleOpen, setRoleOpen] = useState(false);
   const [allPairsOpen, setAllPairsOpen] = useState(false);
+  const groupCardRef = useRef<HTMLDivElement>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [summary, setSummary] = useState<{
     avg: number;
@@ -86,6 +92,22 @@ export default function GroupGrid({ members }: Props) {
   } | null>(null);
   const router = useRouter();
   const popupTier = popup ? getCoupleTier(popup.score) : null;
+
+  const handleSaveImage = useCallback(async () => {
+    if (!groupCardRef.current) return;
+    trackEvent("share_image_save", { content: "group", member_count: members.length });
+    setPreviewUrl(null);
+    setPreviewOpen(true);
+    const { toPng } = await import("html-to-image");
+    await document.fonts.ready;
+    const dataUrl = await toPng(groupCardRef.current, {
+      pixelRatio: 2,
+      width: 1080,
+      height: 1350,
+      skipFonts: true,
+    });
+    setPreviewUrl(dataUrl);
+  }, [members.length]);
   /** 모든 멤버 쌍의 궁합 점수 — members에서 직접 계산 (animation 불필요) */
   const pairScores = useMemo<PairScore[]>(() => {
     if (members.length < 2) return [];
@@ -991,6 +1013,7 @@ export default function GroupGrid({ members }: Props) {
               path="/group-match"
               rgb={CYAN_RGB}
               contentType="group"
+              onSaveImage={handleSaveImage}
             />
             <CtaButton
               title={CTA_TEXTS.group.toLove.title}
@@ -1110,6 +1133,33 @@ export default function GroupGrid({ members }: Props) {
         mbtiType={profileType}
         rgb={CYAN_RGB}
         onClose={() => setProfileType(null)}
+      />
+
+      {/* off-screen 그룹 궁합 캡처 영역 */}
+      {summary && groupAnalysis && (
+        <div
+          aria-hidden="true"
+          style={{ position: "fixed", top: 0, left: 0, zIndex: -9999, pointerEvents: "none", opacity: 0 }}
+        >
+          <GroupShareImage
+            data={{
+              members,
+              avg: summary.avg,
+              best: summary.best,
+              worst: summary.worst,
+              pairs: summary.pairs,
+              analysis: groupAnalysis,
+            }}
+            cardRef={groupCardRef}
+          />
+        </div>
+      )}
+
+      <ImagePreviewModal
+        open={previewOpen}
+        imageDataUrl={previewUrl}
+        fileName={`chemifit-group-${members.length}members.png`}
+        onClose={() => { setPreviewOpen(false); setPreviewUrl(null); }}
       />
     </div>
   );

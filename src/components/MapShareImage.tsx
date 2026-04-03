@@ -5,11 +5,22 @@
  * 선택된 MBTI의 16타입 궁합 순위를 S~F 티어로 분류하여 표시.
  * html-to-image로 캡처하여 저장.
  */
-import { useEffect, useRef } from "react";
 import type React from "react";
 import type { MbtiType } from "@/data/compatibility";
-
-const BARCODE_HEIGHTS = [28, 36, 20, 40, 24, 36, 16, 32, 40, 20, 36, 28, 40, 16, 32, 24, 40, 20, 36, 28];
+import { useShareImageSetup } from "./useShareImageSetup";
+import {
+  BARCODE_HEIGHTS,
+  SI_LOGO,
+  SI_SUB,
+  SI_HERO_PADDING,
+  SI_HERO_TYPE_BASE,
+  SI_HERO_TITLE_BASE,
+  SI_SEP_D,
+  SI_SEP_DB,
+  SI_CARD_BG,
+  SI_NOISE_URL,
+  SI_RECEIPT_BG,
+} from "./shareImageTokens";
 
 /** 티어 정의: 점수 범위 + 색상 */
 const TIERS = [
@@ -36,29 +47,7 @@ type Props = {
 
 export default function MapShareImage({ data, cardRef }: Props) {
   const { myMbti, nickname, scores, best, worst } = data;
-  const wrapRef = useRef(null);
-
-  useEffect(() => {
-    const FONT_ID = "chemifit-share-fonts";
-    if (!document.getElementById(FONT_ID)) {
-      const link = document.createElement("link");
-      link.id = FONT_ID;
-      link.rel = "stylesheet";
-      link.href = "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap";
-      document.head.appendChild(link);
-    }
-  }, []);
-
-  useEffect(() => {
-    function fit() {
-      if (!wrapRef.current) return;
-      const s = Math.min(window.innerWidth / 1080, window.innerHeight / 1350, 1);
-      (wrapRef.current as HTMLElement).style.transform = `scale(${s})`;
-    }
-    fit();
-    window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
-  }, []);
+  const wrapRef = useShareImageSetup();
 
   /** 점수 배열을 티어별로 그룹핑 */
   const tierGroups = TIERS.map((tier) => ({
@@ -73,38 +62,46 @@ export default function MapShareImage({ data, cardRef }: Props) {
     <>
       <style>{`
         .ms-wrap{width:1080px;height:1350px;transform-origin:center center}
-        .ms-card{width:1080px;height:1350px;position:relative;overflow:hidden;background:#08000e}
+        .ms-card{width:1080px;height:1350px;position:relative;overflow:hidden;${SI_CARD_BG}}
         .ms-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(168,85,247,0.08) 0%,transparent 55%)}
         .ms-orb{position:absolute;border-radius:50%;filter:blur(70px);width:400px;height:400px;background:rgba(168,85,247,0.1);top:300px;left:50%;transform:translateX(-50%)}
-        .ms-noise{position:absolute;inset:0;opacity:0.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-        .ms-receipt{position:relative;z-index:2;width:100%;height:100%;background:linear-gradient(145deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%);padding:48px 56px;display:flex;flex-direction:column}
+        .ms-noise{position:absolute;inset:0;opacity:0.04;background-image:${SI_NOISE_URL}}
+        .ms-receipt{position:relative;z-index:2;width:100%;height:100%;${SI_RECEIPT_BG};padding:48px 56px;display:flex;flex-direction:column}
         .ms-mono{font-family:'JetBrains Mono',monospace}
-        .ms-sep{border:none;margin:14px 0}
-        .ms-sep-d{border-top:2px dashed rgba(255,255,255,0.08)}
-        .ms-sep-db{border-top:3px double rgba(255,255,255,0.1)}
+        .ms-sep{border:none;margin:20px 0}
+        .ms-sep-d{${SI_SEP_D}}
+        .ms-sep-db{${SI_SEP_DB}}
         .ms-header{text-align:center;margin-bottom:4px}
-        .ms-logo{font-size:32px;font-weight:800;color:#fff;letter-spacing:4px;text-shadow:0 0 16px rgba(168,85,247,0.3)}
-        .ms-sub{font-size:13px;color:rgba(255,255,255,0.25);letter-spacing:3px;margin-top:4px}
-        .ms-hero{text-align:center;padding:16px 0}
-        .ms-hero-type{font-size:56px;font-weight:800;color:#fff;letter-spacing:6px;text-shadow:0 0 24px rgba(168,85,247,0.3);line-height:1}
-        .ms-hero-title{font-size:20px;font-weight:900;color:rgba(255,255,255,0.5);margin-top:10px}
+        .ms-logo{${SI_LOGO}}
+        .ms-sub{${SI_SUB}}
+        .ms-hero{text-align:center;${SI_HERO_PADDING}}
+        .ms-hero-type{${SI_HERO_TYPE_BASE};text-shadow:0 0 32px rgba(168,85,247,0.65),0 0 64px rgba(168,85,247,0.25)}
+        .ms-hero-title{${SI_HERO_TITLE_BASE}}
         .ms-hero-title em{font-style:normal;background:linear-gradient(90deg,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .ms-th{font-size:12px;color:rgba(255,255,255,0.12);letter-spacing:3px;text-align:center;margin-bottom:8px}
-        .ms-tiers{display:flex;flex-direction:column;gap:8px;flex:1}
+        .ms-tiers{display:flex;flex-direction:column;gap:8px}
+        .ms-top3{display:flex;flex-direction:column;gap:6px}
+        .ms-t3-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.025)}
+        .ms-t3-row:last-child{border-bottom:none}
+        .ms-t3-rank{font-size:18px;width:28px;flex-shrink:0;text-align:center}
+        .ms-t3-type{font-size:15px;font-weight:700;letter-spacing:2px;width:56px;flex-shrink:0}
+        .ms-t3-bar{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,0.04);overflow:hidden}
+        .ms-t3-fill{height:100%;border-radius:4px}
+        .ms-t3-pct{font-size:14px;font-weight:700;color:rgba(255,255,255,0.45);width:40px;text-align:right;flex-shrink:0}
         .ms-tr{display:flex;align-items:stretch;gap:0;border-radius:14px;overflow:hidden;min-height:52px}
         .ms-tl{width:64px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;flex-shrink:0;letter-spacing:2px}
         .ms-ti-wrap{flex:1;display:flex;align-items:center;gap:8px;padding:10px 16px;flex-wrap:wrap;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.03);border-left:none}
         .ms-ti{padding:6px 16px;border-radius:8px;font-size:15px;font-weight:700;letter-spacing:2px;display:flex;align-items:center;gap:6px}
         .ms-ti-pct{font-size:12px;opacity:0.5}
-        .ms-bw{display:flex;gap:12px}
+        .ms-bw{display:flex;gap:12px;margin-top:auto}
         .ms-bw-card{flex:1;border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04)}
-        .ms-bw-emoji{font-size:24px}
+        .ms-bw-emoji{font-size:24px;line-height:1;display:flex;align-items:center}
         .ms-bw-info{display:flex;flex-direction:column;gap:1px}
         .ms-bw-label{font-size:11px;color:rgba(255,255,255,0.15);letter-spacing:2px}
         .ms-bw-type{font-size:18px;font-weight:800;letter-spacing:2px}
         .ms-bw-val{margin-left:auto;font-size:24px;font-weight:800;color:#fff}
         .ms-bw-val span{font-size:12px;color:rgba(255,255,255,0.2)}
-        .ms-footer{text-align:center;margin-top:auto;padding-top:8px}
+        .ms-footer{text-align:center;padding-top:8px}
         .ms-cta{font-size:14px;color:rgba(255,255,255,0.18);margin-bottom:6px}
         .ms-url{font-size:18px;font-weight:700;color:#c084fc;text-shadow:0 0 12px rgba(168,85,247,0.3);letter-spacing:2px}
         .ms-barcode{margin-top:10px;display:flex;gap:3px;justify-content:center;align-items:flex-end}
@@ -165,6 +162,33 @@ export default function MapShareImage({ data, cardRef }: Props) {
                   </div>
                 </div>
               ))}
+            </div>
+            <hr className="ms-sep ms-sep-d" />
+
+            {/* TOP 3 */}
+            <div className="ms-mono ms-th">── TOP 3 ──</div>
+            <div className="ms-top3 ms-mono">
+              {scores.slice(0, 3).map((item, i) => {
+                const tier = TIERS.find((t) => item.score >= t.min) ?? TIERS[TIERS.length - 1];
+                const medals = ["🥇", "🥈", "🥉"];
+                return (
+                  <div key={item.type} className="ms-t3-row">
+                    <div className="ms-t3-rank">{medals[i]}</div>
+                    <div className="ms-t3-type" style={{ color: tier.color }}>{item.type}</div>
+                    <div className="ms-t3-bar">
+                      <div
+                        className="ms-t3-fill"
+                        style={{
+                          width: `${item.score}%`,
+                          background: `linear-gradient(90deg,${tier.bg}0.7),${tier.bg}0.5))`,
+                          boxShadow: `0 0 8px ${tier.bg}0.3)`,
+                        }}
+                      />
+                    </div>
+                    <div className="ms-t3-pct">{item.score}%</div>
+                  </div>
+                );
+              })}
             </div>
             <hr className="ms-sep ms-sep-d" />
 

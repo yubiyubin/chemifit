@@ -4,11 +4,22 @@
  * 1080x1350 캐릭터 스탯 시트 스타일.
  * MBTI 4개 차원(E/I, S/N, T/F, J/P)을 기반으로 8개 능력치를 산출하여 표시.
  */
-import { useEffect, useRef } from "react";
 import type React from "react";
 import type { MbtiProfile } from "@/data/type-profiles";
-
-const BARCODE_HEIGHTS = [28, 36, 20, 40, 24, 36, 16, 32, 40, 20, 36, 28, 40, 16, 32, 24, 40, 20, 36, 28];
+import { useShareImageSetup } from "./useShareImageSetup";
+import {
+  BARCODE_HEIGHTS,
+  SI_LOGO,
+  SI_SUB,
+  SI_HERO_PADDING,
+  SI_HERO_TYPE_BASE,
+  SI_HERO_TITLE_BASE,
+  SI_SEP_D,
+  SI_SEP_DB,
+  SI_CARD_BG,
+  SI_NOISE_URL,
+  SI_RECEIPT_BG,
+} from "./shareImageTokens";
 
 /** 능력치 정의: MBTI 차원별 가중치로 점수 산출 + 점수 구간별 한 줄 설명 */
 const STAT_DEFS = [
@@ -58,10 +69,14 @@ function getBarClass(score: number): string {
   return "psf-vlow";
 }
 
-/** 연애 스타일을 짧게 줄임 (공유 이미지용) */
+/** 연애 스타일을 공유 이미지용으로 줄임 — 문장 경계에서 자름 */
 function shortenLoveStyle(text: string): string {
-  const first = text.split("\n")[0];
-  return first.length > 50 ? first.slice(0, 50) + "…" : first;
+  const first = text.split("\n\n")[0];
+  if (first.length <= 100) return first;
+  // 100자 이내 마지막 문장 끝(. 또는 요)에서 자름
+  const cutoff = first.slice(0, 100);
+  const lastDot = Math.max(cutoff.lastIndexOf(". "), cutoff.lastIndexOf("요."), cutoff.lastIndexOf("요 "));
+  return lastDot > 30 ? first.slice(0, lastDot + 1) + "…" : cutoff + "…";
 }
 
 type Props = {
@@ -70,57 +85,35 @@ type Props = {
 };
 
 export default function ProfileShareImage({ profile, cardRef }: Props) {
-  const wrapRef = useRef(null);
+  const wrapRef = useShareImageSetup();
   const stats = computeStats(profile.type);
-
-  useEffect(() => {
-    const FONT_ID = "chemifit-share-fonts";
-    if (!document.getElementById(FONT_ID)) {
-      const link = document.createElement("link");
-      link.id = FONT_ID;
-      link.rel = "stylesheet";
-      link.href = "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap";
-      document.head.appendChild(link);
-    }
-  }, []);
-
-  useEffect(() => {
-    function fit() {
-      if (!wrapRef.current) return;
-      const s = Math.min(window.innerWidth / 1080, window.innerHeight / 1350, 1);
-      (wrapRef.current as HTMLElement).style.transform = `scale(${s})`;
-    }
-    fit();
-    window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
-  }, []);
 
   return (
     <>
       <style>{`
         .ps-wrap{width:1080px;height:1350px;transform-origin:center center}
-        .ps-card{width:1080px;height:1350px;position:relative;overflow:hidden;background:#08000e}
+        .ps-card{width:1080px;height:1350px;position:relative;overflow:hidden;${SI_CARD_BG}}
         .ps-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 35%,rgba(102,237,195,0.08) 0%,transparent 55%)}
         .ps-orb{position:absolute;border-radius:50%;filter:blur(70px);width:400px;height:400px;background:rgba(102,237,195,0.1);top:250px;left:50%;transform:translateX(-50%)}
-        .ps-noise{position:absolute;inset:0;opacity:0.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-        .ps-receipt{position:relative;z-index:2;width:100%;height:100%;background:linear-gradient(145deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%);padding:40px 56px;display:flex;flex-direction:column}
+        .ps-noise{position:absolute;inset:0;opacity:0.04;background-image:${SI_NOISE_URL}}
+        .ps-receipt{position:relative;z-index:2;width:100%;height:100%;${SI_RECEIPT_BG};padding:40px 56px;display:flex;flex-direction:column}
         .ps-mono{font-family:'JetBrains Mono',monospace}
         .ps-sep{border:none;margin:12px 0}
-        .ps-sep-d{border-top:2px dashed rgba(255,255,255,0.08)}
-        .ps-sep-db{border-top:3px double rgba(255,255,255,0.1)}
+        .ps-sep-d{${SI_SEP_D}}
+        .ps-sep-db{${SI_SEP_DB}}
         .ps-header{text-align:center;margin-bottom:4px}
-        .ps-logo{font-size:32px;font-weight:800;color:#fff;letter-spacing:4px;text-shadow:0 0 16px rgba(102,237,195,0.3)}
-        .ps-sub{font-size:13px;color:rgba(255,255,255,0.25);letter-spacing:3px;margin-top:4px}
-        .ps-hero{text-align:center;padding:16px 0}
-        .ps-hero-type{font-size:72px;font-weight:800;color:#fff;letter-spacing:6px;text-shadow:0 0 24px rgba(102,237,195,0.3);line-height:1}
-        .ps-hero-title{font-size:22px;font-weight:900;color:rgba(255,255,255,0.55);margin-top:12px}
+        .ps-logo{${SI_LOGO}}
+        .ps-sub{${SI_SUB}}
+        .ps-hero{text-align:center;${SI_HERO_PADDING}}
+        .ps-hero-type{${SI_HERO_TYPE_BASE};text-shadow:0 0 32px rgba(102,237,195,0.65),0 0 64px rgba(102,237,195,0.25)}
+        .ps-hero-title{${SI_HERO_TITLE_BASE}}
         .ps-hero-title em{font-style:normal;background:linear-gradient(90deg,#66edc3,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .ps-sh{font-size:12px;color:rgba(255,255,255,0.12);letter-spacing:3px;text-align:center;margin-bottom:6px}
         .ps-stats{display:flex;flex-direction:column;gap:2px;flex:1}
         .ps-stat{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.025)}
         .ps-stat:last-child{border-bottom:none}
         .ps-sn{font-size:15px;color:rgba(255,255,255,0.45);width:120px;flex-shrink:0;display:flex;align-items:center;gap:6px}
-        .ps-bar{flex:1;height:10px;border-radius:5px;background:rgba(255,255,255,0.04);overflow:hidden;margin:0 14px}
+        .ps-bar{flex:4;height:10px;border-radius:5px;background:rgba(255,255,255,0.04);overflow:hidden;margin:0 14px}
         .ps-fill{height:100%;border-radius:5px}
         .psf-high{background:linear-gradient(90deg,rgba(52,211,153,0.7),rgba(110,231,183,0.7));box-shadow:0 0 12px rgba(52,211,153,0.35)}
         .psf-mid{background:linear-gradient(90deg,rgba(168,85,247,0.7),rgba(192,132,252,0.7));box-shadow:0 0 12px rgba(168,85,247,0.35)}
@@ -147,7 +140,7 @@ export default function ProfileShareImage({ profile, cardRef }: Props) {
         .ps-tp-best{color:#34d399;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.1)}
         .ps-tp-worst{color:#f87171;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.1)}
         .ps-names{display:flex;gap:6px;flex-wrap:wrap}
-        .ps-nm{font-size:13px;color:rgba(255,255,255,0.28);padding:4px 12px;border-radius:6px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04)}
+        .ps-nm{font-size:13px;color:rgba(255,255,255,0.28);padding:4px 12px;border-radius:6px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);white-space:nowrap}
         .ps-footer{text-align:center;margin-top:auto;padding-top:6px}
         .ps-cta{font-size:14px;color:rgba(255,255,255,0.18);margin-bottom:6px}
         .ps-url{font-size:18px;font-weight:700;color:#66edc3;text-shadow:0 0 12px rgba(102,237,195,0.3);letter-spacing:2px}

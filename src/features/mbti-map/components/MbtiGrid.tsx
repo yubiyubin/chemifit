@@ -13,7 +13,7 @@
  */
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { MBTI_TYPES, COMPATIBILITY, MbtiType } from "@/data/compatibility";
 import { MBTI_MAP } from "@/data/ui-text";
 import { getScoreInfo } from "@/data/labels";
@@ -29,7 +29,7 @@ import { PURPLE_RGB } from "@/styles/card-themes";
 import SharePanel from "@/components/SharePanel";
 import MapShareImage from "@/components/MapShareImage";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
-import { trackEvent } from "@/lib/analytics";
+import { useShareImageCapture } from "@/hooks/useShareImageCapture";
 
 /** 동일 점수를 가진 MBTI들을 하나의 그룹으로 묶기 위한 타입 */
 type GroupedPair = {
@@ -66,24 +66,11 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
   const setSelectedMbti = onSelect ?? (() => {});
   const scrollRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const handleSaveImage = useCallback(async () => {
-    if (!cardRef.current) return;
-    trackEvent("share_image_save", { type: selectedMbti, content: "map" });
-    setPreviewUrl(null);
-    setPreviewOpen(true);
-    const { toPng } = await import("html-to-image");
-    await document.fonts.ready;
-    const dataUrl = await toPng(cardRef.current, {
-      pixelRatio: 2,
-      width: 1080,
-      height: 1350,
-      skipFonts: true,
-    });
-    setPreviewUrl(dataUrl);
-  }, [selectedMbti]);
+  const { handleSaveImage, previewOpen, previewUrl, handleClose } = useShareImageCapture(
+    cardRef,
+    { type: selectedMbti, content: "map" },
+  );
 
   // 선택된 버튼이 보이도록 자동 스크롤 (쿼리 파라미터 초기 로드 포함)
   useEffect(() => {
@@ -349,7 +336,7 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
         open={previewOpen}
         imageDataUrl={previewUrl}
         fileName={`chemifit-map-${selectedMbti}.png`}
-        onClose={() => { setPreviewOpen(false); setPreviewUrl(null); }}
+        onClose={handleClose}
       />
     </div>
   );

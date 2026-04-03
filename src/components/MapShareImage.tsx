@@ -7,6 +7,7 @@
  */
 import type React from "react";
 import type { MbtiType } from "@/data/compatibility";
+import { SHARE_IMAGE } from "@/data/ui-text";
 import { useShareImageSetup } from "./useShareImageSetup";
 import {
   BARCODE_HEIGHTS,
@@ -130,7 +131,7 @@ export default function MapShareImage({ data, cardRef }: Props) {
             <hr className="ms-sep ms-sep-db" />
 
             {/* 티어 리스트 */}
-            <div className="ms-mono ms-th">── TIER RANKING ──</div>
+            <div className="ms-mono ms-th">{SHARE_IMAGE.mapTierHeader}</div>
             <div className="ms-tiers ms-mono">
               {tierGroups.map((tier) => (
                 <div key={tier.label} className="ms-tr">
@@ -166,7 +167,7 @@ export default function MapShareImage({ data, cardRef }: Props) {
             <hr className="ms-sep ms-sep-d" />
 
             {/* TOP 3 */}
-            <div className="ms-mono ms-th">── TOP 3 ──</div>
+            <div className="ms-mono ms-th">{SHARE_IMAGE.mapTop3Header}</div>
             <div className="ms-top3 ms-mono">
               {scores.slice(0, 3).map((item, i) => {
                 const tier = TIERS.find((t) => item.score >= t.min) ?? TIERS[TIERS.length - 1];
@@ -215,7 +216,7 @@ export default function MapShareImage({ data, cardRef }: Props) {
 
             {/* 푸터 */}
             <div className="ms-footer ms-mono">
-              <div className="ms-cta">너도 궁합 맵 확인해봐</div>
+              <div className="ms-cta">{SHARE_IMAGE.mapCtaFooter}</div>
               <div className="ms-url">chemifit.cyb-labs.com</div>
               <div className="ms-barcode">
                 {BARCODE_HEIGHTS.map((h, i) => (

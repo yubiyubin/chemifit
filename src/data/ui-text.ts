@@ -21,7 +21,6 @@ export const COMMON = {
 
 export const SITE = {
   title: "MBTI 궁합 맵",
-  subtitle: "재미로 보는 궁합이에요 😊 과학적 근거는 없어요",
   copyright: "© 2026 CYB Labs. All rights reserved.",
   myMbtiLabel: "내 MBTI",
   reselectButton: "재선택",
@@ -215,4 +214,25 @@ export const EMOJIS = {
   best: "🏆",
   worst: "💀",
   hearts: ["💕", "💗", "💘", "♥", "💖"],
+} as const;
+
+// ─────────────────────────────────────────────
+// 공유 이미지 텍스트 (ShareImage 컴포넌트들)
+// ─────────────────────────────────────────────
+
+export const SHARE_IMAGE = {
+  // 공통 푸터
+  coupleCtaFooter: "너도 궁합 확인해봐",
+  mapCtaFooter: "너도 궁합 맵 확인해봐",
+  profileCtaFooter: "너도 유형 확인해봐",
+  groupCtaFooter: "너도 그룹 궁합 확인해봐",
+  // GroupShareImage 섹션 헤더
+  groupMembersHeader: "── 멤버 목록 ──",
+  groupPairsHeader: "── 조합별 궁합 ──",
+  groupRolesHeader: "── 그룹 역할 ──",
+  // MapShareImage 섹션 헤더
+  mapTierHeader: "── TIER RANKING ──",
+  mapTop3Header: "── TOP 3 ──",
+  // ProfileShareImage 섹션 헤더
+  profileStatsHeader: "── ABILITY STATS ──",
 } as const;

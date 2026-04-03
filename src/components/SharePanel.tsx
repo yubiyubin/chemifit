@@ -1,8 +1,7 @@
 /**
- * SharePanel — 통합 공유 버튼 패널
+ * SharePanel — 통합 공유 + 이미지 저장 패널
  *
- * 카카오톡, 트위터(X), 링크 복사 버튼을 균등 배치.
- * 모바일에서 Web Share API 가용 시 네이티브 공유 시트도 지원.
+ * 카카오톡, 링크 복사, 이미지 저장 버튼을 균등 배치.
  * 사이트의 neon-btn 스타일 기반으로 통일된 디자인.
  */
 "use client";
@@ -23,6 +22,8 @@ type Props = {
   rgb?: string;
   /** 콘텐츠 타입 (GA 이벤트용) */
   contentType?: string;
+  /** 이미지 저장 핸들러 — 전달하면 이미지 저장 버튼 표시 */
+  onSaveImage?: () => void;
 };
 
 export default function SharePanel({
@@ -31,6 +32,7 @@ export default function SharePanel({
   path,
   rgb = "236,72,153",
   contentType = "general",
+  onSaveImage,
 }: Props) {
   const [copied, setCopied] = useState(false);
   const fullUrl = `${SITE_URL}${path}`;
@@ -91,6 +93,19 @@ export default function SharePanel({
           <span>{copied ? "복사됨" : "링크 복사"}</span>
         </button>
 
+        {/* 이미지 저장 */}
+        {onSaveImage && (
+          <button
+            data-testid="save-image-btn"
+            onClick={onSaveImage}
+            className={btnClass}
+            style={{ "--neon": rgb } as React.CSSProperties}
+            aria-label="이미지 저장"
+          >
+            <span>📸</span>
+            <span>이미지 저장</span>
+          </button>
+        )}
       </div>
     </div>
   );

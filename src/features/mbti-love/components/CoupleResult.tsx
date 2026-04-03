@@ -550,25 +550,14 @@ export default function CoupleResult({
 
           {/* ── 섹션 7: 공유 + 이미지 저장 ── */}
           {partnerMbti && score !== null && loveDesc && (
-            <div className="flex flex-col gap-3">
-              <SharePanel
-                title={`${myMbti}와 ${partnerMbti} 연애 궁합 - ${score}점`}
-                description={loveDesc.preview}
-                path={`/mbti-love/${myMbti.toLowerCase()}/${partnerMbti.toLowerCase()}`}
-                rgb={PINK_RGB}
-                contentType="couple"
-              />
-              {shareData && (
-                <button
-                  data-testid="save-image-btn"
-                  onClick={handleSaveImage}
-                  className="neon-ghost w-full py-2.5 rounded-xl text-sm font-bold"
-                  style={{ "--neon": PINK_RGB } as React.CSSProperties}
-                >
-                  📸 {COUPLE.saveImageBtn}
-                </button>
-              )}
-            </div>
+            <SharePanel
+              title={`${myMbti}와 ${partnerMbti} 연애 궁합 - ${score}점`}
+              description={loveDesc.preview}
+              path={`/mbti-love/${myMbti.toLowerCase()}/${partnerMbti.toLowerCase()}`}
+              rgb={PINK_RGB}
+              contentType="couple"
+              onSaveImage={shareData ? handleSaveImage : undefined}
+            />
           )}
         </div>
       )}

@@ -293,27 +293,14 @@ export default function ProfileDetail({ profile }: Props) {
         </NeonCard>
       </div>
 
-      {/* 하단 공유 버튼 */}
-      <div className="flex gap-3">
-        <button
-          data-testid="save-image-btn"
-          onClick={handleSaveImage}
-          className="flex-1 py-3 rounded-xl text-xs font-bold transition-all hover:opacity-80"
-          style={{
-            color: `rgba(${MINT_RGB},0.9)`,
-            background: `rgba(${MINT_RGB},0.08)`,
-            border: `1px solid rgba(${MINT_RGB},0.25)`,
-          }}
-        >
-          📸 {PROFILES.saveImageBtn}
-        </button>
-      </div>
+      {/* 하단 공유 + 이미지 저장 */}
       <SharePanel
         title={`${profile.type} 성격 - ${profile.nickname}`}
         description={`${profile.type} 유형의 성격 특징, 장단점, 연애 스타일을 확인하세요.`}
         path={`/mbti-profiles/${profile.type.toLowerCase()}`}
         rgb={MINT_RGB}
         contentType="profile"
+        onSaveImage={handleSaveImage}
       />
       </NeonCard>
 

@@ -316,22 +316,14 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
       </NeonCard>
 
       {/* ── 공유 + 이미지 저장 ── */}
-      <div className="flex flex-col gap-3">
-        <SharePanel
-          title={`${selectedMbti} MBTI 궁합 순위`}
-          description={`${selectedMbti}와 가장 잘 맞는 MBTI는? 16타입 궁합 랭킹을 확인하세요.`}
-          path={`/mbti-map?mbti=${selectedMbti}`}
-          rgb={PURPLE_RGB}
-          contentType="map"
-        />
-        <button
-          data-testid="save-image-btn"
-          onClick={handleSaveImage}
-          className="neon-ghost w-full py-2.5 rounded-xl text-sm font-bold"
-        >
-          📸 {MBTI_MAP.saveImageBtn}
-        </button>
-      </div>
+      <SharePanel
+        title={`${selectedMbti} MBTI 궁합 순위`}
+        description={`${selectedMbti}와 가장 잘 맞는 MBTI는? 16타입 궁합 랭킹을 확인하세요.`}
+        path={`/mbti-map?mbti=${selectedMbti}`}
+        rgb={PURPLE_RGB}
+        contentType="map"
+        onSaveImage={handleSaveImage}
+      />
 
       {/* ── 상세 팝업 패널 (배지 클릭 시 활성화) ── */}
       <CompatDetailModal data={panel} onClose={() => setPanel(null)} />

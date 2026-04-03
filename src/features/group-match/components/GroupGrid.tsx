@@ -1013,15 +1013,8 @@ export default function GroupGrid({ members }: Props) {
               path="/group-match"
               rgb={CYAN_RGB}
               contentType="group"
+              onSaveImage={handleSaveImage}
             />
-            <button
-              data-testid="save-image-btn"
-              onClick={handleSaveImage}
-              className="neon-ghost w-full py-2.5 rounded-xl text-sm font-bold"
-              style={{ "--neon": CYAN_RGB } as React.CSSProperties}
-            >
-              📸 이미지 저장
-            </button>
             <CtaButton
               title={CTA_TEXTS.group.toLove.title}
               subtitle={CTA_TEXTS.group.toLove.subtitle}

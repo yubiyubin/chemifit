@@ -10,7 +10,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, type RefObject } from "react";
-import { COMPATIBILITY, type MbtiType } from "@/data/compatibility";
+import { COMPATIBILITY, type MbtiType, type Member } from "@/data/compatibility";
 import { getGraphColor as getColor, hslToRgb } from "@/data/colors";
 
 // ─────────────────────────────────────────────
@@ -35,8 +35,7 @@ export type GraphNode = {
   /** 강조 종류 (MbtiGraph 전용) */
   highlightType?: "best" | "worst" | null;
   /** 소비자별 추가 데이터 (GroupGrid: Member 객체 등) */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data?: any;
+  data?: Member;
 };
 
 /** 연결선 히트 테스트용 데이터 */

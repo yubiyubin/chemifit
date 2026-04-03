@@ -7,7 +7,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import type { MbtiType } from "@/data/compatibility";
 import { SITE } from "@/data/ui-text";
 import { SYMBOLS } from "@/data/symbols";
@@ -22,36 +21,26 @@ type Props = {
 export default function SiteHeader({ selectedMbti, onOpenModal, neonRgb }: Props) {
   return (
     <>
-      <header className="flex justify-between items-start gap-4">
+      <header className="flex justify-between items-center gap-4">
         <div className="flex flex-col gap-2">
           <Link
             href="/"
             className="flex flex-col md:flex-row items-start md:items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <Image
+            {/* SVG는 next/image 최적화 불필요 — 네이티브 img로 항상 선명하게 렌더링 */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src="/chemifit.svg"
-              alt="Chemifit 로고"
-              width={150}
-              height={50}
-              priority
+              alt="ChemiFit 로고"
+              style={{ height: "50px", width: "auto" }}
             />
-            <h1
-              className="text-xl md:text-2xl pl-2 pt-0 md:pt-3 md:pl-0 font-bold tracking-tight"
-              style={{
-                color: "#ffffffce",
-                textShadow:
-                  "0 0 8px rgba(168,85,247,0.4), 0 0 20px rgba(168,85,247,0.15)",
-              }}
-            >
-              {SITE.title}
-            </h1>
           </Link>
         </div>
         {selectedMbti && (
           <button
             data-testid="reselect-btn"
             onClick={onOpenModal}
-            className="group flex items-center gap-3 px-4 py-2 sm:py-2.5 rounded-2xl hover:-translate-y-1 mt-1 shrink-0"
+            className="group flex items-center gap-3 px-4 py-2 sm:py-2.5 rounded-2xl hover:-translate-y-1 shrink-0"
             style={{
               background: `linear-gradient(135deg, rgba(${neonRgb},0.15) 0%, rgba(${neonRgb},0.1) 100%)`,
               border: `1px solid rgba(${neonRgb},0.4)`,
@@ -93,9 +82,6 @@ export default function SiteHeader({ selectedMbti, onOpenModal, neonRgb }: Props
           </button>
         )}
       </header>
-      <p className="text-white/50 text-sm md:text-base pl-2  pb-8">
-        {SITE.subtitle}
-      </p>
     </>
   );
 }

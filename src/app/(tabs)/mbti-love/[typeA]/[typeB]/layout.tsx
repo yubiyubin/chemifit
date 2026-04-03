@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/lib/json-ld";
-import { SITE_URL, SITE_NAME } from "@/data/metadata";
+import { SITE_URL, SITE_NAME, OG_IMAGE } from "@/data/metadata";
 import { MBTI_TYPES, COMPATIBILITY } from "@/data/compatibility";
 import type { MbtiType } from "@/data/compatibility";
 import { LOVE_DESC } from "@/features/mbti-love/consts/love-descriptions";
@@ -63,11 +63,13 @@ export async function generateMetadata({
       type: "article",
       locale: "ko_KR",
       siteName: SITE_NAME,
+      images: [OG_IMAGE],
     },
     twitter: {
       card: "summary_large_image",
       title: `${title} | ChemiFit`,
       description,
+      images: [OG_IMAGE.url],
     },
   };
 }
@@ -91,6 +93,16 @@ export default async function CoupleStaticLayout({ params, children }: Props) {
             { "@type": "ListItem", position: 2, name: "연애 궁합", item: `${SITE_URL}/mbti-love` },
             { "@type": "ListItem", position: 3, name: `${a} × ${b}`, item: pageUrl },
           ],
+        }}
+      />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: `${a}와 ${b} 연애 궁합 - ${COMPATIBILITY[a][b]}점`,
+          description: `${a}와 ${b}의 MBTI 연애 궁합 ${COMPATIBILITY[a][b]}점. 싸움 패턴, 해결법까지 상세 분석.`,
+          url: pageUrl,
+          publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
         }}
       />
       {children}

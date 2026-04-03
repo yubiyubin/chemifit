@@ -8,6 +8,7 @@ import type React from "react";
 import type { Member } from "@/data/compatibility";
 import type { GroupAnalysis } from "@/features/group-match/utils/group-roles";
 import { getScoreInfo } from "@/data/labels";
+import { SHARE_IMAGE } from "@/data/ui-text";
 import { useShareImageSetup } from "./useShareImageSetup";
 import {
   BARCODE_HEIGHTS,
@@ -143,7 +144,7 @@ export default function GroupShareImage({ data, cardRef }: Props) {
             <hr className="gs-sep gs-sep-d" />
 
             {/* 멤버 목록 */}
-            <div className="gs-mono gs-sh">── 멤버 목록 ──</div>
+            <div className="gs-mono gs-sh">{SHARE_IMAGE.groupMembersHeader}</div>
             <div className="gs-members gs-mono">
               {members.map((m, i) => {
                 const role = analysis.roles.find((r) =>
@@ -177,7 +178,7 @@ export default function GroupShareImage({ data, cardRef }: Props) {
             <hr className="gs-sep gs-sep-d" />
 
             {/* 조합별 궁합 */}
-            <div className="gs-mono gs-sh">── 조합별 궁합 ──</div>
+            <div className="gs-mono gs-sh">{SHARE_IMAGE.groupPairsHeader}</div>
             <div className="gs-pairs gs-mono">
               {sortedPairs.map(({ mA, mB, score }, i) => (
                 <div key={i} className="gs-p">
@@ -191,7 +192,7 @@ export default function GroupShareImage({ data, cardRef }: Props) {
             <hr className="gs-sep gs-sep-d" />
 
             {/* 그룹 역할 */}
-            <div className="gs-mono gs-sh">── 그룹 역할 ──</div>
+            <div className="gs-mono gs-sh">{SHARE_IMAGE.groupRolesHeader}</div>
             <div className="gs-roles gs-mono">
               {activeRoles.map((role) => (
                 <div key={role.id} className="gs-role">
@@ -206,7 +207,7 @@ export default function GroupShareImage({ data, cardRef }: Props) {
 
             {/* 푸터 */}
             <div className="gs-footer gs-mono">
-              <div className="gs-cta">너도 그룹 궁합 확인해봐</div>
+              <div className="gs-cta">{SHARE_IMAGE.groupCtaFooter}</div>
               <div className="gs-url">chemifit.cyb-labs.com</div>
               <div className="gs-barcode">
                 {BARCODE_HEIGHTS.map((h, i) => (

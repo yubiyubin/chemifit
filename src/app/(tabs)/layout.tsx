@@ -48,13 +48,22 @@ function TabsLayoutInner({ children }: { children: React.ReactNode }) {
       )}
       <div className="max-w-3xl mx-auto px-4 py-12 flex flex-col gap">
         <SiteHeader selectedMbti={selectedMbti} onOpenModal={openModal} neonRgb={activeNeon} />
-        <nav aria-label="메인 탭" className="mb-3">
+        <nav aria-label="메인 탭" className="mt-10 mb-3">
           <TabSwitcher tabs={TABS} activeNeon={activeNeon} />
         </nav>
-        <section>{children}</section>
+        <section aria-label="페이지 콘텐츠">{children}</section>
       </div>
       <SiteFooter />
     </main>
+  );
+}
+
+/** 공유 URL로 접근한 정적 결과 페이지: MBTI 선택 모달 없이 바로 콘텐츠 표시 */
+function useIsStaticResultPage() {
+  const pathname = usePathname();
+  return (
+    /^\/mbti-love\/[a-z]+\/[a-z]+/.test(pathname) ||
+    /^\/mbti-profiles\/[a-z]+/.test(pathname)
   );
 }
 
@@ -63,8 +72,9 @@ export default function TabsLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isStaticResultPage = useIsStaticResultPage();
   return (
-    <MbtiProvider>
+    <MbtiProvider initialShowModal={!isStaticResultPage}>
       <TabsLayoutInner>{children}</TabsLayoutInner>
     </MbtiProvider>
   );

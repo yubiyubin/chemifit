@@ -273,7 +273,7 @@ export default function MbtiGraph({ selectedMbti }: Props) {
                 animation: "hint-glow 2.5s ease-in-out infinite",
               }}
             >
-              {MBTI_MAP.graphTapHint}
+              {MBTI_MAP.nodeHint}
             </span>
           </div>
         )}

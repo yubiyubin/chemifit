@@ -26,16 +26,10 @@ import { useRouter } from "next/navigation";
 import { COMPATIBILITY, MbtiType, MBTI_TYPES } from "@/data/compatibility";
 import { getCoupleTier } from "@/data/labels";
 import { LOVE_DESC } from "@/features/mbti-love/consts/love-descriptions";
+import { trackEvent } from "@/lib/analytics";
 import MbtiSelectModal from "@/components/MbtiSelectModal";
 import DetailScoreCard from "@/components/DetailScoreCard";
 import NeonCard from "@/components/NeonCard";
-
-type Props = {
-  myMbti: MbtiType;
-  partnerMbti: MbtiType | null;
-  onPartnerSelect: (mbti: MbtiType) => void;
-};
-
 import { TITLE1, TITLE2, TITLE3, titleProps } from "@/styles/titles";
 import { FIGHT_THEME, SOLUTION_THEME, PINK_RGB, PURPLE_RGB, CYAN_RGB } from "@/styles/card-themes";
 import { getCategoryScores } from "@/features/mbti-love/consts/categories";
@@ -46,7 +40,14 @@ import { SYMBOLS } from "@/data/symbols";
 import ReceiptShareImage from "@/components/shareImage";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
 import SharePanel from "@/components/SharePanel";
-import { trackEvent } from "@/lib/analytics";
+import { useShareImageCapture } from "@/hooks/useShareImageCapture";
+import { OFFSCREEN_CAPTURE_STYLE } from "@/styles/capture";
+
+type Props = {
+  myMbti: MbtiType;
+  partnerMbti: MbtiType | null;
+  onPartnerSelect: (mbti: MbtiType) => void;
+};
 
 
 /**
@@ -215,8 +216,6 @@ export default function CoupleResult({
   const cardRef = useRef<HTMLDivElement>(null); // ReceiptShareImage .rc-card 직접 참조
   const [detailOpen, setDetailOpen] = useState(false); // 아코디언 펼침 상태
   const [isModalOpen, setIsModalOpen] = useState(!partnerMbti);
-  const [previewOpen, setPreviewOpen] = useState(false); // 이미지 미리보기 모달 열림 여부
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // 이미지 미리보기 URL
 
   // 선택된 상대 MBTI 버튼이 보이도록 자동 스크롤
   useEffect(() => {
@@ -286,22 +285,11 @@ export default function CoupleResult({
         }
       : null;
 
-  /** 모달을 즉시 열고(로딩 상태) 백그라운드에서 캡처 후 이미지 교체 */
-  async function handleSaveImage() {
-    if (!cardRef.current || !shareData || !partnerMbti) return;
-    trackEvent("share_image_save", { my: myMbti, partner: partnerMbti });
-    setPreviewUrl(null);
-    setPreviewOpen(true); // 로딩 상태로 모달 즉시 표시
-    const { toPng } = await import("html-to-image");
-    await document.fonts.ready;
-    const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, width: 1080, height: 1350, skipFonts: true });
-    setPreviewUrl(dataUrl);
-  }
-
-  function handlePreviewClose() {
-    setPreviewOpen(false);
-    setPreviewUrl(null);
-  }
+  /** 이미지 저장 훅 — previewOpen/previewUrl 상태와 캡처 로직을 공통 훅으로 위임 */
+  const { handleSaveImage, previewOpen, previewUrl, handleClose: handlePreviewClose } = useShareImageCapture(
+    cardRef,
+    partnerMbti ? { my: myMbti, partner: partnerMbti } : { my: myMbti },
+  );
 
   return (
     <div className="flex flex-col gap-8">
@@ -566,7 +554,7 @@ export default function CoupleResult({
       {shareData && (
         <div
           aria-hidden="true"
-          style={{ position: "fixed", top: 0, left: 0, zIndex: -9999, pointerEvents: "none", opacity: 0 }}
+          style={OFFSCREEN_CAPTURE_STYLE}
         >
           <ReceiptShareImage data={shareData} cardRef={cardRef} />
         </div>

@@ -1,4 +1,5 @@
 import type React from "react";
+import { SHARE_IMAGE } from "@/data/ui-text";
 import { useShareImageSetup } from "./useShareImageSetup";
 import {
   BARCODE_HEIGHTS,
@@ -37,54 +38,23 @@ const STAT_COLORS = [
 ];
 
 
-const defaultData = {
-  typeA: "INTP",
-  typeB: "ENFP",
-  score: 68,
-  category: "💥 생각의 불꽃놀이",
-  copy: {
-    before: "둘 다 ",
-    highlight: "아이디어 중독",
-    after: "이라\n현실이 안드로메다로",
-  },
-  tagline: "미묘하게 설레는 거 맞지? 😏",
-  matchType: "연인 궁합",
-  stats: [
-    {
-      icon: "🩷",
-      name: "감정교류",
-      value: 46,
-      desc: "감정 표현 방식이 좀 다를 뿐",
-    },
-    {
-      icon: "💬",
-      name: "대화궁합",
-      value: 61,
-      desc: "서로 관심사 겹치는 게 많을 ✌",
-    },
-    {
-      icon: "⚖️",
-      name: "가치관",
-      value: 61,
-      desc: "핵심 가치관은 비슷한 편 💜",
-    },
-    {
-      icon: "✨",
-      name: "일상호환",
-      value: 66,
-      desc: "생활 리듬 꽤 맞는 편 👌",
-    },
-  ],
+type ShareData = {
+  typeA: string;
+  typeB: string;
+  score: number;
+  category: string;
+  copy: { before: string; highlight: string; after: string };
+  tagline: string;
+  matchType: string;
+  stats: { icon: string; name: string; value: number; desc: string }[];
 };
 
-type ShareData = typeof defaultData;
-
 type ReceiptShareImageProps = {
-  data?: ShareData;
+  data: ShareData;
   cardRef?: React.Ref<HTMLDivElement>;
 };
 
-export default function ReceiptShareImage({ data = defaultData, cardRef }: ReceiptShareImageProps) {
+export default function ReceiptShareImage({ data, cardRef }: ReceiptShareImageProps) {
   const { typeA, typeB, score, category, copy, tagline, matchType, stats } =
     data;
   const today = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
@@ -214,7 +184,7 @@ export default function ReceiptShareImage({ data = defaultData, cardRef }: Recei
             <hr className="rc-dotline" />
 
             <div className="rc-footer">
-              <div className="rc-cta">너도 궁합 확인해봐</div>
+              <div className="rc-cta">{SHARE_IMAGE.coupleCtaFooter}</div>
               <div className="rc-url">chemifit.cyb-labs.com</div>
               <div className="rc-barcode">
                 {BARCODE_HEIGHTS.map((h, i) => (

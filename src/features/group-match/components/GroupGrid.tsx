@@ -52,7 +52,8 @@ import GroupShareImage from "@/components/GroupShareImage";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
 import MbtiProfileModal from "@/components/MbtiProfileModal";
 import NeonCard from "@/components/NeonCard";
-import { trackEvent } from "@/lib/analytics";
+import { useShareImageCapture } from "@/hooks/useShareImageCapture";
+import { OFFSCREEN_CAPTURE_STYLE } from "@/styles/capture";
 
 /** 컴포넌트 Props: 그룹에 포함된 멤버 배열 (첫 번째 멤버가 '나') */
 type Props = { members: Member[] };
@@ -81,8 +82,11 @@ export default function GroupGrid({ members }: Props) {
   const [roleOpen, setRoleOpen] = useState(false);
   const [allPairsOpen, setAllPairsOpen] = useState(false);
   const groupCardRef = useRef<HTMLDivElement>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const { handleSaveImage, previewOpen, previewUrl, handleClose } = useShareImageCapture(
+    groupCardRef,
+    { content: "group", member_count: String(members.length) },
+  );
 
   const [summary, setSummary] = useState<{
     avg: number;
@@ -93,21 +97,6 @@ export default function GroupGrid({ members }: Props) {
   const router = useRouter();
   const popupTier = popup ? getCoupleTier(popup.score) : null;
 
-  const handleSaveImage = useCallback(async () => {
-    if (!groupCardRef.current) return;
-    trackEvent("share_image_save", { content: "group", member_count: members.length });
-    setPreviewUrl(null);
-    setPreviewOpen(true);
-    const { toPng } = await import("html-to-image");
-    await document.fonts.ready;
-    const dataUrl = await toPng(groupCardRef.current, {
-      pixelRatio: 2,
-      width: 1080,
-      height: 1350,
-      skipFonts: true,
-    });
-    setPreviewUrl(dataUrl);
-  }, [members.length]);
   /** 모든 멤버 쌍의 궁합 점수 — members에서 직접 계산 (animation 불필요) */
   const pairScores = useMemo<PairScore[]>(() => {
     if (members.length < 2) return [];
@@ -779,7 +768,7 @@ export default function GroupGrid({ members }: Props) {
                       animation: "hint-glow-cyan 2.5s ease-in-out infinite",
                     }}
                   >
-                    {MBTI_MAP.graphTapHint}
+                    {MBTI_MAP.nodeHint}
                   </span>
                 </div>
               )}
@@ -1139,7 +1128,7 @@ export default function GroupGrid({ members }: Props) {
       {summary && groupAnalysis && (
         <div
           aria-hidden="true"
-          style={{ position: "fixed", top: 0, left: 0, zIndex: -9999, pointerEvents: "none", opacity: 0 }}
+          style={OFFSCREEN_CAPTURE_STYLE}
         >
           <GroupShareImage
             data={{
@@ -1159,7 +1148,7 @@ export default function GroupGrid({ members }: Props) {
         open={previewOpen}
         imageDataUrl={previewUrl}
         fileName={`chemifit-group-${members.length}members.png`}
-        onClose={() => { setPreviewOpen(false); setPreviewUrl(null); }}
+        onClose={handleClose}
       />
     </div>
   );

@@ -81,8 +81,8 @@ export default function MemberInput({ members, onChange }: Props) {
           <select
             value={mbti}
             onChange={(e) => setMbti(e.target.value as MbtiType)}
-            className="neon-btn h-12 w-[76px] rounded-xl text-sm font-bold text-center ml-3 appearance-none cursor-pointer pl-1 pr-4"
-            style={{ "--neon": CYAN_RGB, borderColor: "rgba(0,203,255,0.45)" } as React.CSSProperties}
+            className="neon-btn h-12 w-[76px] rounded-xl text-sm font-bold text-center ml-3 appearance-none cursor-pointer px-4"
+            style={{ "--neon": CYAN_RGB, borderColor: "rgba(0,203,255,0.45)", textAlignLast: "center" } as React.CSSProperties}
           >
             {MBTI_TYPES.map((type) => (
               <option
@@ -132,7 +132,7 @@ export default function MemberInput({ members, onChange }: Props) {
             <button
               data-testid={`member-remove-${i}`}
               onClick={() => handleRemove(i)}
-              className="neon-ghost text-white/40 hover:text-red-400 ml-1 border-0"
+              className="text-white/40 hover:text-red-400 ml-1 border-none bg-transparent transition-colors duration-200"
             >
               {SYMBOLS.close}
             </button>

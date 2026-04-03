@@ -27,6 +27,8 @@ import ProfileShareImage from "@/components/ProfileShareImage";
 import { PROFILES } from "@/data/ui-text";
 import { MINT_RGB, PINK_RGB, PURPLE_RGB, CYAN_RGB } from "@/styles/card-themes";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
+import { useShareImageCapture } from "@/hooks/useShareImageCapture";
+import { OFFSCREEN_CAPTURE_STYLE } from "@/styles/capture";
 
 type Props = {
   profile: MbtiProfile;
@@ -36,9 +38,12 @@ export default function ProfileDetail({ profile }: Props) {
   const router = useRouter();
   const detailRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [expandedCelebs, setExpandedCelebs] = useState<Set<string>>(new Set());
+
+  const { handleSaveImage, previewOpen, previewUrl, handleClose: handlePreviewClose } = useShareImageCapture(
+    cardRef,
+    { type: profile.type },
+  );
 
   const toggleCeleb = (name: string) => {
     setExpandedCelebs((prev) => {
@@ -48,26 +53,6 @@ export default function ProfileDetail({ profile }: Props) {
       return next;
     });
   };
-
-  const handleSaveImage = async () => {
-    if (!cardRef.current) return;
-    setPreviewUrl(null);
-    setPreviewOpen(true);
-    const { toPng } = await import("html-to-image");
-    await document.fonts.ready;
-    const dataUrl = await toPng(cardRef.current, {
-      pixelRatio: 2,
-      width: 1080,
-      height: 1350,
-      skipFonts: true,
-    });
-    setPreviewUrl(dataUrl); // 이미지 준비되면 교체
-  };
-
-  function handlePreviewClose() {
-    setPreviewOpen(false);
-    setPreviewUrl(null);
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -307,7 +292,7 @@ export default function ProfileDetail({ profile }: Props) {
       {/* off-screen RPG 스탯 시트 캡처 영역 */}
       <div
         aria-hidden="true"
-        style={{ position: "fixed", top: 0, left: 0, zIndex: -9999, pointerEvents: "none", opacity: 0 }}
+        style={OFFSCREEN_CAPTURE_STYLE}
       >
         <ProfileShareImage profile={profile} cardRef={cardRef} />
       </div>

@@ -6,6 +6,7 @@
  */
 import type React from "react";
 import type { MbtiProfile } from "@/data/type-profiles";
+import { SHARE_IMAGE } from "@/data/ui-text";
 import { useShareImageSetup } from "./useShareImageSetup";
 import {
   BARCODE_HEIGHTS,
@@ -170,7 +171,7 @@ export default function ProfileShareImage({ profile, cardRef }: Props) {
             <hr className="ps-sep ps-sep-d" />
 
             {/* 능력치 */}
-            <div className="ps-mono ps-sh">── ABILITY STATS ──</div>
+            <div className="ps-mono ps-sh">{SHARE_IMAGE.profileStatsHeader}</div>
             <div className="ps-stats ps-mono">
               {stats.map((stat) => {
                 const grade = getGrade(stat.score);
@@ -224,7 +225,7 @@ export default function ProfileShareImage({ profile, cardRef }: Props) {
 
             {/* 푸터 */}
             <div className="ps-footer ps-mono">
-              <div className="ps-cta">너도 유형 확인해봐</div>
+              <div className="ps-cta">{SHARE_IMAGE.profileCtaFooter}</div>
               <div className="ps-url">chemifit.cyb-labs.com</div>
               <div className="ps-barcode">
                 {BARCODE_HEIGHTS.map((h, i) => (

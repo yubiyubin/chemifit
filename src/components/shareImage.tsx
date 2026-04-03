@@ -124,28 +124,28 @@ export default function ReceiptShareImage({ data = defaultData, cardRef }: Recei
         .rc-noise { position:absolute; inset:0; opacity:0.04; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
         .rc-receipt { position:relative; z-index:2; width:100%; height:100%; background:linear-gradient(145deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.01) 100%); padding:48px 56px; display:flex; flex-direction:column; }
         .rc-header { text-align:center; margin-bottom:24px; }
-        .rc-logo { font-family:'JetBrains Mono',monospace; font-size:32px; font-weight:800; color:#fff; letter-spacing:4px; text-shadow:0 0 16px rgba(255,0,128,0.3); }
-        .rc-sub { font-family:'JetBrains Mono',monospace; font-size:14px; color:rgba(255,255,255,0.25); letter-spacing:3px; margin-top:4px; }
+        .rc-logo { font-family:'JetBrains Mono',monospace; font-size:32px; font-weight:800; color:rgba(255,255,255,0.25); letter-spacing:4px; }
+        .rc-sub { font-family:'JetBrains Mono',monospace; font-size:12px; color:rgba(255,255,255,0.2); letter-spacing:4px; margin-top:4px; }
         .rc-dotline { border:none; border-top:2px dashed rgba(255,255,255,0.08); margin:20px 0; }
         .rc-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; }
         .rc-rlabel { font-family:'JetBrains Mono',monospace; font-size:16px; color:rgba(255,255,255,0.35); letter-spacing:1px; }
         .rc-rvalue { font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:rgba(255,255,255,0.6); }
         .rc-main { text-align:center; padding:32px 0; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; }
         .rc-types { display:flex; align-items:center; gap:16px; justify-content:center; }
-        .rc-type { font-family:'JetBrains Mono',monospace; font-size:32px; font-weight:800; letter-spacing:3px; }
+        .rc-type { font-family:'JetBrains Mono',monospace; font-size:36px; font-weight:800; letter-spacing:3px; }
         .rc-type-a { color:#c4b5fd; text-shadow:0 0 12px rgba(167,139,250,0.4); }
         .rc-type-b { color:#ff7eb8; text-shadow:0 0 12px rgba(255,100,170,0.4); }
         .rc-heart { font-size:24px; filter:drop-shadow(0 0 10px rgba(255,50,150,0.6)); }
-        .rc-pct { font-family:'JetBrains Mono',monospace; font-size:100px; font-weight:800; color:#fff; line-height:1; text-shadow:0 0 24px rgba(255,0,128,0.25); }
+        .rc-pct { font-family:'JetBrains Mono',monospace; font-size:96px; font-weight:800; color:#fff; line-height:1; text-shadow:0 0 32px rgba(255,0,128,0.65),0 0 64px rgba(255,0,128,0.25); }
         .rc-pct span { font-size:36px; color:rgba(255,255,255,0.3); }
-        .rc-copy { font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif; font-size:36px; font-weight:900; color:#fff; line-height:1.5; word-break:keep-all; }
+        .rc-copy { font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif; font-size:32px; font-weight:700; color:#fff; line-height:1.5; word-break:keep-all; }
         .rc-copy em { font-style:normal; background:linear-gradient(90deg,#ff6eb4,#c084fc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-        .rc-csb { font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif; font-size:20px; color:rgba(255,255,255,0.25); }
+        .rc-csb { font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif; font-size:17px; color:rgba(255,255,255,0.25); }
         .rc-stats { display:flex; flex-direction:column; gap:2px; }
         .rc-stat { display:flex; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.025); }
         .rc-stat:last-child { border-bottom:none; }
         .rc-sname { font-family:'JetBrains Mono',monospace; font-size:15px; color:rgba(255,255,255,0.5); width:130px; display:flex; align-items:center; gap:8px; flex-shrink:0; }
-        .rc-sbar { width:340px; height:10px; border-radius:5px; background:rgba(255,255,255,0.04); overflow:hidden; flex-shrink:0; }
+        .rc-sbar { flex:4; height:10px; border-radius:5px; background:rgba(255,255,255,0.04); overflow:hidden; }
         .rc-sfill { height:100%; border-radius:4px; }
         .rc-sval { font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:rgba(255,255,255,0.5); width:48px; text-align:right; flex-shrink:0; margin:0 12px; }
         .rc-sdesc { font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif; font-size:13px; color:rgba(255,255,255,0.35); flex:1; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

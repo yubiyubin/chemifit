@@ -58,10 +58,14 @@ function getBarClass(score: number): string {
   return "psf-vlow";
 }
 
-/** 연애 스타일을 짧게 줄임 (공유 이미지용) */
+/** 연애 스타일을 공유 이미지용으로 줄임 — 문장 경계에서 자름 */
 function shortenLoveStyle(text: string): string {
-  const first = text.split("\n")[0];
-  return first.length > 50 ? first.slice(0, 50) + "…" : first;
+  const first = text.split("\n\n")[0];
+  if (first.length <= 100) return first;
+  // 100자 이내 마지막 문장 끝(. 또는 요)에서 자름
+  const cutoff = first.slice(0, 100);
+  const lastDot = Math.max(cutoff.lastIndexOf(". "), cutoff.lastIndexOf("요."), cutoff.lastIndexOf("요 "));
+  return lastDot > 30 ? first.slice(0, lastDot + 1) + "…" : cutoff + "…";
 }
 
 type Props = {
@@ -109,18 +113,18 @@ export default function ProfileShareImage({ profile, cardRef }: Props) {
         .ps-sep-d{border-top:2px dashed rgba(255,255,255,0.08)}
         .ps-sep-db{border-top:3px double rgba(255,255,255,0.1)}
         .ps-header{text-align:center;margin-bottom:4px}
-        .ps-logo{font-size:32px;font-weight:800;color:#fff;letter-spacing:4px;text-shadow:0 0 16px rgba(102,237,195,0.3)}
-        .ps-sub{font-size:13px;color:rgba(255,255,255,0.25);letter-spacing:3px;margin-top:4px}
-        .ps-hero{text-align:center;padding:16px 0}
-        .ps-hero-type{font-size:72px;font-weight:800;color:#fff;letter-spacing:6px;text-shadow:0 0 24px rgba(102,237,195,0.3);line-height:1}
-        .ps-hero-title{font-size:22px;font-weight:900;color:rgba(255,255,255,0.55);margin-top:12px}
+        .ps-logo{font-size:32px;font-weight:800;color:rgba(255,255,255,0.25);letter-spacing:4px}
+        .ps-sub{font-size:12px;color:rgba(255,255,255,0.2);letter-spacing:4px;margin-top:4px}
+        .ps-hero{text-align:center;padding:20px 0}
+        .ps-hero-type{font-size:76px;font-weight:800;color:#fff;letter-spacing:8px;text-shadow:0 0 32px rgba(102,237,195,0.65),0 0 64px rgba(102,237,195,0.25);line-height:1}
+        .ps-hero-title{font-size:19px;font-weight:700;color:rgba(255,255,255,0.5);margin-top:12px}
         .ps-hero-title em{font-style:normal;background:linear-gradient(90deg,#66edc3,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .ps-sh{font-size:12px;color:rgba(255,255,255,0.12);letter-spacing:3px;text-align:center;margin-bottom:6px}
         .ps-stats{display:flex;flex-direction:column;gap:2px;flex:1}
         .ps-stat{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.025)}
         .ps-stat:last-child{border-bottom:none}
         .ps-sn{font-size:15px;color:rgba(255,255,255,0.45);width:120px;flex-shrink:0;display:flex;align-items:center;gap:6px}
-        .ps-bar{flex:1;height:10px;border-radius:5px;background:rgba(255,255,255,0.04);overflow:hidden;margin:0 14px}
+        .ps-bar{flex:4;height:10px;border-radius:5px;background:rgba(255,255,255,0.04);overflow:hidden;margin:0 14px}
         .ps-fill{height:100%;border-radius:5px}
         .psf-high{background:linear-gradient(90deg,rgba(52,211,153,0.7),rgba(110,231,183,0.7));box-shadow:0 0 12px rgba(52,211,153,0.35)}
         .psf-mid{background:linear-gradient(90deg,rgba(168,85,247,0.7),rgba(192,132,252,0.7));box-shadow:0 0 12px rgba(168,85,247,0.35)}
@@ -147,7 +151,7 @@ export default function ProfileShareImage({ profile, cardRef }: Props) {
         .ps-tp-best{color:#34d399;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.1)}
         .ps-tp-worst{color:#f87171;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.1)}
         .ps-names{display:flex;gap:6px;flex-wrap:wrap}
-        .ps-nm{font-size:13px;color:rgba(255,255,255,0.28);padding:4px 12px;border-radius:6px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04)}
+        .ps-nm{font-size:13px;color:rgba(255,255,255,0.28);padding:4px 12px;border-radius:6px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);white-space:nowrap}
         .ps-footer{text-align:center;margin-top:auto;padding-top:6px}
         .ps-cta{font-size:14px;color:rgba(255,255,255,0.18);margin-bottom:6px}
         .ps-url{font-size:18px;font-weight:700;color:#66edc3;text-shadow:0 0 12px rgba(102,237,195,0.3);letter-spacing:2px}

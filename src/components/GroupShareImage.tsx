@@ -78,14 +78,14 @@ export default function GroupShareImage({ data, cardRef }: Props) {
         .gs-sep-d{border-top:2px dashed rgba(255,255,255,0.08)}
         .gs-sep-db{border-top:3px double rgba(255,255,255,0.1)}
         .gs-header{text-align:center;margin-bottom:2px}
-        .gs-logo{font-size:32px;font-weight:800;color:#fff;letter-spacing:4px;text-shadow:0 0 16px rgba(0,203,255,0.3)}
-        .gs-sub{font-size:13px;color:rgba(255,255,255,0.25);letter-spacing:3px;margin-top:4px}
+        .gs-logo{font-size:32px;font-weight:800;color:rgba(255,255,255,0.25);letter-spacing:4px}
+        .gs-sub{font-size:12px;color:rgba(255,255,255,0.2);letter-spacing:4px;margin-top:4px}
         .gs-row{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;color:rgba(255,255,255,0.28)}
         .gs-row .gs-v{font-weight:700;color:rgba(255,255,255,0.5)}
-        .gs-hero{text-align:center;padding:12px 0 8px}
-        .gs-hero-score{font-size:72px;font-weight:800;color:#fff;letter-spacing:4px;text-shadow:0 0 24px rgba(0,203,255,0.2);line-height:1}
+        .gs-hero{text-align:center;padding:20px 0}
+        .gs-hero-score{font-size:76px;font-weight:800;color:#fff;letter-spacing:8px;text-shadow:0 0 32px rgba(0,203,255,0.65),0 0 64px rgba(0,203,255,0.25);line-height:1}
         .gs-hero-score span{font-size:28px;color:rgba(255,255,255,0.3)}
-        .gs-hero-copy{font-size:24px;font-weight:900;color:rgba(255,255,255,0.6);margin-top:8px}
+        .gs-hero-copy{font-size:22px;font-weight:700;color:rgba(255,255,255,0.5);margin-top:12px}
         .gs-hero-copy em{font-style:normal;background:linear-gradient(90deg,#22d3ee,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .gs-sh{font-size:12px;color:rgba(255,255,255,0.12);letter-spacing:3px;text-align:center;margin-bottom:6px}
         .gs-members{display:flex;flex-direction:column;gap:0}

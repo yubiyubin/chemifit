@@ -7,6 +7,13 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
+        /** 빌드 아티팩트·내부 API는 크롤러 접근 차단 */
+        disallow: ["/_next/", "/api/"],
+      },
+      {
+        userAgent: "Googlebot",
+        allow: "/",
+        disallow: ["/_next/", "/api/"],
       },
       {
         userAgent: "Yeti",

@@ -39,14 +39,14 @@ export const META = {
     ],
     canonical: "/",
     og: {
-      title: "ChemiFit - MBTI & 성격 테스트 허브",
+      title: "ChemiFit - MBTI 궁합 테스트",
       description:
-        "MBTI 궁합, 동물 매칭, 연애 유형 등 다양한 성격 콘텐츠를 즐겨보세요.",
+        "MBTI 연애 궁합, 그룹 궁합, 궁합 맵까지. 16가지 MBTI 유형 간 궁합을 점수·그래프·상세 분석으로 확인하세요.",
     },
     twitter: {
-      title: "ChemiFit - MBTI & 성격 테스트 허브",
+      title: "ChemiFit - MBTI 궁합 테스트",
       description:
-        "MBTI 궁합, 동물 매칭, 연애 유형 등 다양한 성격 콘텐츠를 즐겨보세요.",
+        "MBTI 연애 궁합, 그룹 궁합, 궁합 맵까지. 16가지 MBTI 유형 간 궁합을 점수·그래프·상세 분석으로 확인하세요.",
     },
   },
   mbtiLove: {

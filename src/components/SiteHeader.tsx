@@ -31,7 +31,7 @@ export default function SiteHeader({ selectedMbti, onOpenModal, neonRgb }: Props
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/chemifit.svg"
-              alt="Chemifit 로고"
+              alt="ChemiFit 로고"
               style={{ height: "50px", width: "auto" }}
             />
           </Link>

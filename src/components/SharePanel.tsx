@@ -66,6 +66,20 @@ export default function SharePanel({
       }}
     >
       <div className="flex gap-2">
+        {/* 이미지 저장 */}
+        {onSaveImage && (
+          <button
+            data-testid="save-image-btn"
+            onClick={onSaveImage}
+            className={btnClass}
+            style={{ "--neon": rgb } as React.CSSProperties}
+            aria-label="이미지 저장"
+          >
+            <span>📸</span>
+            <span>이미지 저장</span>
+          </button>
+        )}
+
         {/* 카카오톡 */}
         <button
           onClick={handleKakao}
@@ -92,20 +106,6 @@ export default function SharePanel({
           <span>{copied ? "✓" : "🔗"}</span>
           <span>{copied ? "복사됨" : "링크 복사"}</span>
         </button>
-
-        {/* 이미지 저장 */}
-        {onSaveImage && (
-          <button
-            data-testid="save-image-btn"
-            onClick={onSaveImage}
-            className={btnClass}
-            style={{ "--neon": rgb } as React.CSSProperties}
-            aria-label="이미지 저장"
-          >
-            <span>📸</span>
-            <span>이미지 저장</span>
-          </button>
-        )}
       </div>
     </div>
   );

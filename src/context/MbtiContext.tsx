@@ -43,9 +43,16 @@ type MbtiContextValue = {
 
 const MbtiContext = createContext<MbtiContextValue | null>(null);
 
-export function MbtiProvider({ children }: { children: ReactNode }) {
+export function MbtiProvider({
+  children,
+  initialShowModal = true,
+}: {
+  children: ReactNode;
+  /** 공유 링크 등 모달 없이 바로 콘텐츠를 보여줘야 하는 페이지에서 false 전달 */
+  initialShowModal?: boolean;
+}) {
   const [selectedMbti, setSelectedMbti] = useState<MbtiType | null>(null);
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(initialShowModal);
 
   const router = useRouter();
   const pathname = usePathname();

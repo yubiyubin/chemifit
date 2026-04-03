@@ -9,44 +9,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { TYPE_PROFILES } from "@/data/type-profiles";
 import { MBTI_GROUPS } from "@/data/groups";
-import { SITE } from "@/data/ui-text";
+import { LANDING, LANDING_FEATURES } from "@/data/ui-text";
 import SiteFooter from "@/components/SiteFooter";
 import ScrollReveal from "@/components/ScrollReveal";
-
-const FEATURES = [
-  {
-    emoji: "💕",
-    title: "연인 궁합",
-    desc: "이 사람이랑 사귀면 어떻게 될까? 점수부터 싸움 패턴까지",
-    href: "/mbti-love",
-    rgb: "236,72,153",
-    stats: "256가지 조합",
-  },
-  {
-    emoji: "🌐",
-    title: "궁합 맵",
-    desc: "16타입 중 나랑 제일 잘 맞는 MBTI는? 전체 순위 공개",
-    href: "/mbti-map",
-    rgb: "168,85,247",
-    stats: "16타입 순위",
-  },
-  {
-    emoji: "👥",
-    title: "그룹 궁합",
-    desc: "친구들이랑 모이면 누가 텐션 담당? 그룹 케미 분석",
-    href: "/group-match",
-    rgb: "0,203,255",
-    stats: "팀 역할 분석",
-  },
-  {
-    emoji: "📖",
-    title: "유형 설명",
-    desc: "내 MBTI는 어떤 캐릭터? RPG 스탯표로 확인",
-    href: "/mbti-profiles",
-    rgb: "102,237,195",
-    stats: "16타입 프로필",
-  },
-] as const;
 
 export default function LandingPage() {
   return (
@@ -89,28 +54,28 @@ export default function LandingPage() {
           {/* 헤드라인 */}
           <div className="relative text-center">
             <h1 className="text-5xl sm:text-7xl font-black leading-tight tracking-tight">
-              <span className="block sm:inline text-white/95">MBTI 궁합,</span>
+              <span className="block sm:inline text-white/95">{LANDING.heroHeadline1}</span>
               <br className="hidden sm:block" />{" "}
               {/* 그라디언트 텍스트 + 복제 글로우 */}
               <span className="relative inline-block">
                 <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent relative z-10">
-                  한눈에
+                  {LANDING.heroHeadline2}
                 </span>
                 {/* blur된 복제본으로 실제 글로우 효과 */}
                 <span
                   className="absolute inset-0 bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent blur-2xl opacity-60"
                   aria-hidden="true"
                 >
-                  한눈에
+                  {LANDING.heroHeadline2}
                 </span>
               </span>
             </h1>
           </div>
 
           <p className="text-base sm:text-lg text-white/45 max-w-md text-center leading-relaxed">
-            연인 궁합부터 그룹 케미까지
+            {LANDING.heroParagraph1}
             <br />
-            256가지 MBTI 조합을 점수 · 그래프 · 상세 분석으로
+            {LANDING.heroParagraph2}
           </p>
 
           {/* CTA — 네온 맥동 */}
@@ -124,10 +89,9 @@ export default function LandingPage() {
               animation: "cta-glow 3s ease-in-out infinite",
             }}
           >
-            지금 궁합 확인하기
+            {LANDING.heroCta}
           </Link>
 
-          <p className="text-xs text-white/20">{SITE.subtitle}</p>
         </section>
 
         {/* 섹션 디바이더 */}
@@ -141,11 +105,11 @@ export default function LandingPage() {
         <ScrollReveal>
           <section className="flex flex-col gap-6 mb-20">
             <h2 className="text-2xl sm:text-3xl font-black text-center text-white/90">
-              어떤 케미가 궁금해?
+              {LANDING.featuresSectionTitle}
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {FEATURES.map((f) => (
+              {LANDING_FEATURES.map((f) => (
                 <Link
                   key={f.href}
                   href={f.href}
@@ -178,8 +142,8 @@ export default function LandingPage() {
         <ScrollReveal>
           <section className="flex flex-col gap-6 mb-20">
             <div className="text-center">
-              <h2 className="text-2xl sm:text-3xl font-black text-white/90">16가지 MBTI 유형</h2>
-              <p className="text-sm text-white/30 mt-2">클릭하면 성격 특징, 장단점, 궁합을 확인할 수 있어요</p>
+              <h2 className="text-2xl sm:text-3xl font-black text-white/90">{LANDING.typesSectionTitle}</h2>
+              <p className="text-sm text-white/30 mt-2">{LANDING.typesSectionSubtitle}</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -255,10 +219,10 @@ export default function LandingPage() {
                 style={{ background: "radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 60%)" }} />
 
               <p className="relative z-10 text-xl sm:text-2xl font-black text-white/70">
-                나의 MBTI 궁합이 궁금하다면
+                {LANDING.bottomCtaHeadline}
               </p>
               <p className="relative z-10 text-sm text-white/30 -mt-2">
-                256가지 조합 중 나의 궁합을 찾아보세요
+                {LANDING.bottomCtaSubtitle}
               </p>
               <Link
                 href="/mbti-love"
@@ -270,7 +234,7 @@ export default function LandingPage() {
                   animation: "cta-glow 3s ease-in-out infinite 1.5s",
                 }}
               >
-                궁합 테스트 시작하기
+                {LANDING.bottomCtaButton}
               </Link>
             </div>
           </section>

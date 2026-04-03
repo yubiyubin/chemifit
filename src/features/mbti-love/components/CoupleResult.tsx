@@ -26,16 +26,10 @@ import { useRouter } from "next/navigation";
 import { COMPATIBILITY, MbtiType, MBTI_TYPES } from "@/data/compatibility";
 import { getCoupleTier } from "@/data/labels";
 import { LOVE_DESC } from "@/features/mbti-love/consts/love-descriptions";
+import { trackEvent } from "@/lib/analytics";
 import MbtiSelectModal from "@/components/MbtiSelectModal";
 import DetailScoreCard from "@/components/DetailScoreCard";
 import NeonCard from "@/components/NeonCard";
-
-type Props = {
-  myMbti: MbtiType;
-  partnerMbti: MbtiType | null;
-  onPartnerSelect: (mbti: MbtiType) => void;
-};
-
 import { TITLE1, TITLE2, TITLE3, titleProps } from "@/styles/titles";
 import { FIGHT_THEME, SOLUTION_THEME, PINK_RGB, PURPLE_RGB, CYAN_RGB } from "@/styles/card-themes";
 import { getCategoryScores } from "@/features/mbti-love/consts/categories";
@@ -47,6 +41,13 @@ import ReceiptShareImage from "@/components/shareImage";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
 import SharePanel from "@/components/SharePanel";
 import { useShareImageCapture } from "@/hooks/useShareImageCapture";
+import { OFFSCREEN_CAPTURE_STYLE } from "@/styles/capture";
+
+type Props = {
+  myMbti: MbtiType;
+  partnerMbti: MbtiType | null;
+  onPartnerSelect: (mbti: MbtiType) => void;
+};
 
 
 /**
@@ -553,7 +554,7 @@ export default function CoupleResult({
       {shareData && (
         <div
           aria-hidden="true"
-          style={{ position: "fixed", top: 0, left: 0, zIndex: -9999, pointerEvents: "none", opacity: 0 }}
+          style={OFFSCREEN_CAPTURE_STYLE}
         >
           <ReceiptShareImage data={shareData} cardRef={cardRef} />
         </div>

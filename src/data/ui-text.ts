@@ -20,7 +20,6 @@ export const COMMON = {
 // ─────────────────────────────────────────────
 
 export const SITE = {
-  title: "MBTI 궁합 맵",
   copyright: "© 2026 CYB Labs. All rights reserved.",
   myMbtiLabel: "내 MBTI",
   reselectButton: "재선택",
@@ -205,6 +204,60 @@ export const PROFILES = {
   backToGrid: "← 전체 유형 보기",
   myTypeBadge: "내 유형",
 } as const;
+
+// ─────────────────────────────────────────────
+// 랜딩 페이지 (page.tsx)
+// ─────────────────────────────────────────────
+
+export const LANDING = {
+  heroHeadline1: "MBTI 궁합,",
+  heroHeadline2: "한눈에",
+  heroParagraph1: "연인 궁합부터 그룹 케미까지",
+  heroParagraph2: "256가지 MBTI 조합을 점수 · 그래프 · 상세 분석으로",
+  heroCta: "지금 궁합 확인하기",
+  featuresSectionTitle: "어떤 케미가 궁금해?",
+  typesSectionTitle: "16가지 MBTI 유형",
+  typesSectionSubtitle: "클릭하면 성격 특징, 장단점, 궁합을 확인할 수 있어요",
+  bottomCtaHeadline: "나의 MBTI 궁합이 궁금하다면",
+  bottomCtaSubtitle: "256가지 조합 중 나의 궁합을 찾아보세요",
+  bottomCtaButton: "궁합 테스트 시작하기",
+} as const;
+
+/** 랜딩 페이지 기능 카드 목록 */
+export const LANDING_FEATURES = [
+  {
+    emoji: "💕",
+    title: "연인 궁합",
+    desc: "이 사람이랑 사귀면 어떻게 될까? 점수부터 싸움 패턴까지",
+    href: "/mbti-love",
+    rgb: "236,72,153",
+    stats: "256가지 조합",
+  },
+  {
+    emoji: "🌐",
+    title: "궁합 맵",
+    desc: "16타입 중 나랑 제일 잘 맞는 MBTI는? 전체 순위 공개",
+    href: "/mbti-map",
+    rgb: "168,85,247",
+    stats: "16타입 순위",
+  },
+  {
+    emoji: "👥",
+    title: "그룹 궁합",
+    desc: "친구들이랑 모이면 누가 텐션 담당? 그룹 케미 분석",
+    href: "/group-match",
+    rgb: "0,203,255",
+    stats: "팀 역할 분석",
+  },
+  {
+    emoji: "📖",
+    title: "유형 설명",
+    desc: "내 MBTI는 어떤 캐릭터? RPG 스탯표로 확인",
+    href: "/mbti-profiles",
+    rgb: "102,237,195",
+    stats: "16타입 프로필",
+  },
+] as const;
 
 // ─────────────────────────────────────────────
 // 공용 이모지

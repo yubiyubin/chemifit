@@ -30,6 +30,7 @@ import SharePanel from "@/components/SharePanel";
 import MapShareImage from "@/components/MapShareImage";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
 import { useShareImageCapture } from "@/hooks/useShareImageCapture";
+import { OFFSCREEN_CAPTURE_STYLE } from "@/styles/capture";
 
 /** 동일 점수를 가진 MBTI들을 하나의 그룹으로 묶기 위한 타입 */
 type GroupedPair = {
@@ -318,7 +319,7 @@ export default function MbtiGrid({ selectedMbti, onSelect, children }: Props) {
       {/* off-screen 티어리스트 캡처 영역 */}
       <div
         aria-hidden="true"
-        style={{ position: "fixed", top: 0, left: 0, zIndex: -9999, pointerEvents: "none", opacity: 0 }}
+        style={OFFSCREEN_CAPTURE_STYLE}
       >
         <MapShareImage
           data={{

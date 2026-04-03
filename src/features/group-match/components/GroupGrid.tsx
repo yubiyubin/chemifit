@@ -53,6 +53,7 @@ import ImagePreviewModal from "@/components/ImagePreviewModal";
 import MbtiProfileModal from "@/components/MbtiProfileModal";
 import NeonCard from "@/components/NeonCard";
 import { useShareImageCapture } from "@/hooks/useShareImageCapture";
+import { OFFSCREEN_CAPTURE_STYLE } from "@/styles/capture";
 
 /** 컴포넌트 Props: 그룹에 포함된 멤버 배열 (첫 번째 멤버가 '나') */
 type Props = { members: Member[] };
@@ -1127,7 +1128,7 @@ export default function GroupGrid({ members }: Props) {
       {summary && groupAnalysis && (
         <div
           aria-hidden="true"
-          style={{ position: "fixed", top: 0, left: 0, zIndex: -9999, pointerEvents: "none", opacity: 0 }}
+          style={OFFSCREEN_CAPTURE_STYLE}
         >
           <GroupShareImage
             data={{

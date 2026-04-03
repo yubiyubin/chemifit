@@ -28,6 +28,7 @@ import { PROFILES } from "@/data/ui-text";
 import { MINT_RGB, PINK_RGB, PURPLE_RGB, CYAN_RGB } from "@/styles/card-themes";
 import ImagePreviewModal from "@/components/ImagePreviewModal";
 import { useShareImageCapture } from "@/hooks/useShareImageCapture";
+import { OFFSCREEN_CAPTURE_STYLE } from "@/styles/capture";
 
 type Props = {
   profile: MbtiProfile;
@@ -291,7 +292,7 @@ export default function ProfileDetail({ profile }: Props) {
       {/* off-screen RPG 스탯 시트 캡처 영역 */}
       <div
         aria-hidden="true"
-        style={{ position: "fixed", top: 0, left: 0, zIndex: -9999, pointerEvents: "none", opacity: 0 }}
+        style={OFFSCREEN_CAPTURE_STYLE}
       >
         <ProfileShareImage profile={profile} cardRef={cardRef} />
       </div>

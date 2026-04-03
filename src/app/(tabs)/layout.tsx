@@ -26,6 +26,7 @@ import MbtiSelectModal from "@/components/MbtiSelectModal";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { MbtiProvider, useMbti } from "@/context/MbtiContext";
+import { MBTI_TYPES, type MbtiType } from "@/data/compatibility";
 import { TABS, DEFAULT_TAB_NEON } from "@/data/tabs";
 
 /** Context를 소비하는 내부 레이아웃 (Provider 안에서만 사용 가능) */
@@ -58,13 +59,27 @@ function TabsLayoutInner({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** 공유 URL로 접근한 정적 결과 페이지: MBTI 선택 모달 없이 바로 콘텐츠 표시 */
-function useIsStaticResultPage() {
+/**
+ * 공유 URL 정적 결과 페이지 감지 + 공유자 MBTI 추출
+ *
+ * - /mbti-love/intj/enfp → { isStatic: true, mbti: "INTJ" }
+ * - /mbti-profiles/intj  → { isStatic: true, mbti: null }
+ * - 그 외                → { isStatic: false, mbti: null }
+ */
+function useSharedPageInfo(): { isStatic: boolean; mbti: MbtiType | null } {
   const pathname = usePathname();
-  return (
-    /^\/mbti-love\/[a-z]+\/[a-z]+/.test(pathname) ||
-    /^\/mbti-profiles\/[a-z]+/.test(pathname)
-  );
+
+  const loveMatch = pathname.match(/^\/mbti-love\/([a-z]+)\/([a-z]+)/);
+  if (loveMatch) {
+    const mbti = loveMatch[1].toUpperCase() as MbtiType;
+    return { isStatic: true, mbti: MBTI_TYPES.includes(mbti) ? mbti : null };
+  }
+
+  if (/^\/mbti-profiles\/[a-z]+/.test(pathname)) {
+    return { isStatic: true, mbti: null };
+  }
+
+  return { isStatic: false, mbti: null };
 }
 
 export default function TabsLayout({
@@ -72,9 +87,9 @@ export default function TabsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const isStaticResultPage = useIsStaticResultPage();
+  const { isStatic, mbti } = useSharedPageInfo();
   return (
-    <MbtiProvider initialShowModal={!isStaticResultPage}>
+    <MbtiProvider initialShowModal={!isStatic} initialMbti={mbti}>
       <TabsLayoutInner>{children}</TabsLayoutInner>
     </MbtiProvider>
   );
